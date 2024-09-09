@@ -5,6 +5,7 @@ import compilador.compilador as ts
 
 
 
+
 class InterfazCompilador:
     
     def __init__(self, root):
@@ -14,8 +15,9 @@ class InterfazCompilador:
         self.setup_ui() #Inicio de GUI
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # Detecta Cierre de ventana
         self.root.bind("<Control-Shift-S>", self.guardar_archivo_como_evento)  # Detecta Ctrl + Shift + S
+        self.cmplr = ts.Compilador()
         
-
+        
     def setup_ui(self):
         self.root.title("Compilador")
         
@@ -57,7 +59,7 @@ class InterfazCompilador:
         # Tabla de simboloes
         archivo_menu3 = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Tablas de Simbolos", menu=archivo_menu3)
-        archivo_menu3.add_command(label="Tabla estatica", ) 
+        archivo_menu3.add_command(label="Tabla estatica", )
         archivo_menu3.add_command(label="Tabla dinamica", )
 
 
@@ -175,11 +177,16 @@ class InterfazCompilador:
     #Botón compilar
     def compilar(self):
         self.guardar_archivo()
-        resultado = ts.test(self.text_area.get_text())
-        self.mostrar_resultado('Todo salio bien')
+        self.cmplr = ts.Compilador()
+        self.cmplr.parte_Lexico(self.text_area.get_text())
+        if self.cmplr.compilo:
+            self.mostrar_resultado('Compilador de forma exitosa.')
+        else:
+            self.mostrar_resultado(self.cmplr.errores())
 
     #Resultado de la compilación
     def mostrar_resultado(self, resultado):
+        self.console.selection_clear()
         self.console.config(state='normal')
         self.console.insert(tk.END, resultado + '\n')
         self.console.config(state='disabled')
