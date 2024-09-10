@@ -88,8 +88,6 @@ class Lexico():
             'constant': 'CONSTANT',
             'this': 'THIS',
             'null': 'NULL',
-            'true': 'TRUE',
-            'false': 'FALSE'
         }
         self.errores = []
 
@@ -141,14 +139,15 @@ class Lexico():
     t_PUNTO_Y_COMA = r';'
     t_DOS_PUNTOS = r':'
     
+    
+    # Valores booleanos
+    t_TRUE = r'true'
+    t_FALSE = r'false'
+
     # Números int
     def t_NUMERO(self,t):
         r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4})'
         return t
-
-    # Valores booleanos
-    t_TRUE = r'true'
-    t_FALSE = r'false'
 
     # Valores de char y string
     def t_VALOR_CHAR(self,t):

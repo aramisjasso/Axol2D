@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import Menu, scrolledtext, filedialog, messagebox
 import clases as cs
 import compilador.compilador as ts
+import tabla_static as ta
+import tabla_dinamica as td
 
 
 
@@ -16,6 +18,9 @@ class InterfazCompilador:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # Detecta Cierre de ventana
         self.root.bind("<Control-Shift-S>", self.guardar_archivo_como_evento)  # Detecta Ctrl + Shift + S
         self.cmplr = ts.Compilador()
+        self.tabla_estatica = ta.TablaDatos()
+        self.tabla_dinamica = td.TablaDinamica()
+        
         
         
     def setup_ui(self):
@@ -59,8 +64,8 @@ class InterfazCompilador:
         # Tabla de simboloes
         archivo_menu3 = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Tablas de Simbolos", menu=archivo_menu3)
-        archivo_menu3.add_command(label="Tabla estatica", )
-        archivo_menu3.add_command(label="Tabla dinamica", )
+        archivo_menu3.add_command(label="Tabla estatica ", command=self.mostrar_tabla_estatica)
+        archivo_menu3.add_command(label="Tabla dinamica",command=self.mostrar_tabla_dinamica )
 
 
 
@@ -183,6 +188,7 @@ class InterfazCompilador:
             self.mostrar_resultado('Compilador de forma exitosa.')
         else:
             self.mostrar_resultado(self.cmplr.errores())
+        
 
     #Resultado de la compilación
     def mostrar_resultado(self, resultado):
@@ -234,10 +240,14 @@ class InterfazCompilador:
                 self.compilar()
                 return False
         return False
-    
+    #Tabla estatica
+    def mostrar_tabla_estatica(self):
+        self.tabla_estatica.mostrar_tabla()
 
-
-
+    #Tabla Dinanica
+    def mostrar_tabla_dinamica(self):
+        self.tabla_dinamica.set_datos(self.cmplr.identificadores_lista())
+        self.tabla_dinamica.mostrar_tabla()
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()
