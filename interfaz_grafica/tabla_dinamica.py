@@ -12,7 +12,7 @@ class TablaDinamica:
         ventana_tabla.title("Tabla de Simbolos Dinamica")
         
         # Crear un widget Treeview para mostrar la tabla
-        columnas = ["Lexema","Tipo de Datos", "Valor"]
+        columnas = ["Lexema","NO. ID","Tipo de Datos", "Valor"]
         tree = ttk.Treeview(ventana_tabla, columns=columnas, show='headings')
         # Configurar encabezados de columna
         for col in columnas:

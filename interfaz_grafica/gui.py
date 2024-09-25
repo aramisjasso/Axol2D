@@ -182,19 +182,21 @@ class InterfazCompilador:
     #Botón compilar
     def compilar(self):
         self.guardar_archivo()
+
         self.cmplr = ts.Compilador()
-        self.cmplr.parte_Lexico(self.text_area.get_text())
+        self.cmplr.compilar(self.text_area.get_text())
         if self.cmplr.compilo:
+            
             self.mostrar_resultado('Compilador de forma exitosa.')
         else:
-            self.mostrar_resultado(self.cmplr.errores())
+            self.mostrar_resultado(self.cmplr.errores_re())
         
 
     #Resultado de la compilación
     def mostrar_resultado(self, resultado):
-        self.console.selection_clear()
         self.console.config(state='normal')
-        self.console.insert(tk.END, resultado + '\n')
+        self.console.delete(1.0, tk.END)
+        self.console.insert(tk.END, f"{resultado}")
         self.console.config(state='disabled')
 
     #Detecta si se modifico el texto o se uso un shortcut

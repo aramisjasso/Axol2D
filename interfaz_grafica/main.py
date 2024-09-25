@@ -1,7 +1,7 @@
 import compilador.lexico as lexico
 import compilador.sintactico as sintactico
 
-# Clase del compilador
+# Función de prueba para el parser
 class Compilador():
     def __init__(self):
         self.lexi = lexico.Lexico() #Lexico
@@ -33,8 +33,6 @@ class Compilador():
             if not tok:
                 break
             self.tokens.append(tok)
-            if tok.type == 'IDENTIFICADOR': #Agrega a la lista de identificadores
-                    self.revisar_ts(tok)
             print(tok)
         self.errores_lexicos = self.lexi.errores
         self.lexi.errores=[]
@@ -42,7 +40,6 @@ class Compilador():
             self.compilo=True
         else:
             self.compilo=False
-        self.identificadores_lista()
 
     def parte_Sintactica(self,data,lexer):
         self.sin.build()
@@ -65,40 +62,63 @@ class Compilador():
         for error in self.errores_lista:
             mensajes+=(f"{error[0]}" +'\n')
         return mensajes
-    
-    #Revisa la lista de identificadores, agrega el token y los ordena
-    def revisar_ts(self,tok):
-        for token in self.identificadores:
-            if token[0].value == tok.value :
-                return 
-        self.varId += 1
-        self.identificadores.append([tok,f"id{self.varId}"])
-        self.identificadores = sorted(self.identificadores, key=lambda x: x[0].value)
-                
 
-    def identificadores_lista(self):
-        self.identificadores_ts=[]
-        for token in self.identificadores:
-            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Sin Valor'])
-        return self.identificadores_ts
-
+# Prueba de ambos
 if __name__ == "__main__":
     # Define algunas pruebas
     pruebas = [
-        'a = b',
-        'n = 5',
-        'array[1] = 3*5', 
-        'i++',
-        'numeros = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]',
-        'cadenas = ["cadena1", "cadena2", "cadena3"]'
-        'Clase objeto = new Clase(1, 2, 3)', 
-        'bandera = this.metodoBooleano(x, z)',
-        'a += 5',
-        'arrar[3] == 3'
-    ]
-    compila = Compilador()
+        'int a = 5;',
+        '(x+3*(y-8)/z)-(a+6)*b'
+        '''for(int i = 0; i < 10; i++) {
+                a[0] += i;
+                print(i);
+           }''',
+        '''while(a < 10) {
+            bandera = this.metodoBooleano(x, z);
+            arrar[3] *= 3;
+        }''',
 
-    # Ejecutar pruebas
+        '''switch (a) {
+            case 1: 
+                cadenas = ["cadena1", "cadena2", "cadena3"]; 
+                break;
+            case 2: 
+                array[1] = 3*5;
+                break;
+            default: 
+                numeros = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+        }''', 
+        'cadenas = ["cadena1", "cadena2", "cadena3"]; ', 
+        '''
+        import Controllers;
+        import enemies;
+
+        level MiPrimerNivel {
+            int a = 0;
+            int b = 2;
+            byte c = 16;
+            string d = "mi Cadenon";
+            char x;
+
+            method boolean miMetodo (int a, int b, byte c, string d, char x) {
+                if (a==b) { 
+                    x = a + b - c * d;
+                    print(x);
+            }
+            return x;
+           }
+
+           axol2D play () {
+                this.miMetodo(2, 3, 4, "aramis", 'x');
+                z += 3;
+                MiPrimerNivel.start();
+           }
+        
+        }'''
+    ]
+    
     for prueba in pruebas:
         print(f"\nProbando: {prueba}")
-        compila.compilar(prueba)
+        compilador = Compilador()
+        compilador.compilar(prueba)
+        print(compilador.errores_re)
