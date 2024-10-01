@@ -1,5 +1,6 @@
 import compilador.lexico as lexico
 import compilador.sintactico as sintactico
+import compilador.semantico as semantico
 
 # Clase del compilador
 class Compilador():
@@ -14,10 +15,14 @@ class Compilador():
         self.errores_lista = [] #Lista de todos los errores
         self.compilo = True #Si compilo
         self.varId = 0
+        self.resultado=None
+        self.sema = semantico.Semantico()
 
     def compilar(self,data):
         self.parte_Lexico(data)
+        
         self.parte_Sintactica(data,self.lexi.lexer)
+        self.parte_Semantica()
 
     #Parte_del lexico
     def parte_Lexico(self,data):
@@ -48,19 +53,27 @@ class Compilador():
         self.sin.build()
         lexer.lineno = 1 #Reincia el número de linea
         try:
-            resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
-            if resultado:
-                print("Análisis sintáctico exitoso:", resultado)
+            self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
+            if self.resultado:
+                print("Análisis sintáctico exitoso:", self.resultado)
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")
             if self.sin.errores !=[]:
                 self.compilo = False
                 self.errores_sintacticos=self.sin.errores
         except Exception as e:
             print(f"Error durante el análisis sintáctico: {e}")
+
+    def parte_Semantica(self):
+        self.sema.correr(self.resultado,self.identificadores_ts)
+        if(self.sema.compilo):
+            self.compilo = False
+
     #Errores
     def errores_re(self):
         mensajes=''
-        self.errores_lista = self.errores_lexicos+self.errores_sintacticos
+        self.errores_lista = self.errores_lexicos
+        self.errores_lista +=self.errores_sintacticos
+        self.errores_lista +=self.sema.errores
         self.errores_lista= sorted(self.errores_lista, key=lambda x:x[2])
         for error in self.errores_lista:
             mensajes+=(f"{error[0]}" +'\n')
@@ -79,7 +92,7 @@ class Compilador():
     def identificadores_lista(self):
         self.identificadores_ts=[]
         for token in self.identificadores:
-            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Sin Valor'])
+            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Sin Valor','Sin Declación'])
         return self.identificadores_ts
 
 if __name__ == "__main__":

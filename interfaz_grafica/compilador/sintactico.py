@@ -11,7 +11,8 @@ class Sintactico():
             ('left', 'MAS_MAS', 'MENOS_MENOS'),
             ('left', 'POR', 'DIVISION', 'MODULO')
         )
-
+        self.fila = 0
+        self.matriz = 0
         #Lista de errores
         self.errores = []
         self.parser = None
@@ -30,10 +31,7 @@ class Sintactico():
                     | importaciones
                     | nivel
                     | empty
-                    
-                    
-                    | bloqueDeclaracion 
-                    | expresion'''
+                    '''
         if(len(p) == 2):
             p[0] = p[1]
         else:
@@ -44,7 +42,7 @@ class Sintactico():
     #<importaciones> ::= <importacion> <restoImportaciones>
     def p_importaciones(self,p):
         '''importaciones : importacion restoImportaciones'''
-        p[0] = [p[1]] + p[2]  # Concatenamos la importación actual con las importaciones restantes
+        p[0] = ('importaciones',[p[1]] + p[2])  # Concatenamos la importación actual con las importaciones restantes
 
     #<restoImportaciones> ::= <importacion> <restoImportaciones> | ε
     def p_restoImportaciones(self,p):
@@ -58,7 +56,7 @@ class Sintactico():
     #<importacion> ::= import <libreriaAxol> ;
     def p_importacion(self,p):
         '''importacion : IMPORT libreriaAxol PUNTO_Y_COMA'''
-        p[0] = p[1]
+        p[0] = p[2]
 
     #<libreriaAxol> ::= Controllers | Enemies
     def p_libreriaAxol(self,p):
@@ -72,7 +70,7 @@ class Sintactico():
     def p_nivel(self,p):
         '''nivel : LEVEL IDENTIFICADOR LLAVE_ABRE contenidoNivel LLAVE_CIERRA'''
         if len(p) == 6:
-            p[0] = ('nivel', p[4])
+            p[0] = ('nivel', p[2], p[4])
 
     #<contenidoNivel> ::= <atributos> <metodos> <metodoPrincipal>
     def p_contenidoNivel(self,p):
@@ -114,10 +112,10 @@ class Sintactico():
             p[0] = ('declaracion', p[1])
         # Declaracion con Asignacion
         elif len(p) == 4:
-            p[0] = ('declaracion', p[1], p[2])
+            p[0] = ('declaracion', p[1], p[2],f'Linea: {p.lineno(1)}')
         # Declaracion de Estructura de Datos
         else: 
-            p[0] = ('declaracionEstructuraDatos', p[1])
+            p[0] = ('declaracion', p[1],'')#vacio para el manejo más adelante
 
     #<declaracionTipo> ::= <tipoDato> idenfiticador
     def p_declaracionTipo(self,p):
@@ -314,12 +312,12 @@ class Sintactico():
 
     #<restoTermino> ::= <operadorMultiplicacion> <factor> <restoTermino> | ε
     def p_restoTermino(self,p):
-        '''restoTermino : operadorMultiplicacion factor restoTermino
+        '''restoTermino : restoTermino operadorMultiplicacion factor
                         | empty'''
         if len(p) == 2:
             p[0] = None  # ε
-        elif p[3] is None:
-            p[0] = ('restoTermino', p[1], p[2])
+        elif p[1] is None:
+            p[0] = ('restoTermino', p[2], p[3])
         else:
             p[0] = ('restoTermino', p[1], p[2], p[3])
 
@@ -589,7 +587,7 @@ class Sintactico():
     # <declaracionArregloSimple> ::= <tipoDato> [ numero ] identificador ;
     def p_declaracionArregloSimple(self,p):
         '''declaracionArregloSimple : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ('declaracionArregloSimple', p[1])
+        p[0] = ('declaracionArregloSimple', p[1],p[2],p[4])
 
     # <declaracionMatrizSimple> ::= <tipoDato> [ numero ] [ numero ] identificador ;
     def p_declaracionMatrizSimple(self,p):
@@ -613,13 +611,15 @@ class Sintactico():
     # <fila> ::= [ <elementosFila> ]
     def p_fila(self,p):
         '''fila : CORCHETE_ABRE elementosFila CORCHETE_CIERRA'''
-        p[0] = ('fila', p[2])
+        p[0] = ('fila',self.fila, p[2])
+        self.fila=0
 
     # <elementosFila> ::= <expresion> <restoElementosFila>
     def p_elementosFila(self,p):
         '''elementosFila : expresion restoElementosFila
                         | valorCadena restoElementosFila
                         | booleano restoElementosFila'''
+        self.fila+=1
         p[0] = [p[1]] + p[2]
 
     # <restoElementosFila> ::= , <elementosFila> | ε
@@ -661,10 +661,9 @@ class Sintactico():
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
         if p:
-            mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea '{p.lineno}'")
-            print(mensaje_error)
+            mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
             self.errores.append([mensaje_error,p.lineno,p.lexpos])
-            print(self.errores)
         else:
             print("Error de sintaxis al final de la entrada")
     #----------------------------------------------------------------------------------------------------------
+
