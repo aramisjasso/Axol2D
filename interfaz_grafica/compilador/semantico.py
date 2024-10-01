@@ -11,6 +11,7 @@ class Semantico():
         self.parteMetodos = None
         self.parteMetodoPrincipal = None
         self.listaDeclaraciones = []
+        self.listaParametros = []
 
     #Run
     def correr(self,resultadoSemantico,TS):
@@ -53,14 +54,13 @@ class Semantico():
         #Validación en TS del nombre de nivel
         self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         self.fnBloqueDeclaracion()
-        #self.bloqueMetodos 
+        self.fnbloqueMetodos()
         #self.metodoPrincipal
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
     def fnSeparacionDeclaracion(self):
         compara = True
         while(compara):
-            print(self.parteDeclaracion)
             if len(self.parteDeclaracion[1]) == 2: #Declaraciones simples
                 self.listaDeclaraciones.append((self.parteDeclaracion[1]))
             else:
@@ -73,11 +73,9 @@ class Semantico():
 
 #---------Bloque declaración -----------------------------------------------------------------------
     def fnBloqueDeclaracion(self):
-        print('Bloque Declaración')
         self.fnSeparacionDeclaracion()
         #Muestra una declaración una por una
         for declaracion in self.listaDeclaraciones:
-            print(declaracion)
             estructura = None
             tipo = None
             tamaño = None
@@ -97,7 +95,6 @@ class Semantico():
                 tipo = declaracion[0][1][1][1]
                 tamaño = declaracion[0][1][1][3]
                 id= declaracion[0][1][1][2]
-                print(estructura,tipo,id,tamaño)
                 #Declaracion
                 self.fnDeclararEstructuraDatos(estructura,tipo,id,tamaño)
                 if len(declaracion[0][1])==3:
@@ -205,7 +202,6 @@ class Semantico():
                     tamaño_x=int(valores[1][0])
                     tamaño_y=valores[1][1]
                     compara=int(tamaño_y[0])
-                    print(tamaño_matriz_x,tamaño_matriz_y,tamaño_x,tamaño_y)
                     resultado=True
                     for x in tamaño_y:
                         if int(x) != compara:
@@ -224,8 +220,6 @@ class Semantico():
                                     self.ts[indice+1][3] = valor
                                     indice+=1
                 
-
-                    print('Matriz')
         else:
             tipo=self.fnRegresaValor(valores,tipo_id)
             if tipo_id==tipo:
@@ -239,6 +233,34 @@ class Semantico():
 #---------Funcion que regresa tipo, NO FUNCIONA ES DE PRUEBA----------------------------
     def fnRegresaValor(self,valor,tipo):
         return tipo
+    
+#-----------Bloque Metodos--------------------------------------------------------------
+    def fnbloqueMetodos(self):
+        metodo=self.parteMetodos[1]
+        print('Parte Metodo:',metodo)
+        id = metodo[2]
+        regreso= metodo[1]
+        print('Regreso:',regreso,'id:',id)
+        parametros = metodo[3]
+        print('Parametros:',parametros)
+        #Separación de Parametros
+        self.fnSeparacionDeParametros(parametros[1])
+        #Declaracion
+
+        contenido = metodo[4]
+        print('contenido:', contenido)
+#---------Separación de Parametros ----------------------------------------------------
+    def fnSeparacionDeParametros(self,parametros):
+        compara = True
+        while(compara):
+            print(parametros)
+            
+            if parametros[0] =='parametro':
+                self.listaParametros.append(parametros[0])
+                parametros = parametros[1] 
+            else:
+                compara =False
+
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):
         simbolo = None

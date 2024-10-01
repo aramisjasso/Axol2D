@@ -160,7 +160,7 @@ class Sintactico():
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-        p[0] = ('metodoDeclaracion', p[2], p[5], p[8])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8])
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
     def p_contenidoMetodo(self,p):
@@ -170,14 +170,19 @@ class Sintactico():
     #<parametros> ::= <tipoDato> identificador |
     #                 <tipoDato> identificador , <parametros> | 
     #                 ε
+
     def p_parametros(self,p):
-        '''parametros : tipoDato IDENTIFICADOR
-                    | tipoDato IDENTIFICADOR COMA parametros
+        '''parametros : parametro'''
+        p[0] = ('parametros', p[1])
+
+    def p_parametro(self,p):
+        '''parametro : tipoDato IDENTIFICADOR COMA parametro
+                    | tipoDato IDENTIFICADOR
                     | empty'''
         if len(p) == 3:
-            p[0] = ('parametros', p[1], p[2])
+            p[0] = ('parametro',(p[1], p[2]))
         elif len(p) == 5:
-            p[0] = ('parametros', p[1], p[2], p[4])
+            p[0] = ('parametro',(p[1], p[2]) ), p[4]
         else:
             p[0] = None
     #----------------------------------------------------------------------------------------------------------
