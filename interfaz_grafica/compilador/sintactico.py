@@ -13,6 +13,7 @@ class Sintactico():
         )
         self.fila = 0
         self.matriz = 0
+        self.filas = []
         #Lista de errores
         self.errores = []
         self.parser = None
@@ -572,6 +573,7 @@ class Sintactico():
         else:
             # Caso de declaración de arreglo con asignación de una fila (elementos del arreglo)
             p[0] = ('declaracionArreglo', p[1], p[3])
+            self.filas=[]
 
     # <declaracionArreglo> ::=  
     def p_declaracionMatriz(self,p):
@@ -592,26 +594,31 @@ class Sintactico():
     # <declaracionMatrizSimple> ::= <tipoDato> [ numero ] [ numero ] identificador ;
     def p_declaracionMatrizSimple(self,p):
         '''declaracionMatrizSimple : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ('declaracionMatrizSimple', p[1])
+        p[0] = ('declaracionMatrizSimple', p[1],p[2],[p[4],p[7]])
 
-    # <filas> ::= <fila> <restoFilas>
     def p_filas(self,p):
-        '''filas : fila restoFilas'''
-        p[0] = ('filas', p[1], p[2])
+        '''filas : restoFilas'''
+        p[0] = ('filas',[self.matriz,self.filas],p[1])
+        self.matriz=0
+        self.filas=[]
 
-    # <restoFilas> ::= , <filas> | ε
     def p_restoFilas(self,p):
-        '''restoFilas : COMA filas
-                    | empty'''
-        if len(p) == 3:
-            p[0] = ('restoFilas', p[2])
+        '''restoFilas : fila COMA restoFilas
+                | fila
+                | empty'''
+        if len(p) == 4:
+            p[0] = [p[1]] + p[3]
+            self.matriz+=1
+        elif len(p) == 2:
+            p[0] = [p[1]]
+            self.matriz+=1
         else:
-            p[0] = ('restoFilas', [])
+            p[0] = []
 
-    # <fila> ::= [ <elementosFila> ]
     def p_fila(self,p):
         '''fila : CORCHETE_ABRE elementosFila CORCHETE_CIERRA'''
         p[0] = ('fila',self.fila, p[2])
+        self.filas.append(self.fila)
         self.fila=0
 
     # <elementosFila> ::= <expresion> <restoElementosFila>
@@ -634,7 +641,8 @@ class Sintactico():
     # <definicionArreglo> ::= <identificador> = [ <elementosArreglo> ] 
     def p_definicionArreglo(self,p):
         '''definicionArreglo : IDENTIFICADOR IGUAL fila'''
-        p[0] = ('definicionArreglo', p[3])
+        p[0] = ('definicionArreglo', p[1],p[3])
+        self.filas=[]
 
     def p_definicionMatriz(self,p):
         '''definicionMatriz : IDENTIFICADOR IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA'''

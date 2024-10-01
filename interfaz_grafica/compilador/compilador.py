@@ -20,7 +20,6 @@ class Compilador():
 
     def compilar(self,data):
         self.parte_Lexico(data)
-        
         self.parte_Sintactica(data,self.lexi.lexer)
         self.parte_Semantica()
 
@@ -65,8 +64,10 @@ class Compilador():
 
     def parte_Semantica(self):
         self.sema.correr(self.resultado,self.identificadores_ts)
+        self.identificadores_ts=self.sema.ts
         if(self.sema.compilo):
-            self.compilo = False
+            self.compilo = True
+        
 
     #Errores
     def errores_re(self):
@@ -92,26 +93,5 @@ class Compilador():
     def identificadores_lista(self):
         self.identificadores_ts=[]
         for token in self.identificadores:
-            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Sin Valor','Sin Declación'])
+            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Null','Sin Declación'])
         return self.identificadores_ts
-
-if __name__ == "__main__":
-    # Define algunas pruebas
-    pruebas = [
-        'a = b',
-        'n = 5',
-        'array[1] = 3*5', 
-        'i++',
-        'numeros = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]',
-        'cadenas = ["cadena1", "cadena2", "cadena3"]'
-        'Clase objeto = new Clase(1, 2, 3)', 
-        'bandera = this.metodoBooleano(x, z)',
-        'a += 5',
-        'arrar[3] == 3'
-    ]
-    compila = Compilador()
-
-    # Ejecutar pruebas
-    for prueba in pruebas:
-        print(f"\nProbando: {prueba}")
-        compila.compilar(prueba)

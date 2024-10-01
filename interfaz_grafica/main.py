@@ -39,7 +39,9 @@ if __name__ == "__main__":
             string d = "mi Cadenon";
             char x;
             int x1 [5] = [1,2,3,4,5];
-            int x3 [6] = [1,2,3,4,5,6];
+            int x2 [5];
+            int y1 [5][1];
+            int x3 [3][2]=[[1,2],[3,4],[5,6]];
 
             method boolean miMetodo (int a, int b, byte c, string d, char x) {
                 if (a==b) { 

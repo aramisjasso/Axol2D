@@ -97,6 +97,7 @@ class Semantico():
                 tipo = declaracion[0][1][1][1]
                 tamaño = declaracion[0][1][1][3]
                 id= declaracion[0][1][1][2]
+                print(estructura,tipo,id,tamaño)
                 #Declaracion
                 self.fnDeclararEstructuraDatos(estructura,tipo,id,tamaño)
                 if len(declaracion[0][1])==3:
@@ -129,10 +130,17 @@ class Semantico():
                     simbolo[2]=tipo
                     break
             if tipo[0]=='arreglo':
-                self.ts[indice][3]=int(var)
+                self.ts[indice][3]=var
                 for x in range(int(var)):
-                    in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Sin Valor', 'Linea declaración']
-                    self.ts.insert(indice+x+1,in_simbolo)        
+                    in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
+                    self.ts.insert(indice+x+1,in_simbolo)
+            if tipo[0]=='matriz':
+                self.ts[indice][3]=var
+                for x in range(int(var[0])):
+                    for y in range(int(var[1])):
+                        in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1],'Null', 'Linea declaración']
+                        self.ts.insert(indice+1,in_simbolo)
+                        indice+=1       
         else:
             #Error dos veces declarado
             self.compilo = False
@@ -143,6 +151,9 @@ class Semantico():
     def fnDeclararEstructuraDatos(self,estructura,tipo,id,tamaño):
         if estructura=='declaracionArreglo':
             tipo = ('arreglo',tipo)
+            self.fnDeclararTipo(id,tipo,tamaño)
+        if estructura=='declaracionMatriz':
+            tipo=('matriz',tipo)
             self.fnDeclararTipo(id,tipo,tamaño)
 
 
@@ -172,19 +183,49 @@ class Semantico():
                 return
             elif tipo_id[0]=='arreglo':
                 if tipo != tipo_id[0]:
-                  self.errores.append([f'Error Semántico al identificador {id} es de tipo Arreglo y no se puede asignar una matriz.',0,1])
+                  self.errores.append([f'Error Semántico al identificador {id} es de tipo Arreglo y no se puede asignar una Matriz.',0,1])
                 else:
                     #Validación por Tamaño
                     tamaño=int(valores[1])
-                    tamaño_arreglo=self.ts[indice][3]
+                    tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
-                        
-                        self.errores.append([f'Error Semántico, el tamaño de la fila o matriz no se puede asignar al identificador {id} el tamaño declaro es: {tamaño_arreglo}',0,1])
+                        self.errores.append([f'Error Semántico, el tamaño de la fila no se puede asignar al identificador {id} el tamaño declaro es: {tamaño_arreglo}',0,1])
                     else:
                         for x in range(tamaño):
                             self.ts[indice+x+1][3]=valores[2][x]
             else:
-                print('Matriz')
+                #Validacion Tipos
+                if tipo != tipo_id[0]:
+                    
+                    self.errores.append([f'Error Semántico al identificador {id} es de tipo Matriz y no se puede asignar un Arreglo.',0,1])
+                else:
+                    #Validación por Tamaño
+                    tamaño_matriz_x=int(self.ts[indice][3][0])
+                    tamaño_matriz_y=int(self.ts[indice][3][1])
+                    tamaño_x=int(valores[1][0])
+                    tamaño_y=valores[1][1]
+                    compara=int(tamaño_y[0])
+                    print(tamaño_matriz_x,tamaño_matriz_y,tamaño_x,tamaño_y)
+                    resultado=True
+                    for x in tamaño_y:
+                        if int(x) != compara:
+                            resultado=False
+                    #La filas son de diferentes tamaños entre si
+                    if resultado is False:
+                        self.errores.append([f'Error Semántico la matriz tiene filas con diferentes tamaños',0,1])
+                    else:
+                        if tamaño_matriz_x !=tamaño_x or tamaño_matriz_y!=compara:
+                            self.errores.append([f'Error Semántico, las Matriz no se puede asignar al identificador {id} el tamaño declarado es de: {[tamaño_matriz_x,tamaño_matriz_y]}.',0,1])
+                        else:
+                            filas=valores[2]
+                            for x in range(tamaño_matriz_x):
+                                for y in range(tamaño_matriz_y):
+                                    valor=filas[x][2][y]
+                                    self.ts[indice+1][3] = valor
+                                    indice+=1
+                
+
+                    print('Matriz')
         else:
             tipo=self.fnRegresaValor(valores,tipo_id)
             if tipo_id==tipo:

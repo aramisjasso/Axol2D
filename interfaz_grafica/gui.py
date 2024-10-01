@@ -248,7 +248,7 @@ class InterfazCompilador:
 
     #Tabla Dinanica
     def mostrar_tabla_dinamica(self):
-        self.tabla_dinamica.set_datos(self.cmplr.identificadores_lista())
+        self.tabla_dinamica.set_datos(self.cmplr.identificadores_ts)
         self.tabla_dinamica.mostrar_tabla()
 #Inicio del main
 if __name__ == "__main__":
