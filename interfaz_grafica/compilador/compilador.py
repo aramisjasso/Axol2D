@@ -13,7 +13,7 @@ class Compilador():
         self.errores_lexicos = []#Lista de errores lexicos
         self.errores_sintacticos = [] #Lista de errores Sintacticos
         self.errores_lista = [] #Lista de todos los errores
-        self.compilo = True #Si compilo
+        self.compilo = True #Si compila
         self.varId = 0
         self.resultado=None
         self.sema = semantico.Semantico()
@@ -39,7 +39,7 @@ class Compilador():
             self.tokens.append(tok)
             if tok.type == 'IDENTIFICADOR': #Agrega a la lista de identificadores
                     self.revisar_ts(tok)
-            print(tok)
+            # print(tok)
         self.errores_lexicos = self.lexi.errores
         self.lexi.errores=[]
         if self.errores_lexicos == []:
@@ -54,9 +54,9 @@ class Compilador():
         try:
             self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
             if self.resultado:
-                print("Análisis sintáctico exitoso:", self.resultado)
+                print("Análisis sintáctico exitoso:", self.resultado, '\n')
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")
-            if self.sin.errores !=[]:
+            if self.sin.errores != []:
                 self.compilo = False
                 self.errores_sintacticos=self.sin.errores
         except Exception as e:

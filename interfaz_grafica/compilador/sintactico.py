@@ -106,14 +106,15 @@ class Sintactico():
     #<declaracion> ::= ( <declaracionTipo> ( <valorDeclaracion> | ε ) ; ) | <declaracionEstructuraDatos>
     def p_declaracion(self,p):
         '''declaracion : declaracionTipo PUNTO_Y_COMA
-                    | declaracionTipo valorDeclaracion PUNTO_Y_COMA
-                    | declaracionEstructuraDatos '''
+                       | declaracionTipo valorDeclaracion PUNTO_Y_COMA
+                       | declaracionEstructuraDatos '''
         # Declaracion Simple
         if len(p) == 3:
             p[0] = ('declaracion', p[1])
         # Declaracion con Asignacion
         elif len(p) == 4:
-            p[0] = ('declaracion', p[1], p[2],f'Linea: {p.lineno(1)}')
+            p[0] = ('declaracion', p[1], p[2])
+            #p[0] = ('declaracion', p[1], p[2], f'Linea: {p.lineno(1)}')
         # Declaracion de Estructura de Datos
         else: 
             p[0] = ('declaracion', p[1],'')#vacio para el manejo más adelante
@@ -282,15 +283,62 @@ class Sintactico():
 
     #-------------------------------------- E X P R E S I O N -------------------------------------------------
     #<expresion> ::= <expresionAritmetica> | <expresionLogica> | <expresionPostfijo> | <expresionParentesis>
-    def p_expresion(self,p):
-        '''expresion : expresionAritmetica
-                    | expresionLogica
-                    | expresionUnaria
-                    | expresionParentesis'''
+    def p_expresion(self, p):
+        '''expresion : expresionLogica'''
         p[0] = ('expresion', p[1])
 
+    #<expresionLogica> ::= <expresionComparacion> <restoExpresionLogica> 
+    #                         | NOT <expresionComparacion> | <booleano> <restoExpresionLogica>
+    def p_expresionLogica(self, p):
+        '''expresionLogica : elementoExpresionLogica restoExpresionLogica'''
+        if len(p) == 3 and p[2] is None:
+            p[0] = p[1]
+        else:
+            p[0] = ('expresionLogica', p[1], p[2])
+
+    #<restoExpresionLogica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
+    def p_restoExpresionLogica(self, p):
+        '''restoExpresionLogica : restoExpresionLogica operadorLogico elementoExpresionLogica
+                                | empty'''
+        if len(p) == 2:
+            p[0] = None 
+        elif p[1] is None:
+            p[0] = ('restoExpresionLogica', p[2], p[3])
+        else:
+            p[0] = ('restoExpresionLogica', p[1], p[2], p[3])
+
+    def p_elementoExpresionLogica(self, p):
+        '''elementoExpresionLogica : expresionComparacion
+                                | booleano
+                                | NOT expresionComparacion 
+                                | NOT booleano'''
+        if len(p) == 2:
+            p[0] = ('elementoExpresionLogica', p[1])
+        else:
+            p[0] = ('elementoExpresionLogica', p[1], p[2])
+
+    #<expresionComparacion> ::= <expresionAritmetica> <restoExpresionComparacion>
+    def p_expresionComparacion(self, p):
+        '''expresionComparacion : expresionAritmetica restoExpresionComparacion'''
+        if p[2] is None:
+            p[0] = p[1]
+        else:
+            p[0] = ('expresionComparacion', p[1], p[2])
+
+    #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
+    def p_restoExpresionComparacion(self, p):
+        '''restoExpresionComparacion : restoExpresionComparacion operadorComparacion expresionAritmetica
+                                     | restoExpresionComparacion operadorComparacion valorCadena
+                                     | empty'''
+        if len(p) == 2:
+            p[0] = None 
+        elif p[1] is None:
+            p[0] = ('restoExpresionComparacion', p[2], p[3])
+        else:
+            p[0] = ('restoExpresionComparacion', p[1], p[2], p[3])
+
     #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
-    def p_expresionAritmetica(self,p):
+    def p_expresionAritmetica(self, p):
         '''expresionAritmetica : termino restoExpresionAritmetica'''
         if p[2] is None:
             p[0] = p[1]
@@ -298,13 +346,13 @@ class Sintactico():
             p[0] = ('expresionAritmetica', p[1], p[2])
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
-    def p_restoExpresionAritmetica(self,p):
-        '''restoExpresionAritmetica : operadorAdicion termino restoExpresionAritmetica
+    def p_restoExpresionAritmetica(self, p):
+        '''restoExpresionAritmetica : restoExpresionAritmetica operadorAdicion termino
                                     | empty'''
         if len(p) == 2:
             p[0] = None  # ε
-        elif p[3] is None:
-            p[0] = ('restoExpresionAritmetica', p[1], p[2])
+        elif p[1] is None:
+            p[0] = ('restoExpresionAritmetica', p[2], p[3])
         else:
             p[0] = ('restoExpresionAritmetica', p[1], p[2], p[3])
 
@@ -330,8 +378,10 @@ class Sintactico():
     #<factor> ::= IDENTIFICADOR | NUMERO
     def p_factor(self,p):
         '''factor : IDENTIFICADOR
-                | NUMERO
-                | expresionParentesis'''
+                  | NUMERO
+                  | accesoLineal
+                  | accesoMatriz
+                  | expresionParentesis'''
         p[0] = ('factor', p[1])
 
     #<operadorAdicion> ::= MAS | MENOS
@@ -347,60 +397,10 @@ class Sintactico():
                                 | MODULO'''
         p[0] = p[1]
 
-    #<expresionUnaria> ::= <operadorUnario> <factor>
-    def p_expresionUnaria(self,p):
-        '''expresionUnaria : operadorUnario factor'''
-        p[0] = ('expresionUnaria', p[1], p[2])
-
-    #<operadorUnario> ::= <operadorAdicion> | NOT
-    def p_operadorUnario(self,p):
-        '''operadorUnario : operadorAdicion
-                        | NOT'''
-        p[0] = p[1]
-
     #<expresionParentesis> ::= ( <expresion> )
     def p_expresionParentesis(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion PARENTESIS_CIERRA'''
         p[0] = ('expresionParentesis', p[2])
-
-    # Producción para <expresionLogica>
-    def p_expresionLogica(self,p):
-        '''expresionLogica : expresionLogicaConjuncion restoExpresionLogica'''
-        if p[2] is None:
-            p[0] = p[1]
-        else:
-            p[0] = ('expresionLogica', p[1], p[2])
-
-    # Producción para <restoExpresionLogica>
-    def p_restoExpresionLogica(self,p):
-        '''restoExpresionLogica : operadorLogico expresionLogicaConjuncion restoExpresionLogica
-                                | empty'''
-        if len(p) == 2:  # ε (vacio)
-            p[0] = None
-        else:
-            p[0] = ('restoExpresionLogica', p[1], p[2], p[3])
-
-    # Producción para <expresionLogicaConjuncion>
-    def p_expresionLogicaConjuncion(self,p):
-        '''expresionLogicaConjuncion : expresionComparacion restoExpresionComparacion'''
-        if p[2] is None:
-            p[0] = p[1]
-        else:
-            p[0] = ('expresionLogicaConjuncion', p[1], p[2])
-
-    # Producción para <restoExpresionComparacion>
-    def p_restoExpresionComparacion(self,p):
-        '''restoExpresionComparacion : operadorComparacion expresionComparacion
-                                    | empty'''
-        if len(p) == 2:  # ε (vacio)
-            p[0] = None
-        else:
-            p[0] = ('restoExpresionComparacion', p[1], p[2])
-
-    # Producción para <expresionComparacion>
-    def p_expresionComparacion(self,p):
-        '''expresionComparacion : expresionAritmetica operadorComparacion expresionAritmetica'''
-        p[0] = ('expresionComparacion', p[1], p[2], p[3])
 
     # Producción para <operadorComparacion>
     def p_operadorComparacion(self,p):
@@ -553,8 +553,8 @@ class Sintactico():
     def p_valorCadena(self,p):
         '''valorCadena : VALOR_CHAR
                     | VALOR_STRING'''
-        p[0] = p[1]
-
+        p[0] = ('valorCadena', p[1])
+    
     #<objeto> ::= new <clase>(<argumentos>)
     def p_objeto(self,p):
         '''objeto : NEW IDENTIFICADOR PARENTESIS_ABRE argumentos'''

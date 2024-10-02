@@ -33,9 +33,10 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            int a = 0;
-            int b =3;
-            byte c = 16;
+            boolean a = true;
+            string b = "string";
+            boolean c = (a > true) ;
+
             string d = "mi Cadenon";
             char x;
             int x1 [5] = [1,2,3,4,5];
@@ -60,8 +61,15 @@ if __name__ == "__main__":
     ]
     
     for prueba in pruebas:
-        print(f"\nProbando: {prueba}")
+        print(f"\nProbando: {prueba}\n")
         compilador = compilador.Compilador()
         compilador.compilar(prueba)
         x=compilador.errores_re()
         print(x)
+
+# ------------- Testeo ---------------------
+# Truena con: 
+# boolean a;
+# byte c = a;
+# 
+# byte c = True;
