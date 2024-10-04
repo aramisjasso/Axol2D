@@ -147,11 +147,12 @@ class Semantico():
             #Checa si es de un tipo matriz
             elif tipo[0]=='matriz':
                 self.ts[indice][3]=var
+                x1=0
                 for x in range(int(var[0])):
                     for y in range(int(var[1])):
                         in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1],'Null', 'Linea declaración']
-                        self.ts.insert(indice+1,in_simbolo)
-                        indice+=1
+                        self.ts.insert(indice+x1+1,in_simbolo)
+                        x1+=1
             #Checa si es de un tipo metodo
             elif tipo[0] == 'metodo':
                 atributos = []

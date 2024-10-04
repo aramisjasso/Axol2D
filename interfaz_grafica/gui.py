@@ -19,7 +19,7 @@ class InterfazCompilador:
         self.root.bind("<Control-Shift-S>", self.guardar_archivo_como_evento)  # Detecta Ctrl + Shift + S
         self.cmplr = ts.Compilador()
         self.tabla_estatica = ta.TablaDatos()
-        self.tabla_dinamica = td.TablaDinamica()
+        self.tabla_dinamica = td.TablaDinamica(root)
         
         
         
