@@ -128,22 +128,53 @@ class Semantico():
 #----------- Declaracion en TS  por tipo -----------------------------------------------------
     def fnDeclararTipo(self,id,tipo,var=None):
         if not(self.fnComprobarDeclaracion(id)):
+            #Lo declara en la TS
             for indice,simbolo in enumerate(self.ts):
                 if simbolo[0]==id:
                     simbolo[2]=tipo
                     break
+            #Checa si es de un tipo arreglo
             if tipo[0]=='arreglo':
                 self.ts[indice][3]=var
                 for x in range(int(var)):
                     in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
                     self.ts.insert(indice+x+1,in_simbolo)
-            if tipo[0]=='matriz':
+            #Checa si es de un tipo matriz
+            elif tipo[0]=='matriz':
                 self.ts[indice][3]=var
                 for x in range(int(var[0])):
                     for y in range(int(var[1])):
                         in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1],'Null', 'Linea declaración']
                         self.ts.insert(indice+1,in_simbolo)
-                        indice+=1       
+                        indice+=1
+            #Checa si es de un tipo metodo
+            elif tipo[0] == 'metodo':
+                atributos = []
+                x=0 #inicia x=0 para cuando no hay
+                id_ts=self.ts[indice][1]
+                self.listaParametros = sorted(self.listaParametros,key=lambda x:x[1]) #Ordena
+                #Validar que en los parametros no haya variables repetidas
+                parametros=[]
+                for x,valor in enumerate(self.listaParametros):
+                    id_m = valor[1]
+                    parametros.append(id_m)
+                # 
+                if len(parametros) != len(set(parametros)):
+                    self.errores.append([f'Error semantico, hay parametros repetidos en el método {id}',0,1])
+                else:
+                    for x,valor in enumerate(self.listaParametros):
+                        id_m = valor[1]
+                        #validar que no exista como variable local
+                        if self.fnComprobarDeclaracion(id_m):
+                            self.errores.append([f'Error semantico, el {id_m} ya habia sido declarado anteriormente como variable global',0,1])
+                        else:
+                            tipo_m = valor[0]
+                            #añade a lista atributos
+                            atributos.append(tipo_m)
+                            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
+                            simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
+                            self.ts.insert(indice+x+1,simbolo)
+                    self.ts[indice][3]=(x+1, atributos)
         else:
             #Error dos veces declarado
             self.compilo = False
@@ -262,31 +293,96 @@ class Semantico():
     
 #-----------Bloque Metodos--------------------------------------------------------------
     def fnbloqueMetodos(self):
-        metodo=self.parteMetodos[1]
-        print('Parte Metodo:',metodo)
-        id = metodo[2]
-        regreso= metodo[1]
-        print('Regreso:',regreso,'id:',id)
-        parametros = metodo[3]
-        print('Parametros:',parametros)
-        #Separación de Parametros
-        self.fnSeparacionDeParametros(parametros[1])
-        #Declaracion
+        lista_metodos=self.fnSeparacionMetodos()
+        print(lista_metodos[0])
+        if lista_metodos[0]=='metodo':#si la lista tiene solo un método
+            metodo=lista_metodos[1]
+            id = metodo[2]
+            tipo= metodo[1]
+            tipo=('metodo',tipo)
+            parametros = metodo[3]
+            #Separación de Parametros
+            self.fnSeparacionDeParametros(parametros[1])
+            #Declaracion Métodos
+            self.fnDeclararTipo(id,tipo,self.listaParametros)
+            contenido = metodo[4]
+            instrucciones=contenido[1]
+            self.fnInstrucciones(instrucciones)
+            parteReturn=contenido[2]
+            self.fnReturn(parteReturn,id)
+        else:#Si la lista tiene más metodos
+            for x in lista_metodos:
+                metodo=x[1]
+                id = metodo[2]
+                tipo= metodo[1]
+                tipo=('metodo',tipo)
+                parametros = metodo[3]
+                #Separación de Parametros
+                self.fnSeparacionDeParametros(parametros[1])
+                #Declaracion Métodos
+                self.fnDeclararTipo(id,tipo,self.listaParametros)
+                contenido = metodo[4]
+                print(contenido)
+                instrucciones=contenido[1]
+                self.fnInstrucciones(instrucciones)
+                parteReturn=contenido[2]
+                self.fnReturn(parteReturn,id)
+            
 
-        contenido = metodo[4]
-        print('contenido:', contenido)
+#---------Separación de Métodos -------------------------------------------------------
+    def fnSeparacionMetodos(self):
+        listaMetodos=[]
+        for x in self.parteMetodos[1]:
+            listaMetodos.append(x)
+        return listaMetodos
 
 #---------Separación de Parametros ----------------------------------------------------
     def fnSeparacionDeParametros(self,parametros):
+        self.listaParametros = []
         compara = True
         while(compara):
-            print(parametros)
-            
-            if parametros[0] =='parametro':
-                self.listaParametros.append(parametros[0])
-                parametros = parametros[1] 
+            if parametros is not None:
+                if len(parametros[0])==2 :
+                    self.listaParametros.append(parametros[0][1])
+                    parametros = parametros[1]
+                else:
+                    self.listaParametros.append(parametros[1])
+                    compara = False
             else:
-                compara =False
+                    compara=False
+
+#---------Procesado de intrucciones----------------------------------------------------
+    def fnInstrucciones(self,instrucciones):
+        # print('Instrucciones',instrucciones)
+        lista_instrucciones=[]
+        for x in range(len(instrucciones)):
+            instruccion=instrucciones[x][1]
+            print('Instrucciones',instruccion)
+            lista_instrucciones.append(instruccion)
+        #Se analizan todas las intrucciones para ver su tratamiento
+        for x in lista_instrucciones:#X = intrucción gera
+            if x[0]=='estructuraControl':
+                print('Es una estructura de control', x[1])
+            elif x[0]=='expresionAsignacion':
+                print('Es una expresion de Asignacion', x[1],x[2])
+                #               izqAsignacion expresion
+                #             | izqAsignacion llamadaMetodo
+                #             | izqAsignacion objeto
+                #             | definicionArreglo
+                #             | definicionMatriz
+                #             | expresionPostfijo
+            elif x[0]=='llamadaMetodo':
+                print('Es una llamada de Metodo', x[1],x[2])
+            elif x[0]=='expresion':
+                print('Es una expresion', x[1])
+            elif x[0]=='llamadaStart':
+                print('Es una llamadaStart', x[1])
+
+
+
+ #---------Procesado de intrucciones----------------------------------------------------
+    def fnReturn(self,regreso,id):
+        print('Return Metodo: ',id,regreso)
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):

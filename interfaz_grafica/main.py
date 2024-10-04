@@ -33,22 +33,22 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            boolean a = true;
-            string b = "string";
-            boolean c = (a > true) ;
+            int a = 1;
 
-            string d = "mi Cadenon";
-            char x;
-            int x1 [5] = [1,2,3,4,5];
-            int x2 [5];
-            int y1 [5][1];
-            int x3 [3][2]=[[1,2],[3,4],[5,6]];
+            method boolean miMetodo1 () {
+                X = a + c + d;
+                return x;
+            }
 
-            method boolean miMetodo (int a, int b, byte c, string d, char x) {
+            method boolean miMetodo2 (int a1, int b1, byte c1, string d1, char x5) {
                 if (a==b) { 
                     x = a + b - c * d;
                     print(x);
                 }
+                X = a + c + d;
+                this.miMetodo1(2, 3, 4, "aramis", 'x');
+                a+c+d;
+                MiPrimerNivel.start();
                 return x;
             }
 

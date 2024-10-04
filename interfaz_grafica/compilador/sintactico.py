@@ -146,17 +146,20 @@ class Sintactico():
     #----------------------------------- B L O Q U E   D E   M E T O D O S  -----------------------------------
     #<bloqueMetodos> ::= <metodoDeclaracion> <restoMetodos> | ε
     def p_bloqueMetodos(self,p):
-        '''bloqueMetodos : metodoDeclaracion restoMetodos'''
-        p[0] = ('bloqueMetodos', p[1], p[2])
+        '''bloqueMetodos : metodo'''
+        p[0] = ('bloqueMetodos', p[1])
 
     #<restoMetodos> ::= <metodosDeclaracion> | ε
     def p_restoMetodos(self,p):
-        '''restoMetodos : bloqueMetodos restoMetodos
-                        | empty'''
-        if len(p) == 3:
-            p[0] = ('restoMetodos', p[1], p[2])
-        else:
-            p[0] = p[1]
+        '''metodo : metodoDeclaracion metodo
+                  | metodoDeclaracion
+                  | empty'''
+        if p[1] =='empty':
+            p[0]=None
+        elif len(p) == 2:
+            p[0] = ('metodo',(p[1]))
+        elif len(p) == 3:
+            p[0] = ('metodo',(p[1] )), p[2]
 
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
@@ -186,7 +189,6 @@ class Sintactico():
             p[0] = ('parametro',(p[1], p[2]) ), p[4]
         else:
             p[0] = None
-    #----------------------------------------------------------------------------------------------------------
 
     #---------------------------------------- I N S T R U C C I O N E S ---------------------------------------
     #<instruccionesNivel> ::= 
@@ -488,9 +490,9 @@ class Sintactico():
         '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos 
                         | metodoAxol PARENTESIS_ABRE argumentos '''
         if len(p) == 6:
-            p[0] = ('llamadaMetodo', p[1]) 
+            p[0] = ('llamadaMetodo', p[3],p[5]) 
         else:
-            p[0] = ('llamadaMetodo', p[1], p[2]) 
+            p[0] = ('llamadaMetodo', p[1], p[3]) 
 
     #<metodoAxol> ::= (read_key | read_bin | read_tec | save_bin | print |print_con | pop | push | position |
     #               show | positionX | positionY | add | set | random | getPosition | size | rotate)
