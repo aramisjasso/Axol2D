@@ -33,9 +33,11 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-           boolean resultado = -3;
-
+            boolean resultado = -3;
+            int arreglo [5] = [1,2,3,4,5];
+            int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
             method boolean miMetodo () {
+
                 print(nombre);
                 return flag;
             }

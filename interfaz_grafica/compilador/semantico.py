@@ -227,9 +227,20 @@ class Semantico():
                     tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
                         self.errores.append([f'Error Semántico, el tamaño de la fila no se puede asignar al identificador {id} el tamaño declaro es: {tamaño_arreglo}',0,1])
-                    else:
+                    else:#Validación de inserción
+                        tamaño_errores = len(self.errores)
+                        temp_valores=[]
                         for x in range(tamaño):
-                            self.ts[indice+x+1][3]=valores[2][x]
+                            temp_id = self.ts[indice+x+1][0]
+                            temp_valores.append(self.ts[indice+x+1][3])
+                            temp_valor = valores[2][x]
+                            self.fnAsignar(temp_valor,temp_id)
+                            #self.ts[indice+x+1][3]=valores[2][x]
+                        if tamaño_errores != len(self.errores):
+                            for x in range(tamaño):
+                                self.ts[indice+x+1][3]=temp_valores[x]
+                        
+
             else:
                 #Validacion Tipos
                 if tipo != tipo_id[0]:
@@ -254,11 +265,30 @@ class Semantico():
                             self.errores.append([f'Error Semántico, las Matriz no se puede asignar al identificador {id} el tamaño declarado es de: {[tamaño_matriz_x,tamaño_matriz_y]}.',0,1])
                         else:
                             filas=valores[2]
+                            tamaño_errores = len(self.errores)
+                            temp_matriz=[]
+                            x1=0
                             for x in range(tamaño_matriz_x):
+                                temp_arreglo=[]
                                 for y in range(tamaño_matriz_y):
                                     valor=filas[x][2][y]
-                                    self.ts[indice+1][3] = valor
-                                    indice+=1
+                                    temp_id=self.ts[indice+x1+1][0]
+                                    #Se guarda el valor temporalmente para ver si no se debe de volver a poner
+                                    temp_valor=self.ts[indice+x1+1][3]
+                                    temp_arreglo.append(temp_valor)
+                                    #Asignar valor
+                                    self.fnAsignar(valor,temp_id)
+                                    x1+=1
+                                temp_matriz.append(temp_arreglo)
+                        #En caso de error
+                        if tamaño_errores != len(self.errores):
+                            x1=0       
+                            for x in range(tamaño_matriz_x):
+                                for x in range(tamaño_matriz_y):
+                                    self.ts[indice+x1+1][3]=temp_matriz[x][y]
+
+                            
+                            
                 
         else:
             # tipo=self.fnRetornaValor(valores,tipo_id)
