@@ -57,7 +57,7 @@ class Semantico():
         #Validación en TS del nombre de nivel
         self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         self.fnBloqueDeclaracion()
-        #self.fnbloqueMetodos()
+        self.fnbloqueMetodos()
         #self.metodoPrincipal
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
