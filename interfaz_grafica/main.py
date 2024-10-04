@@ -33,28 +33,15 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            int a = 1;
+           boolean resultado = -3;
 
-            method boolean miMetodo1 () {
-                X = a + c + d;
-                return x;
-            }
-
-            method boolean miMetodo2 (int a1, int b1, byte c1, string d1, char x5) {
-                if (a==b) { 
-                    x = a + b - c * d;
-                    print(x);
-                }
-                X = a + c + d;
-                this.miMetodo1(2, 3, 4, "aramis", 'x');
-                a+c+d;
-                MiPrimerNivel.start();
-                return x;
+            method boolean miMetodo () {
+                print(nombre);
+                return flag;
             }
 
            axol2D play () {
-                this.miMetodo(2, 3, 4, "aramis", 'x');
-                z += 3;
+                this.miMetodo();
                 MiPrimerNivel.start();
            }
         }'''
