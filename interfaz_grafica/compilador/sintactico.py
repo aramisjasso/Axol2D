@@ -32,6 +32,7 @@ class Sintactico():
                     | importaciones
                     | nivel
                     | empty
+                    | expresionUnitaria
                     '''
         if(len(p) == 2):
             p[0] = p[1]
@@ -329,6 +330,7 @@ class Sintactico():
     def p_restoExpresionComparacion(self, p):
         '''restoExpresionComparacion : restoExpresionComparacion operadorComparacion expresionAritmetica
                                      | restoExpresionComparacion operadorComparacion valorCadena
+                                     | restoExpresionComparacion operadorComparacion booleano
                                      | empty'''
         if len(p) == 2:
             p[0] = None 
@@ -339,8 +341,11 @@ class Sintactico():
 
     #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
     def p_expresionAritmetica(self, p):
-        '''expresionAritmetica : termino restoExpresionAritmetica'''
-        if p[2] is None:
+        '''expresionAritmetica : termino restoExpresionAritmetica
+                               | expresionUnitaria '''
+        if len(p) == 2:
+            p[0] = ('expresionAritmetica', p[1])
+        elif p[2] is None:
             p[0] = p[1]
         else:
             p[0] = ('expresionAritmetica', p[1], p[2])
@@ -383,6 +388,10 @@ class Sintactico():
                   | accesoMatriz
                   | expresionParentesis'''
         p[0] = ('factor', p[1])
+
+    def p_expresionUnitaria(self, p):
+        '''expresionUnitaria : operadorAdicion factor'''
+        p[0] = ('expresionUnitaria', ('factor', '0'), p[1], p[2])
 
     #<operadorAdicion> ::= MAS | MENOS
     def p_operadorAdicion(self,p):

@@ -52,7 +52,8 @@ class Compilador():
         self.sin.build()
         lexer.lineno = 1 #Reincia el número de linea
         try:
-            self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
+            #self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
+            self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True)
             if self.resultado:
                 print("Análisis sintáctico exitoso:", self.resultado, '\n')
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")
@@ -68,7 +69,6 @@ class Compilador():
         if(self.sema.compilo):
             self.compilo = True
         
-
     #Errores
     def errores_re(self):
         mensajes=''
@@ -88,7 +88,6 @@ class Compilador():
         self.varId += 1
         self.identificadores.append([tok,f"id{self.varId}"])
         self.identificadores = sorted(self.identificadores, key=lambda x: x[0].value)
-                
 
     def identificadores_lista(self):
         self.identificadores_ts=[]

@@ -1,3 +1,5 @@
+import re
+
 class Semantico():
     def __init__(self):
         #Lista de errores
@@ -121,9 +123,11 @@ class Semantico():
         for simbolo in self.ts:
             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
             if simbolo[0]==id:
-                if simbolo[2] !='Sin tipo':
+                if simbolo[2] != 'Sin tipo':
                     return True
-        return False
+                else:
+                    return False
+        return 'NoId'
 
 #----------- Declaracion en TS  por tipo -----------------------------------------------------
     def fnDeclararTipo(self,id,tipo,var=None):
@@ -148,7 +152,7 @@ class Semantico():
             #Error dos veces declarado
             self.compilo = False
             tipoEn =self.fnEncontrarTipo(id)
-            self.errores.append([f'Error Semántico el identificador {id} ya habia sido declarado anteriormente de tipo {tipoEn}',0,1])
+            self.errores.append([f'Error Semántico. El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',0,1])
 
 #----------- Declaracion en TS por Estructura de Datos ----------------------------------
     def fnDeclararEstructuraDatos(self,estructura,tipo,id,tamaño):
@@ -176,7 +180,7 @@ class Semantico():
             elif tipo=='filas':
                 tipo='matriz'
             else:
-                self.errores.append([f'Error Semántico, el valor no puede ser asignado a un arreglo, una matriz o un identificador.'])
+                self.errores.append([f'Error Semántico, el valor no puede ser asignado a un arreglo, una matriz o un identificador.', 0, 1])
             #Sacar tipo de valores
             
             #Validar si es arreglo, matriz o método
@@ -230,30 +234,53 @@ class Semantico():
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
                 # Asignación de una Expresión
                 if valores[0] == 'expresion':
+                    #print(valores)
                     self.postorden(valores)
                     #Aquí Falta Validar si se pudo resolver la pila
                     #print(self.pila_semantica)
                     valores = self.evaluar_pila(self.pila_semantica)
+                    #print(valores)
                     # self.ts[indice][3] = self.pila_semantica
                     self.pila_semantica = []
 
                 # Asignación de un Valor Diferente a Expresión
                 # String, Char, Llamada a Método, Booleano
-                if isinstance(valores, int) and self.ts[indice][2] in ['int', 'byte']:
+                if not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'int':
+                    if valores >= 0 and valores <= 65535:
+                        self.ts[indice][3] = valores
+                    else: 
+                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
+                elif not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'byte':
+                    if valores >= 0 and valores <= 255:
+                        self.ts[indice][3] = valores
+                    else: 
+                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
+                elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and self.ts[indice][2] == 'char':
                     self.ts[indice][3] = valores
-                elif isinstance(valores, str) and self.ts[indice][2] in ['char', 'string'] and valores != 'errorSemántico1013':
+                elif isinstance(valores, str) and self.ts[indice][2] == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
                     self.ts[indice][3] = valores
                 elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
-                    self.ts[indice][3] = valores
-                elif isinstance(valores, tuple) and self.ts[indice][2] in ['int', 'byte', 'boolean']:
+                    if valores:
+                        self.ts[indice][3] = 'true'
+                    else: 
+                        self.ts[indice][3] = 'false'
+                elif isinstance(valores, tuple) and valores[0] == 'booleano' and self.ts[indice][2] == 'boolean':
+                    self.ts[indice][3] = valores[1]
+                elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte', 'boolean']:
                     self.ts[indice][3] = valores
                 else:
-                    self.errores.append([f'Error Semántico. El tipo de dato del identificador no coincide con el tipo de dato del valor asignado.'])  
-                #print(self.ts[indice])
-            else:
-                self.errores.append([f'Error Semántico, el valor no puede ser asignado al identificador.'])
+                    if valores != 'Null':
+                        if not isinstance(valores, tuple):
+                            #print(valores)
+                            if isinstance(valores, bool) and valores: 
+                                valores = 'true'
+                            elif isinstance(valores, bool) and not valores:  
+                                valores = 'false'
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].', 0, 1])  
+                        else: 
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
 
-#---------Funcion que regresa tipo, NO FUNCIONA ES DE PRUEBA----------------------------
+#---------Funcion que Retorna Valor----------------------------
     def fnRetornaValor(self, id):
         for simbolo in self.ts:
             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
@@ -345,6 +372,8 @@ class Semantico():
                     self.pila_semantica.append(nodo[1])  
                 else:
                     self.pila_semantica.append(nodo[2])
+            elif nodo[0] == 'expresionUnitaria':
+                self.pila_semantica.append(nodo[2])
 #----------------------------------------------------------------------------------------
 
 #------------------------------Validación de Tipos---------------------------------------
@@ -365,19 +394,24 @@ class Semantico():
     def evaluar_pila(self, semantica):
         pila_evaluacion = []
         idConValor = True
-        banderaErrores = False
         
         for elemento in semantica:
+            print(elemento)
+            validaDeclaracion = self.fnComprobarDeclaracion(elemento)
+
             if self.validaNumero(elemento):
                 pila_evaluacion.append(int(elemento))
             #---Validación de Identificadores---
-            elif self.fnComprobarDeclaracion(elemento):
+            elif isinstance(validaDeclaracion, bool) and validaDeclaracion:
                 valor = self.fnRetornaValor(elemento)
                 if valor == 'Null':
                     pila_evaluacion.append(elemento)
                     idConValor = False
                 else:
-                    pila_evaluacion.append(valor)
+                    pila_evaluacion.append(valor)  
+            elif isinstance(validaDeclaracion, bool) and not validaDeclaracion:
+                self.errores.append([f'Error Semántico. La variable [{elemento}] no ha sido declarada.', 0, 1])
+                return 'Null'       
             elif elemento == 'true':
                 pila_evaluacion.append(True)
             elif elemento == 'false':
@@ -388,7 +422,6 @@ class Semantico():
             #Operadores Aritméticos
             elif elemento in ['+', '-', '*', '/', '%']:
                 if len(pila_evaluacion) >= 2:
-                    print(pila_evaluacion)
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
@@ -404,28 +437,28 @@ class Semantico():
                                 resultado = int(a / b)
                             else:
                                 self.errores.append(['Error Semántico. No se puede dividir entre cero.', 0, 1])
-                                banderaErrores = True
+                                return 'Null' 
                         elif elemento == '%':
                             if b != 0:
                                 resultado = a % b
                             else:
                                 self.errores.append(['Error Semántico. No se puede calcular el módulo de una división entre cero. ', 0, 1])
-                                banderaErrores = True
+                                return 'Null' 
                         pila_evaluacion.append(resultado) 
                     else: 
                         if (isinstance(a, int)) or (isinstance(b, int)): 
                             if (isinstance(a, int)):
                                 if not self.fnEncontrarTipo(b) in ['int', 'byte']:
                                     self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                             if (isinstance(b, int)):
                                 if not self.fnEncontrarTipo(a) in ['int', 'byte']:
                                     self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                         else: 
                             if not self.fnEncontrarTipo(a) in ['int', 'byte'] or not self.fnEncontrarTipo(b) in ['int', 'byte'] :
                                 self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
-                                banderaErrores = True
+                                return 'Null' 
 
             # Operadores de comparación
             elif elemento in ['==', '!=', '>', '<', '>=', '<=']:
@@ -434,7 +467,7 @@ class Semantico():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    if ((isinstance(a, int)) and (isinstance(b, int))) or (isinstance(a, str) and (isinstance(b, str))) or (isinstance(a, bool) and (isinstance(b, bool))):
+                    if (not isinstance(a, bool) and not isinstance(b, bool) and  (isinstance(a, int)) and (isinstance(b, int))) or (isinstance(a, str) and (isinstance(b, str))) or (isinstance(a, bool) and (isinstance(b, bool))):
                         if elemento == '==':
                             resultado = a == b
                         elif elemento == '!=':
@@ -453,32 +486,32 @@ class Semantico():
                             if (isinstance(a, int)):
                                 if not self.fnEncontrarTipo(b) in ['int', 'byte']:
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                             if (isinstance(b, int)):
                                 if not self.fnEncontrarTipo(a) in ['int', 'byte']:
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
-                        if (isinstance(a, str)) or (isinstance(b, str)): 
+                                    return 'Null' 
+                        elif (isinstance(a, str)) or (isinstance(b, str)): 
                             if (isinstance(a, str)):
                                 if self.fnEncontrarTipo(b) != 'string':
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                             if (isinstance(b, str)):
                                 if self.fnEncontrarTipo(a) != 'string':
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
-                        if (isinstance(a, bool)) or (isinstance(b, bool)): 
+                                    return 'Null' 
+                        elif (isinstance(a, bool)) or (isinstance(b, bool)): 
                             if (isinstance(a, bool)):
                                 if self.fnEncontrarTipo(b) != 'boolean':
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                             if (isinstance(b, bool)):
                                 if self.fnEncontrarTipo(a) != 'boolean':
                                     self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                                    banderaErrores = True
-                        if self.fnEncontrarTipo(a) != self.fnEncontrarTipo(b):
+                                    return 'Null' 
+                        elif self.fnEncontrarTipo(a) != self.fnEncontrarTipo(b):
                             self.errores.append(['Error Semántico. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. ', 0, 1])
-                            banderaErrores = True
+                            return 'Null' 
             # Operadores Lógicos
             elif elemento in ['&', '|']:
                 if len(pila_evaluacion) >= 2:
@@ -486,26 +519,30 @@ class Semantico():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    if (isinstance(a, bool)) and (isinstance(b, bool)):
+                    if isinstance(a, bool) and isinstance(b, bool):
                         if elemento == '&':
                             resultado = a and b
                         elif elemento == '|':
                             resultado = a or b
-                        pila_evaluacion.append(resultado)  # Convertimos el resultado booleano a entero (1 o 0)
+                        pila_evaluacion.append(resultado)
                     else: 
                         if (isinstance(a, bool)) or (isinstance(b, bool)): 
                             if (isinstance(a, bool)):
                                 if self.fnEncontrarTipo(b) != 'boolean':
                                     self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null' 
                             if (isinstance(b, bool)):
                                 if self.fnEncontrarTipo(a) != 'boolean':
                                     self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
-                                    banderaErrores = True
+                                    return 'Null'
                         else: 
                             if self.fnEncontrarTipo(a) != 'boolean' or self.fnEncontrarTipo(b) != 'boolean':
                                 self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
-                                banderaErrores = True
+                                return 'Null' 
+                            else: #Después lo optimizo jaja
+                                self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
+                                return 'Null' 
+                            
             
             # Operador NOT
             elif elemento == '!':
@@ -518,16 +555,14 @@ class Semantico():
                         pila_evaluacion.append(resultado)  
                     elif self.fnEncontrarTipo(b) != 'boolean':
                         self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
-                        banderaErrores = True
+                        return 'Null' 
 
         # El último valor en la pila de evaluación es el resultado final
         if idConValor:
             if len(pila_evaluacion) == 1:
                 return pila_evaluacion[0]
             # else:
-            #     raise ValueError("Error Semántico. La pila de evaluación no se evaluó correctamente.")
-        elif banderaErrores:
-            return 'errorSemántico1013'      
+            #     raise ValueError("Error Semántico. La pila de evaluación no se evaluó correctamente.")   
         else:
             return semantica
 #-----------------------------------------------------------------------------------------------

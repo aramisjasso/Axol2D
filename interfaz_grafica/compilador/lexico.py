@@ -88,6 +88,8 @@ class Lexico():
             'constant': 'CONSTANT',
             'this': 'THIS',
             'null': 'NULL',
+            'true' : 'TRUE', 
+            'false' : 'FALSE'
         }
         self.errores = []
 
@@ -138,29 +140,25 @@ class Lexico():
     t_COMA = r','
     t_PUNTO_Y_COMA = r';'
     t_DOS_PUNTOS = r':'
-    
-    
-    # Valores booleanos
-    t_TRUE = r'true'
-    t_FALSE = r'false'
 
     # Números int
     def t_NUMERO(self,t):
-        r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4})'
+        r'[0-9]+'
+        #r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4})'
         return t
 
     # Valores de char y string
     def t_VALOR_CHAR(self,t):
-        r"'[a-zA-Z0-9\s]'"
+        r"'[a-zA-ZñÑ0-9]'"
         return t
 
     def t_VALOR_STRING(self,t):
-        r'"[a-zA-Z0-9\s_\-\.]*"'
+        r'"[a-zA-ZñÑ0-9\s_\-\.]*"'
         return t
 
     # Identificadores
     def t_IDENTIFICADOR(self,t):
-        r'[a-zA-Z]([a-zA-Z0-9]{0,31})'
+        r'[a-zA-ZñÑ]([a-zA-Z0-9ñÑ]{0,31})'
         # Verificar si es una palabra reservada
         t.type = self.palabras_reservadas.get(t.value, 'IDENTIFICADOR')
 
