@@ -66,8 +66,8 @@ class Compilador():
     def parte_Semantica(self):
         self.sema.correr(self.resultado,self.identificadores_ts)
         self.identificadores_ts=self.sema.ts
-        if(self.sema.compilo):
-            self.compilo = True
+        if(not self.sema.compilo):
+            self.compilo = False
         
     #Errores
     def errores_re(self):

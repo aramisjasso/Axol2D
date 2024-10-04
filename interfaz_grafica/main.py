@@ -34,9 +34,10 @@ if __name__ == "__main__":
 
         level MiPrimerNivel {
             boolean resultado = -3;
+            int a = 1;
             int arreglo [5] = [1,2,3,4,5];
             int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
-            method boolean miMetodo () {
+            method boolean miMetodo (int a1,int b) {
 
                 print(nombre);
                 return flag;

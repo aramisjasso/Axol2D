@@ -26,6 +26,8 @@ class Semantico():
         #self.fnParteImport()
         self.fnParteNivel()
         self.fnPrintTs()
+        if len(self.errores)!=0:
+            self.compilo=False
         print('Fin Semantico')
 
     #Separa las partes de las tuplas
@@ -132,10 +134,9 @@ class Semantico():
 #----------- Declaracion en TS  por tipo -----------------------------------------------------
     def fnDeclararTipo(self,id,tipo,var=None):
         if not(self.fnComprobarDeclaracion(id)):
-            #Lo declara en la TS
+            temp_errores = len(self.errores)
             for indice,simbolo in enumerate(self.ts):
                 if simbolo[0]==id:
-                    simbolo[2]=tipo
                     break
             #Checa si es de un tipo arreglo
             if tipo[0]=='arreglo':
@@ -162,15 +163,16 @@ class Semantico():
                 for x,valor in enumerate(self.listaParametros):
                     id_m = valor[1]
                     parametros.append(id_m)
-                # 
+                #Se guarda la cantidad de errores
+                temp_errores = len(self.errores)
                 if len(parametros) != len(set(parametros)):
-                    self.errores.append([f'Error semantico, hay parametros repetidos en el método {id}',0,1])
+                    self.errores.append([f'Error semantico, hay parametros repetidos en el método {id}.',0,1])
                 else:
                     for x,valor in enumerate(self.listaParametros):
                         id_m = valor[1]
                         #validar que no exista como variable local
                         if self.fnComprobarDeclaracion(id_m):
-                            self.errores.append([f'Error semantico, el {id_m} ya habia sido declarado anteriormente como variable global',0,1])
+                            self.errores.append([f'Error semantico, el identificador {id_m} ya habia sido declarado anteriormente como variable global.',0,1])
                         else:
                             tipo_m = valor[0]
                             #añade a lista atributos
@@ -178,12 +180,17 @@ class Semantico():
                             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
                             simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
                             self.ts.insert(indice+x+1,simbolo)
-                    self.ts[indice][3]=(x+1, atributos)
+                    if temp_errores ==len(self.errores):
+                        self.ts[indice][3]=(x+1, atributos)
         else:
             #Error dos veces declarado
             self.compilo = False
             tipoEn =self.fnEncontrarTipo(id)
             self.errores.append([f'Error Semántico. El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',0,1])
+        if temp_errores ==len(self.errores):
+            #Lo declara en la TS
+            self.ts[indice][2]=tipo
+            
 
 #----------- Declaracion en TS por Estructura de Datos ----------------------------------
     def fnDeclararEstructuraDatos(self,estructura,tipo,id,tamaño):
