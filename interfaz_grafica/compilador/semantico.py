@@ -137,6 +137,7 @@ class Semantico():
             temp_errores = len(self.errores)
             for indice,simbolo in enumerate(self.ts):
                 if simbolo[0]==id:
+                    self.ts[indice][2]=tipo
                     break
             #Checa si es de un tipo arreglo
             if tipo[0]=='arreglo':
@@ -188,9 +189,9 @@ class Semantico():
             self.compilo = False
             tipoEn =self.fnEncontrarTipo(id)
             self.errores.append([f'Error Semántico. El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',0,1])
-        if temp_errores ==len(self.errores):
+        #if temp_errores ==len(self.errores):
             #Lo declara en la TS
-            self.ts[indice][2]=tipo
+            
             
 
 #----------- Declaracion en TS por Estructura de Datos ----------------------------------
