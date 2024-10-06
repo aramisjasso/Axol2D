@@ -32,7 +32,6 @@ class Sintactico():
                     | importaciones
                     | nivel
                     | empty
-                    | expresionUnitaria
                     '''
         if(len(p) == 2):
             p[0] = p[1]
@@ -169,8 +168,12 @@ class Sintactico():
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
     def p_contenidoMetodo(self,p):
-        '''contenidoMetodo : instrucciones RETURN expresion PUNTO_Y_COMA'''
-        p[0] = ('contenidoMetodo', p[1], p[3])
+        '''contenidoMetodo : instrucciones RETURN expresion PUNTO_Y_COMA
+                           | RETURN expresion PUNTO_Y_COMA '''
+        if len(p) == 5:
+            p[0] = ('contenidoMetodo', p[1], p[3])
+        else: 
+            p[0] = ('contenidoMetodo', p[2])
 
     #<parametros> ::= <tipoDato> identificador |
     #                 <tipoDato> identificador , <parametros> | 
@@ -200,7 +203,7 @@ class Sintactico():
     #<instrucciones> ::= <instruccion> <instrucciones>
     def p_instrucciones(self,p):
         '''instrucciones : instruccion
-                        | instruccion instrucciones'''
+                         | instruccion instrucciones'''
         if len(p) == 2:
             p[0] = [p[1]]  # Lista con una instrucción
         else:
@@ -209,10 +212,10 @@ class Sintactico():
     #<instruccion> ::=  ( <expresionAsignacion> | (<llamadaMetodo>) ; | <estructuraControl>
     def p_instruccion(self,p):
         '''instruccion : expresionAsignacion PUNTO_Y_COMA
-                    | llamadaMetodo PUNTO_Y_COMA
-                    | estructuraControl
-                    | expresion PUNTO_Y_COMA
-                    | llamadaStart'''
+                       | llamadaMetodo PUNTO_Y_COMA
+                       | estructuraControl
+                       | expresion PUNTO_Y_COMA
+                       | llamadaStart'''
         p[0] = ('instruccion', p[1])
     #----------------------------------------------------------------------------------------------------------
 
@@ -220,24 +223,34 @@ class Sintactico():
     #<estructuraControl> ::= <ifElse> | <switch> | <for> | <forEach> | <while> | <doWhile> 
     def p_estructuraControl(self,p):
         '''estructuraControl : ifElse
-                            | switch
-                            | for
-                            | forEach
-                            | while
-                            | doWhile'''
+                             | switch
+                             | for
+                             | forEach
+                             | while
+                             | doWhile'''
         p[0] = ('estructuraControl', p[1])
 
     #<ifElse> ::= if ( <condicion> ) { <instrucciones> } | if ( <condicion> ) { <instrucciones> } else { <instrucciones> } 
     def p_ifElse(self,p):
-        '''ifElse : IF expresion LLAVE_ABRE instrucciones LLAVE_CIERRA
-                | IF expresion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        if len(p) == 6:
+        '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        if len(p) == 5:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 6:
             p[0] = ('ifElse', p[2], p[4])
-        else:
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 9:
+            p[0] = ('ifElse', p[2], p[4])
+        else: 
             p[0] = ('ifElse', p[2], p[4], p[8])
 
     #<switch> ::= switch ( identificador ) { <casos> }
     def p_switch(self,p):
+        #aquí probar con parentesis abre identificador parentesis cierra
         '''switch : SWITCH expresion LLAVE_ABRE casos LLAVE_CIERRA'''
         p[0] = ('switch', p[2], p[4])
 
@@ -251,6 +264,7 @@ class Sintactico():
 
     #<caso> ::= case numero : <instrucciones> break ;
     def p_caso(self,p):
+        #aquí puede ser número, cadena o char
         '''caso : CASE NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA'''
         p[0] = ('caso', p[4])
 
@@ -265,30 +279,41 @@ class Sintactico():
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
     def p_for(self,p):
-        '''for : FOR PARENTESIS_ABRE INT IDENTIFICADOR IGUAL NUMERO PUNTO_Y_COMA expresionComparacion PUNTO_Y_COMA expresionAsignacion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        '''for : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR IGUAL NUMERO PUNTO_Y_COMA condicion PUNTO_Y_COMA expresionAsignacion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
         p[0] = ('for', p[8], p[10], p[13])
 
     #<forEach> ::= for ( <tipoDato> identificador : identificador ) { <instrucciones> }
     def p_forEach(self,p):
-        '''forEach : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        p[0] = ('forEach', p[3], p[4], p[6], p[9])
+        '''forEach : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
+                   | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
+        if len(p) == 10:
+            p[0] = ('forEach', p[3], p[4], p[6])
+        else:
+            p[0] = ('forEach', p[3], p[4], p[6], p[9])
 
     #<while> ::= while ( <condicion> ) { <instrucciones> }
     def p_while(self,p):
-        '''while : WHILE PARENTESIS_ABRE expresion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        p[0] = ('while', p[3], p[6])
+        '''while : WHILE condicion LLAVE_ABRE instrucciones LLAVE_CIERRA
+                 | WHILE condicion LLAVE_ABRE LLAVE_CIERRA'''
+        if len(p) == 5:
+            p[0] = ('while', p[2])
+        else: 
+            p[0] = ('while', p[2], p[4])
 
     #<doWhile> ::= do while ( <condicion> ) { <instrucciones> } 
     def p_doWhile(self,p):
-        '''doWhile : DOWHILE PARENTESIS_ABRE expresion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        p[0] = ('doWhile', p[4], p[7])
+        '''doWhile : DOWHILE condicion LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        if len(p) == 5:
+            p[0] = ('doWhile', p[2])
+        else: 
+            p[0] = ('doWhile', p[2], p[4])
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------- E X P R E S I O N -------------------------------------------------
     #<expresion> ::= <expresionAritmetica> | <expresionLogica> | <expresionPostfijo> | <expresionParentesis>
     def p_expresion(self, p):
-        '''expresion : expresionLogica'''
-        p[0] = ('expresion', p[1])
+        '''condicion : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
+        p[0] = ('condicion', p[2])
 
     #<expresionLogica> ::= <expresionComparacion> <restoExpresionLogica> 
     #                         | NOT <expresionComparacion> | <booleano> <restoExpresionLogica>
@@ -314,7 +339,9 @@ class Sintactico():
         '''elementoExpresionLogica : expresionComparacion
                                 | booleano
                                 | NOT expresionComparacion 
-                                | NOT booleano'''
+                                | NOT booleano
+                                | expresionRelacionalParentesis
+                                | NOT expresionRelacionalParentesis'''
         if len(p) == 2:
             p[0] = ('elementoExpresionLogica', p[1])
         else:
@@ -322,7 +349,7 @@ class Sintactico():
 
     #<expresionComparacion> ::= <expresionAritmetica> <restoExpresionComparacion>
     def p_expresionComparacion(self, p):
-        '''expresionComparacion : expresionAritmetica restoExpresionComparacion'''
+        '''expresionComparacion : expresion restoExpresionComparacion'''
         if p[2] is None:
             p[0] = p[1]
         else:
@@ -330,9 +357,8 @@ class Sintactico():
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionComparacion(self, p):
-        '''restoExpresionComparacion : restoExpresionComparacion operadorComparacion expresionAritmetica
+        '''restoExpresionComparacion : restoExpresionComparacion operadorComparacion expresion
                                      | restoExpresionComparacion operadorComparacion valorCadena
-                                     | restoExpresionComparacion operadorComparacion booleano
                                      | empty'''
         if len(p) == 2:
             p[0] = None 
@@ -343,14 +369,14 @@ class Sintactico():
 
     #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
     def p_expresionAritmetica(self, p):
-        '''expresionAritmetica : termino restoExpresionAritmetica
-                               | expresionUnitaria '''
+        '''expresion : termino restoExpresionAritmetica
+                     | expresionUnitaria '''
         if len(p) == 2:
-            p[0] = ('expresionAritmetica', p[1])
+            p[0] = ('expresion', p[1])
         elif p[2] is None:
-            p[0] = p[1]
+            p[0] = ('expresion', p[1])
         else:
-            p[0] = ('expresionAritmetica', p[1], p[2])
+            p[0] = ('expresion', p[1], p[2])
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionAritmetica(self, p):
@@ -412,6 +438,10 @@ class Sintactico():
     def p_expresionParentesis(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion PARENTESIS_CIERRA'''
         p[0] = ('expresionParentesis', p[2])
+
+    def p_expresionRelacionalParentesis(self,p):
+        '''expresionRelacionalParentesis : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
+        p[0] = ('expresionRelacionalParentesis', p[2])
 
     # Producción para <operadorComparacion>
     def p_operadorComparacion(self,p):
@@ -479,9 +509,9 @@ class Sintactico():
             p[0] = ('expresionAsignacion', p[1])
 
     #<expresionConstante> ::= constant <expresionAsignacion>
-    def p_expresionConstante(self,p):
-        '''expresionConstante : CONSTANT expresionAsignacion'''
-        p[0] = ('expresionConstante', p[2])
+    # def p_expresionConstante(self,p):
+    #     '''expresionConstante : CONSTANT expresionAsignacion'''
+    #     p[0] = ('expresionConstante', p[2])
 
     #<operadorAsignacionAritmetico> ::= += | -= | *= | /=
     def p_operadorAsignacion(self,p):

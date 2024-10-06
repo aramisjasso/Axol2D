@@ -49,7 +49,7 @@ class Lexico():
             'default': 'DEFAULT',
             'for': 'FOR',
             'while': 'WHILE',
-            'do while': 'DOWHILE',
+            'dowhile': 'DOWHILE',
             #las demás
             'method': 'METHOD',
             'return': 'RETURN',

@@ -33,11 +33,20 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-           boolean resultado = -3;
+            boolean t = false;
+            byte a = 1 + 1;
+            int b;
+            int c;
+            int d;
+            //int numero = 0;
+            int numeros [5] = [0, 1, 2, 3, 4]; 
 
             method boolean miMetodo () {
-                print(nombre);
-                return flag;
+                for (int numero : palabras) {
+
+                }
+                
+                return x;
             }
 
            axol2D play () {
@@ -45,6 +54,9 @@ if __name__ == "__main__":
                 MiPrimerNivel.start();
            }
         }'''
+        # '''if (a > b) {
+
+        #    }'''
     ]
     
     for prueba in pruebas:
