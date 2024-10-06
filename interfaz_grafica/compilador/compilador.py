@@ -52,8 +52,8 @@ class Compilador():
         self.sin.build()
         lexer.lineno = 1 #Reincia el número de linea
         try:
-            self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
-            #self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True)
+            #self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
+            self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True)
             if self.resultado:
                 print("Análisis sintáctico exitoso:", self.resultado, '\n')
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")
@@ -66,8 +66,8 @@ class Compilador():
     def parte_Semantica(self):
         self.sema.correr(self.resultado,self.identificadores_ts)
         self.identificadores_ts=self.sema.ts
-        if(self.sema.compilo):
-            self.compilo = True
+        if(not self.sema.compilo):
+            self.compilo = False
         
     #Errores
     def errores_re(self):

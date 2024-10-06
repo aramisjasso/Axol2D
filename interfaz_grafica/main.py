@@ -33,20 +33,11 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            boolean t = false;
-            byte a = 1 + 1;
-            int b;
-            int c;
-            int d;
-            //int numero = 0;
-            int numeros [5] = [0, 1, 2, 3, 4]; 
+           boolean resultado = -3;
 
             method boolean miMetodo () {
-                for (int numero : palabras) {
-
-                }
-                
-                return x;
+                print(nombre);
+                return flag;
             }
 
            axol2D play () {

@@ -26,6 +26,8 @@ class Semantico():
         #self.fnParteImport()
         self.fnParteNivel()
         self.fnPrintTs()
+        if len(self.errores)!=0:
+            self.compilo=False
         print('Fin Semantico')
 
     #Separa las partes de las tuplas
@@ -132,10 +134,10 @@ class Semantico():
 #----------- Declaracion en TS  por tipo -----------------------------------------------------
     def fnDeclararTipo(self,id,tipo,var=None):
         if not(self.fnComprobarDeclaracion(id)):
-            #Lo declara en la TS
+            temp_errores = len(self.errores)
             for indice,simbolo in enumerate(self.ts):
                 if simbolo[0]==id:
-                    simbolo[2]=tipo
+                    self.ts[indice][2]=tipo
                     break
             #Checa si es de un tipo arreglo
             if tipo[0]=='arreglo':
@@ -146,11 +148,12 @@ class Semantico():
             #Checa si es de un tipo matriz
             elif tipo[0]=='matriz':
                 self.ts[indice][3]=var
+                x1=0
                 for x in range(int(var[0])):
                     for y in range(int(var[1])):
                         in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1],'Null', 'Linea declaración']
-                        self.ts.insert(indice+1,in_simbolo)
-                        indice+=1
+                        self.ts.insert(indice+x1+1,in_simbolo)
+                        x1+=1
             #Checa si es de un tipo metodo
             elif tipo[0] == 'metodo':
                 atributos = []
@@ -162,15 +165,16 @@ class Semantico():
                 for x,valor in enumerate(self.listaParametros):
                     id_m = valor[1]
                     parametros.append(id_m)
-                # 
+                #Se guarda la cantidad de errores
+                temp_errores = len(self.errores)
                 if len(parametros) != len(set(parametros)):
-                    self.errores.append([f'Error semantico, hay parametros repetidos en el método {id}',0,1])
+                    self.errores.append([f'Error semantico, hay parametros repetidos en el método {id}.',0,1])
                 else:
                     for x,valor in enumerate(self.listaParametros):
                         id_m = valor[1]
                         #validar que no exista como variable local
                         if self.fnComprobarDeclaracion(id_m):
-                            self.errores.append([f'Error semantico, el {id_m} ya habia sido declarado anteriormente como variable global',0,1])
+                            self.errores.append([f'Error semantico, el identificador {id_m} ya habia sido declarado anteriormente como variable global.',0,1])
                         else:
                             tipo_m = valor[0]
                             #añade a lista atributos
@@ -178,12 +182,17 @@ class Semantico():
                             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
                             simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
                             self.ts.insert(indice+x+1,simbolo)
-                    self.ts[indice][3]=(x+1, atributos)
+                    if temp_errores ==len(self.errores):
+                        self.ts[indice][3]=(x+1, atributos)
         else:
             #Error dos veces declarado
             self.compilo = False
             tipoEn =self.fnEncontrarTipo(id)
             self.errores.append([f'Error Semántico. El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',0,1])
+        #if temp_errores ==len(self.errores):
+            #Lo declara en la TS
+            
+            
 
 #----------- Declaracion en TS por Estructura de Datos ----------------------------------
     def fnDeclararEstructuraDatos(self,estructura,tipo,id,tamaño):
@@ -227,9 +236,20 @@ class Semantico():
                     tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
                         self.errores.append([f'Error Semántico, el tamaño de la fila no se puede asignar al identificador {id} el tamaño declaro es: {tamaño_arreglo}',0,1])
-                    else:
+                    else:#Validación de inserción
+                        tamaño_errores = len(self.errores)
+                        temp_valores=[]
                         for x in range(tamaño):
-                            self.ts[indice+x+1][3]=valores[2][x]
+                            temp_id = self.ts[indice+x+1][0]
+                            temp_valores.append(self.ts[indice+x+1][3])
+                            temp_valor = valores[2][x]
+                            self.fnAsignar(temp_valor,temp_id)
+                            #self.ts[indice+x+1][3]=valores[2][x]
+                        if tamaño_errores != len(self.errores):
+                            for x in range(tamaño):
+                                self.ts[indice+x+1][3]=temp_valores[x]
+                        
+
             else:
                 #Validacion Tipos
                 if tipo != tipo_id[0]:
@@ -254,11 +274,30 @@ class Semantico():
                             self.errores.append([f'Error Semántico, las Matriz no se puede asignar al identificador {id} el tamaño declarado es de: {[tamaño_matriz_x,tamaño_matriz_y]}.',0,1])
                         else:
                             filas=valores[2]
+                            tamaño_errores = len(self.errores)
+                            temp_matriz=[]
+                            x1=0
                             for x in range(tamaño_matriz_x):
+                                temp_arreglo=[]
                                 for y in range(tamaño_matriz_y):
                                     valor=filas[x][2][y]
-                                    self.ts[indice+1][3] = valor
-                                    indice+=1
+                                    temp_id=self.ts[indice+x1+1][0]
+                                    #Se guarda el valor temporalmente para ver si no se debe de volver a poner
+                                    temp_valor=self.ts[indice+x1+1][3]
+                                    temp_arreglo.append(temp_valor)
+                                    #Asignar valor
+                                    self.fnAsignar(valor,temp_id)
+                                    x1+=1
+                                temp_matriz.append(temp_arreglo)
+                        #En caso de error
+                        if tamaño_errores != len(self.errores):
+                            x1=0       
+                            for x in range(tamaño_matriz_x):
+                                for x in range(tamaño_matriz_y):
+                                    self.ts[indice+x1+1][3]=temp_matriz[x][y]
+
+                            
+                            
                 
         else:
             # tipo=self.fnRetornaValor(valores,tipo_id)
