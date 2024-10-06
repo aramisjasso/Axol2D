@@ -60,7 +60,7 @@ class Semantico():
         self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         self.fnBloqueDeclaracion()
         self.fnbloqueMetodos()
-        #self.metodoPrincipal
+        self.fnMetodoPrincipal()
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
     def fnSeparacionDeclaracion(self):
@@ -159,7 +159,6 @@ class Semantico():
                 atributos = []
                 x=0 #inicia x=0 para cuando no hay
                 id_ts=self.ts[indice][1]
-                self.listaParametros = sorted(self.listaParametros,key=lambda x:x[1]) #Ordena
                 #Validar que en los parametros no haya variables repetidas
                 parametros=[]
                 for x,valor in enumerate(self.listaParametros):
@@ -227,6 +226,7 @@ class Semantico():
             if tipo_id[0]=='metodo':
                 self.errores.append([f'Error Semántico al identificador {id} es de tipo método y no se puede asignar nigún valor.',0,1])
                 return
+            
             elif tipo_id[0]=='arreglo':
                 if tipo != tipo_id[0]:
                   self.errores.append([f'Error Semántico al identificador {id} es de tipo Arreglo y no se puede asignar una Matriz.',0,1])
@@ -235,7 +235,7 @@ class Semantico():
                     tamaño=int(valores[1])
                     tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
-                        self.errores.append([f'Error Semántico, el tamaño de la fila no se puede asignar al identificador {id} el tamaño declaro es: {tamaño_arreglo}',0,1])
+                        self.errores.append([f'Error Semántico, la fila no se puede asignar al identificador {id} los tamaños no coinciden el tamaño declaro es: {tamaño_arreglo}',0,1])
                     else:#Validación de inserción
                         tamaño_errores = len(self.errores)
                         temp_valores=[]
@@ -261,44 +261,51 @@ class Semantico():
                     tamaño_matriz_y=int(self.ts[indice][3][1])
                     tamaño_x=int(valores[1][0])
                     tamaño_y=valores[1][1]
-                    compara=int(tamaño_y[0])
+                    lista_numero=[]
                     resultado=True
                     for x in tamaño_y:
-                        if int(x) != compara:
+                        lista_numero.append(int(x))
+                    compara_1 = lista_numero[0]
+                    for x in lista_numero:
+                        if compara_1!=x:
                             resultado=False
+
                     #La filas son de diferentes tamaños entre si
                     if resultado is False:
                         self.errores.append([f'Error Semántico la matriz tiene filas con diferentes tamaños',0,1])
                     else:
-                        if tamaño_matriz_x !=tamaño_x or tamaño_matriz_y!=compara:
+                        #Los tamaños son diferentes
+                        compara=False
+                        if all( num == tamaño_matriz_y for num in lista_numero):
+                            compara = True
+                            
+                        if tamaño_matriz_x !=tamaño_x or not compara:
                             self.errores.append([f'Error Semántico, las Matriz no se puede asignar al identificador {id} el tamaño declarado es de: {[tamaño_matriz_x,tamaño_matriz_y]}.',0,1])
                         else:
                             filas=valores[2]
                             tamaño_errores = len(self.errores)
-                            temp_matriz=[]
+                            temp_valores=[]
                             x1=0
                             for x in range(tamaño_matriz_x):
-                                temp_arreglo=[]
                                 for y in range(tamaño_matriz_y):
                                     valor=filas[x][2][y]
                                     temp_id=self.ts[indice+x1+1][0]
                                     #Se guarda el valor temporalmente para ver si no se debe de volver a poner
                                     temp_valor=self.ts[indice+x1+1][3]
-                                    temp_arreglo.append(temp_valor)
+                                    temp_valores.append(temp_valor)
                                     #Asignar valor
                                     self.fnAsignar(valor,temp_id)
-                                    x1+=1
-                                temp_matriz.append(temp_arreglo)
-                        #En caso de error
-                        if tamaño_errores != len(self.errores):
-                            x1=0       
-                            for x in range(tamaño_matriz_x):
-                                for x in range(tamaño_matriz_y):
-                                    self.ts[indice+x1+1][3]=temp_matriz[x][y]
 
-                            
-                            
-                
+                                    x1+=1
+                                
+                            #En caso de error
+                            if tamaño_errores != len(self.errores):
+                                x1=0       
+                                for x in range(tamaño_matriz_x):
+                                    for y in range(tamaño_matriz_y):
+                                        self.ts[indice+x1+1][3]=temp_valores[x1]
+                                        x1+=1
+                                 
         else:
             # tipo=self.fnRetornaValor(valores,tipo_id)
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
@@ -701,3 +708,22 @@ class Semantico():
         else:
             return semantica
 #-----------------------------------------------------------------------------------------------
+
+#------Método Axol--------------------------------------------------------------------------------------------
+    def fnMetodoPrincipal(self):
+        #
+        print('hola')
+        ##
+        # self.fnDeleteParametros()
+
+#------Delete Parametros--------------------------------------------------------------------------------------
+    def fnDeleteParametros(self):
+        x = True
+        con = 0
+        while x :
+            if 'Sin tipo'==self.ts[con][2]:
+                self.ts.pop(con)
+            else:
+                con+=1
+                if not con < len(self.ts):
+                    x=False
