@@ -14,6 +14,7 @@ class Sintactico():
         self.fila = 0
         self.matriz = 0
         self.filas = []
+        self.parametros=0
         #Lista de errores
         self.errores = []
         self.parser = None
@@ -529,9 +530,11 @@ class Sintactico():
         '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos 
                         | metodoAxol PARENTESIS_ABRE argumentos '''
         if len(p) == 6:
-            p[0] = ('llamadaMetodo', p[3],p[5]) 
+            p[0] = ('llamadaMetodo', p[3], self.parametros ,p[5]) 
+            self.parametros =0
         else:
-            p[0] = ('llamadaMetodo', p[1], p[3]) 
+            p[0] = ('llamadaMetodo', p[1], self.parametros , p[3]) 
+            self.parametros =0
 
     #<metodoAxol> ::= (read_key | read_bin | read_tec | save_bin | print |print_con | pop | push | position |
     #               show | positionX | positionY | add | set | random | getPosition | size | rotate)
@@ -548,6 +551,7 @@ class Sintactico():
                     | GETPOSITION'''
         p[0] = ('metodoAxol', p[1])
 
+
     # <argumentos> ::= (expresion | objeto) <restoArgumentos> PARENTESIS_CIERRA
     def p_argumentos(self,p):
         '''argumentos : expresion restoArgumentos PARENTESIS_CIERRA
@@ -557,9 +561,10 @@ class Sintactico():
                     | direction restoArgumentos PARENTESIS_CIERRA
                     | PARENTESIS_CIERRA'''
         if len(p) == 4:  # Caso con expresión u objeto, restoArgumentos y paréntesis de cierre
-            p[0] = ('argumentos', p[1], p[2])
+            p[0] = ('argumentos', p[1],p[2])
+            self.parametros+=1
         else:  # Caso sin argumentos, solo paréntesis de cierre
-            p[0] = ('argumentos',)
+            p[0] = ('argumentos')
 
     #<restoArgumentos> ::= , <argumentos> | ε
     def p_restoArgumentos(self,p):
@@ -569,10 +574,11 @@ class Sintactico():
                         | COMA booleano restoArgumentos
                         | COMA direction restoArgumentos
                         | empty'''
-        if len(p) == 3:
+        if len(p) == 4:
             p[0] = ('restoArgumentos', p[2])  # Caso con argumentos adicionales
+            self.parametros+=1
         else:
-            p[0] = ('restoArgumentos',)  # Caso ε (sin más argumentos)
+            p[0]   # Caso ε (sin más argumentos)
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------- V A L O R E S -----------------------------------------------
@@ -692,7 +698,7 @@ class Sintactico():
 
     def p_definicionMatriz(self,p):
         '''definicionMatriz : IDENTIFICADOR IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA'''
-        p[0] = ('definicionMatriz', p[4])
+        p[0] = ('definicionMatriz', p[1],p[4])
 
     # <accesoLineal> ::= <identificador> [ numero ]
     def p_accesoLineal(self,p):
