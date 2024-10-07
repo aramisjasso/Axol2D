@@ -66,8 +66,8 @@ if __name__ == "__main__":
             }
 
            axol2D play () {
-                this.miMetodo();
-                MiPrimerNivel.start();
+                b = 10;
+                MiPrimerNivel1.start();
            }
         }'''
     ]
