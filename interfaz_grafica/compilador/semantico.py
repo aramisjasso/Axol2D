@@ -203,11 +203,12 @@ class Semantico():
             self.fnDeclararTipo(id,tipo,tamaño)
 
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
-    def fnAsignar(self,valores,id):
-        #falta validar su declaración
-        #indice
+    def fnAsignar(self,valores,id,inMetodo = False, var = None):
+        #Validar su declaración
         indice=self.fnIndice(id)
+        
         tipo_id=self.ts[indice][2]
+
         
         #Validad si el id es del tipo que se pasa
         #Validar si es arreglo o método
@@ -243,9 +244,9 @@ class Semantico():
                             temp_id = self.ts[indice+x+1][0]
                             temp_valores.append(self.ts[indice+x+1][3])
                             temp_valor = valores[2][x]
-                            self.fnAsignar(temp_valor,temp_id)
+                            self.fnAsignar(temp_valor,temp_id,inMetodo,var)
                             #self.ts[indice+x+1][3]=valores[2][x]
-                        if tamaño_errores != len(self.errores):
+                        if tamaño_errores != len(self.errores) or inMetodo:
                             for x in range(tamaño):
                                 self.ts[indice+x+1][3]=temp_valores[x]
                         
@@ -294,12 +295,12 @@ class Semantico():
                                     temp_valor=self.ts[indice+x1+1][3]
                                     temp_valores.append(temp_valor)
                                     #Asignar valor
-                                    self.fnAsignar(valor,temp_id)
+                                    self.fnAsignar(valor,temp_id,inMetodo,var)
 
                                     x1+=1
                                 
                             #En caso de error
-                            if tamaño_errores != len(self.errores):
+                            if tamaño_errores != len(self.errores) or inMetodo:
                                 x1=0       
                                 for x in range(tamaño_matriz_x):
                                     for y in range(tamaño_matriz_y):
@@ -315,7 +316,7 @@ class Semantico():
                     #print(valores)
                     self.postorden(valores)
                     #print(self.pila_semantica)
-                    valores = self.evaluar_pila(self.pila_semantica)
+                    valores = self.evaluar_pila(self.pila_semantica,var)
                     #print(valores)
                     # self.ts[indice][3] = self.pila_semantica
                     self.pila_semantica = []
@@ -323,32 +324,39 @@ class Semantico():
                 # Asignación de un Valor Diferente a Expresión
                 # String, Char, Llamada a Método, Booleano
                 if not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'int':
-                    if valores >= 0 and valores <= 65535:
-                        self.ts[indice][3] = valores
+                    if (valores >= 0 and valores <= 65535):
+                        if inMetodo is False:
+                            self.ts[indice][3] = valores
                     elif valores < 0:
                         self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
-                        self.ts[indice][3] = 0
+                        if inMetodo is False:
+                            self.ts[indice][3] = 0
                     else: 
                         self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
                 elif not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'byte':
                     if valores >= 0 and valores <= 255:
-                        self.ts[indice][3] = valores
+                        if inMetodo is False:
+                         self.ts[indice][3] = valores
                     elif valores < 0:
                         self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
-                        self.ts[indice][3] = 0
+                        if inMetodo is False:
+                            self.ts[indice][3] = 0
                     else: 
                         self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
                 elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and self.ts[indice][2] == 'char':
-                    self.ts[indice][3] = valores
+                    if inMetodo is False:
+                        self.ts[indice][3] = valores
                 elif isinstance(valores, str) and self.ts[indice][2] == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
-                    self.ts[indice][3] = valores
+                    if inMetodo is False:
+                        self.ts[indice][3] = valores
                 # elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
                 #     if valores:
                 #         self.ts[indice][3] = 'true'
                 #     else: 
                 #         self.ts[indice][3] = 'false'
                 elif isinstance(valores, tuple) and valores[0] == 'booleano' and self.ts[indice][2] == 'boolean':
-                    self.ts[indice][3] = valores[1]
+                    if inMetodo is False:
+                        self.ts[indice][3] = valores[1]
                 # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
                 #     #Error de inicialización
                 #     self.ts[indice][3] = valores
@@ -442,9 +450,11 @@ class Semantico():
             instruccion=instrucciones[x][1]
             # print('Instrucciones',instruccion)
             lista_instrucciones.append(instruccion)
+        
         #Se analizan todas las intrucciones para ver su tratamiento
         #print(lista_instrucciones)
-        for x in lista_instrucciones: 
+        for x in lista_instrucciones:
+            print(lista_instrucciones)
             if x[0] == 'estructuraControl':
                 if x[1][0] == 'ifElse': 
                     condicion = x[1][1]
@@ -502,7 +512,7 @@ class Semantico():
                 elif x[1][0] == 'while':
                     condicion = x[1][1]
                     self.postorden(condicion)
-                    condEval = self.evaluar_pila(self.pila_semantica)
+                    condEval = self.evaluar_pila(self.pila_semantica,var)
                     print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
@@ -511,7 +521,7 @@ class Semantico():
                 elif x[1][0] == 'doWhile':
                     condicion = x[1][1]
                     self.postorden(condicion)
-                    condEval = self.evaluar_pila(self.pila_semantica)
+                    condEval = self.evaluar_pila(self.pila_semantica,var)
                     print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
@@ -519,15 +529,28 @@ class Semantico():
                         self.fnInstrucciones(x[1][2], llamada)
 
             elif x[0]=='expresionAsignacion':
-                id = x[1][1]
+                id=x[1][1]
+                temp = self.fnComprobarDeclaracion(id)
                 if not self.fnComprobarDeclaracion(id):
-                    self.errores.append([f'Error Semántico. La variable [{id}] no ha sido declarada.', 0, 1])
-                    return
-                valores= x[2]
-                print(valores, id)
-                self.fnAsignar(valores, id)
-            # elif x[0]=='llamadaMetodo':
-            #     print('Es una llamada de Metodo', x[1],x[2])
+                    temp_id=id
+                    id=f'{var},{id}'
+                    if 'NoId'== self.fnComprobarDeclaracion(id):
+                        self.errores.append([f'Error Semántico. La variable [{temp_id}] no ha sido declarada.', 0, 1])
+                        return
+                if len(x)==3:
+                    valores= x[2]
+                elif len(x)==2:
+                    valores= x[1][2]
+                self.fnAsignar(valores,id,True,var)
+            elif x[0]=='llamadaMetodo':
+                id = x[1]
+                cantidad = x[2]
+                argumentos = x[3]
+                #Separacion de métodos propios y axol
+                if id in ['READ_BIN', 'READ_TEC','SAVE_BIN','PRINT', 'PRINT_CON', 'SHOW', 'POSITIONX','POSITIONY', 'RANDOM', 'GETPOSITION']:
+                    print('Método Axol')
+                else:
+                    self.fnLlamadaMetodo(x[1],x[2],x[3])
             elif x[0] == 'llamadaStart':
                 if llamada == 'metodo':
                     self.errores.append([f'Error Semántico. El método start() solo puede ser llamado desde el método principal axol2D play().', 0, 1])
@@ -622,14 +645,21 @@ class Semantico():
 #-----------------------------------------------------------------------------------------------
 
 #---------------------------Evaluación de la Pila Semántica-------------------------------------
-    def evaluar_pila(self, semantica):
+    def evaluar_pila(self, semantica,nameMetod =None):
         pila_evaluacion = []
         idConValor = True
         
         for elemento in semantica:
             #print(elemento)
             validaDeclaracion = self.fnComprobarDeclaracion(elemento)
-
+            
+            if validaDeclaracion is False and nameMetod is not None:
+                temp_elemento=elemento
+                elemento=f'{nameMetod},{elemento}'
+                validaDeclaracion = self.fnComprobarDeclaracion(elemento)
+                if validaDeclaracion is False:
+                    elemento=temp_elemento
+            
             if self.validaNumero(elemento):
                 pila_evaluacion.append(int(elemento))
             #---Validación de Identificadores---
@@ -817,6 +847,8 @@ class Semantico():
         while x :
             if 'Sin tipo'==self.ts[con][2]:
                 self.ts.pop(con)
+                if not con < len(self.ts):
+                    x=False
             else:
                 con+=1
                 if not con < len(self.ts):

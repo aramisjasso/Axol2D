@@ -37,6 +37,13 @@ if __name__ == "__main__":
             string nombre;
             byte b;
             int identificador = 0; 
+            boolean resultado = true;
+            
+            int arreglo [6] = [1,2,3,4,5,6];
+            int a = 1;
+            int arreglo1 [6] = [arreglo[5],a,a,a,a,a];
+            int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
+            int b1 = arreglo2[1][1];
 
             method boolean miMetodo () {
                 switch ( identificador ) {
@@ -45,6 +52,23 @@ if __name__ == "__main__":
                     default: 
                         a = 0;
                 }
+            method boolean miMetodo1(string b,int a1){
+                a1 = 12;
+                arreglo = [1,1,a,a,a,a];
+                //arreglo2 = [['a',b,a],[a,a,a]];
+                //b2 = a1;
+                //arreglo1[0]=1;
+                return flag;
+            }
+
+            method boolean miMetodo2(string b,int a1, int b2) {
+                a1 = 12;
+                arreglo[1]=1;
+                arreglo = [1,1,a,a,a,a];
+                //arreglo2 = [['a',b,a],[a,a,a]];
+                //b2 = a1;
+                //arreglo1[0]=1;
+                this.miMetodo (b,a);
                 return flag;
             }
 
