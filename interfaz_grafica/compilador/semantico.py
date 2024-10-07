@@ -461,7 +461,7 @@ class Semantico():
                     #print(condicion)
                     self.postorden(condicion)
                     #print(self.pila_semantica)
-                    self.evaluar_pila(self.pila_semantica)
+                    self.evaluar_pila(self.pila_semantica, llamada)
                     #condicionEvaluada = self.evaluar_pila(self.pila_semantica)
                     self.pila_semantica = []
 
@@ -512,7 +512,7 @@ class Semantico():
                 elif x[1][0] == 'while':
                     condicion = x[1][1]
                     self.postorden(condicion)
-                    condEval = self.evaluar_pila(self.pila_semantica,var)
+                    condEval = self.evaluar_pila(self.pila_semantica,llamada)
                     print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
@@ -521,7 +521,7 @@ class Semantico():
                 elif x[1][0] == 'doWhile':
                     condicion = x[1][1]
                     self.postorden(condicion)
-                    condEval = self.evaluar_pila(self.pila_semantica,var)
+                    condEval = self.evaluar_pila(self.pila_semantica,llamada)
                     print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
@@ -541,7 +541,7 @@ class Semantico():
                     valores= x[2]
                 elif len(x)==2:
                     valores= x[1][2]
-                self.fnAsignar(valores,id,True,var)
+                self.fnAsignar(valores,id,True, llamada)
             elif x[0]=='llamadaMetodo':
                 id = x[1]
                 cantidad = x[2]
@@ -552,7 +552,7 @@ class Semantico():
                 else:
                     self.fnLlamadaMetodo(x[1],x[2],x[3])
             elif x[0] == 'llamadaStart':
-                if llamada == 'metodo':
+                if llamada != 'axol':
                     self.errores.append([f'Error Semántico. El método start() solo puede ser llamado desde el método principal axol2D play().', 0, 1])
                     return
                 # print(self.ts[0][0])
