@@ -541,6 +541,8 @@ class Semantico():
                     valores= x[2]
                 elif len(x)==2:
                     valores= x[1][2]
+                print('id:',id)
+                print('valor:',valores)
                 self.fnAsignar(valores,id,True,var)
             elif x[0]=='llamadaMetodo':
                 id = x[1]
@@ -556,14 +558,23 @@ class Semantico():
 #----------Asignación Metodo ()--------------------------------------------------------------
     def fnLlamadaMetodo(self,id,cantidad,argumentos,):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
+        #Validación si esta declarado
+        #print('declarado: ',self.fnComprobarDeclaracion(id))
         #Validación si es un método
         tipo=self.fnEncontrarTipo(id)
         if not (isinstance(tipo, tuple) and tipo[0] in ['metodo']):
             self.errores.append([f'Error Semántico. La variable llamada no es un método [{id}].', 0, 1])
             return
         print('Tipo',tipo)
-        #lista_argumentos = fnSeparacionArgumentos(argumentos)
+        lista_argumentos = self.fnSeparacionArgumentos(argumentos)
 
+#----------Separacion de Arguemntos-----------------------------------------------------
+    def fnSeparacionArgumentos(self,argumentos):
+        lista_arguemntos=[]
+        print('Argumentos',argumentos)
+        print('Tamaño: ',len(argumentos))
+        #while(compara):
+            #argumentos
 
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):

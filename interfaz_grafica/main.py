@@ -35,7 +35,7 @@ if __name__ == "__main__":
         level MiPrimerNivel {
             int numeros [5] = [0, 1, 2, 3, 4];
             string nombre;
-            byte b;
+            //byte b;
             int identificador = 0; 
             boolean resultado = true;
             
@@ -44,14 +44,7 @@ if __name__ == "__main__":
             int arreglo1 [6] = [arreglo[5],a,a,a,a,a];
             int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
             int b1 = arreglo2[1][1];
-
-            method boolean miMetodo () {
-                switch ( identificador ) {
-                    case 1: 
-                        a = a + 1; break;
-                    default: 
-                        a = 0;
-                }
+ 
             method boolean miMetodo1(string b,int a1){
                 a1 = 12;
                 arreglo = [1,1,a,a,a,a];
@@ -67,8 +60,8 @@ if __name__ == "__main__":
                 arreglo = [1,1,a,a,a,a];
                 //arreglo2 = [['a',b,a],[a,a,a]];
                 //b2 = a1;
-                //arreglo1[0]=1;
-                this.miMetodo (b,a);
+                arreglo1[0]=1;
+                this.miMetodo1 (b,x,c);
                 return flag;
             }
 
