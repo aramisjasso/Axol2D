@@ -53,9 +53,6 @@ if __name__ == "__main__":
                 MiPrimerNivel.start();
            }
         }'''
-        # '''if (a > b) {
-
-        #    }'''
     ]
     
     for prueba in pruebas:
