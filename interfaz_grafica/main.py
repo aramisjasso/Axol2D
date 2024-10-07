@@ -33,50 +33,15 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            int numeros [5] = [0, 1, 2, 3, 4];
-            string nombre = "cadena";
-            byte a123 = 1;
-            int identificador = 0; 
             boolean resultado = true;
             boolean resultado2 = resultado;
-            string nombre2 = nombre;
             
-            int arreglo [6] = [1,2,3,4,5,6];
-            int a = 1;
-            int arreglo1 [6] = [arreglo[5],a,a,a,a,a];
-            int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
-            int b1 = arreglo2[1][1];
-            char letra = 'a';
-            
-            method int miMetodo1(string b,int a1,int c){
+            method int miMetodo1(string b, int a1, int c){
                 a1 = 12;
-                //arreglo = [1,1,a,a,a,a];
-                //arreglo2 = [['a',b,a],[a,a,a]];
-                //b2 = a1;
-                //arreglo1[0]=1;
-                return a;
+                return 0;
             }
             
-            method string miMetodo2(string b,int a1, int c) {
-                a1 = 12;
-                arreglo[1]=1;
-                arreglo = [1,1,a,a,a,a];
-                //arreglo2 = [['a',b,a],[a,a,a]];
-                //reglo[1] = a;
-                //sds=a;
-                a=1;
-                //b2 = a1;
-                arreglo1[0]=1;
-                //resultado = resultado;
-                //nombre2 = nombre;
-                //miMetodo2 = 1;
-                //this.miMetodo1 (nombre,a,c);
-                return nombre;
-            }
-
-
            axol2D play () {
-                a = 10;
                 MiPrimerNivel.start();
            }
         }'''
@@ -95,3 +60,57 @@ if __name__ == "__main__":
 # byte c = a;
 # 
 # byte c = True;
+
+# '''
+#         import Controllers;
+#         import enemies;
+
+#         level MiPrimerNivel {
+#             string nombre = "cadena";
+#             /°int numeros [5] = [0, 1, 2, 3, 4];
+#             byte a123 = 1;
+#             int identificador = 0; °/
+#             boolean resultado = true;
+#             boolean resultado2 = resultado;
+#             //string nombre2 = nombre;
+            
+#             /°int arreglo [6] = [1,2,3,4,5,6];
+#             int a = 1;
+#             int arreglo1 [6] = [arreglo[5],a,a,a,a,a];
+#             int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
+#             int b1 = arreglo2[1][1];
+#             char letra = 'a';°/
+            
+#             method int miMetodo1(string b,int a1,int c){
+#                 a1 = 12;
+#                 //arreglo = [1,1,a,a,a,a];
+#                 //arreglo2 = [['a',b,a],[a,a,a]];
+#                 //b2 = a1;
+#                 //arreglo1[0]=1;
+#                 return 0;
+#             }
+            
+#             method string miMetodo2(string b,int a1, int c) {
+#                 a1 = 12;
+#                 /°
+#                 arreglo[1]=1;
+#                 arreglo = [1,1,a,a,a,a];
+#                 //arreglo2 = [['a',b,a],[a,a,a]];
+#                 //reglo[1] = a;
+#                 //sds=a;
+#                 a=1;
+#                 //b2 = a1;
+#                 arreglo1[0]=1;
+#                 //resultado = resultado;
+#                 //nombre2 = nombre;
+#                 //miMetodo2 = 1;
+#                 //this.miMetodo1 (nombre,a,c);°/
+#                 return nombre;
+#             }
+
+
+#            axol2D play () {
+#                 //a = 10;
+#                 MiPrimerNivel.start();
+#            }
+#         }'''
