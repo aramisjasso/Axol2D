@@ -388,7 +388,7 @@ class Semantico():
             contenido = metodo[4]
             if len(contenido) == 3: 
                 instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones)
+                self.fnInstrucciones(instrucciones, 'metodo')
                 parteReturn=contenido[2]
             else: 
                 parteReturn=contenido[1]
@@ -407,7 +407,7 @@ class Semantico():
                 contenido = metodo[4]
                 #print(contenido)
                 instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones)
+                self.fnInstrucciones(instrucciones, 'metodo')
                 parteReturn=contenido[2]
                 #self.fnReturn(parteReturn,id)
             
@@ -435,7 +435,7 @@ class Semantico():
                     compara=False
 
 #---------Procesado de instrucciones----------------------------------------------------
-    def fnInstrucciones(self,instrucciones):
+    def fnInstrucciones(self, instrucciones, llamada):
         # print('Instrucciones',instrucciones)
         lista_instrucciones=[]
         for x in range(len(instrucciones)):
@@ -457,11 +457,11 @@ class Semantico():
 
                     #if con instrucciones sin else (o else sin instrucciones)
                     if len(x[1]) == 3: 
-                        self.fnInstrucciones(x[1][2])
+                        self.fnInstrucciones(x[1][2], llamada)
                     #Condición, instrucciones del if y else
                     elif len(x[1]) == 4: 
-                        self.fnInstrucciones(x[1][2])
-                        self.fnInstrucciones(x[1][3])
+                        self.fnInstrucciones(x[1][2], llamada)
+                        self.fnInstrucciones(x[1][3], llamada)
                     
                 elif x[1][0] == 'switch':
                     #Validar que x[1][1] esté declarada
@@ -475,7 +475,7 @@ class Semantico():
                     #Advertir si x[1][1] no ha sido inicializada
                     if self.fnRetornaValor(x[1][1]) == 'Null':
                         self.errores.append([f'Advertencia. La variable [{x[1][1]}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', 0, 1])
-                    print(x[1])
+                    #print(x[1])
                 # elif x[1][0] == 'for':
                 #     print(x[1])
                 elif x[1][0] == 'forEach':
@@ -497,7 +497,7 @@ class Semantico():
                         return
                     
                     if len(x[1]) == 5:
-                         self.fnInstrucciones(x[1][4])
+                         self.fnInstrucciones(x[1][4], llamada)
 
                 elif x[1][0] == 'while':
                     condicion = x[1][1]
@@ -507,7 +507,7 @@ class Semantico():
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
-                         self.fnInstrucciones(x[1][2])
+                         self.fnInstrucciones(x[1][2], llamada)
                 elif x[1][0] == 'doWhile':
                     condicion = x[1][1]
                     self.postorden(condicion)
@@ -516,7 +516,7 @@ class Semantico():
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
-                         self.fnInstrucciones(x[1][2])
+                        self.fnInstrucciones(x[1][2], llamada)
 
             elif x[0]=='expresionAsignacion':
                 id = x[1][1]
@@ -529,7 +529,18 @@ class Semantico():
             # elif x[0]=='llamadaMetodo':
             #     print('Es una llamada de Metodo', x[1],x[2])
             elif x[0] == 'llamadaStart':
-                print(x)
+                if llamada == 'metodo':
+                    self.errores.append([f'Error Semántico. El método start() solo puede ser llamado desde el método principal axol2D play().', 0, 1])
+                    return
+                # print(self.ts[0][0])
+                # print(x[1])
+                if not (self.fnComprobarDeclaracion(x[1]) and self.fnEncontrarTipo(x[1]) == 'Nivel'):
+                    if self.ts[0][2] == 'Nivel':
+                        nombreNivel = self.ts[0][0]
+                    else: 
+                        nombreNivel = 'Nivel sin Idenficador'
+                    self.errores.append([f'Error Semántico. El identificador de llamada al método start() [{x[1]}] no coincide con el identificador del nivel [{nombreNivel}].', 0, 1])
+                    return
 
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):
@@ -795,10 +806,9 @@ class Semantico():
 
 #------Método Axol--------------------------------------------------------------------------------------------
     def fnMetodoPrincipal(self):
-        #
-        print('hola')
-        ##
-        # self.fnDeleteParametros()
+        # Procesar instrucciones
+        print(self.parteMetodoPrincipal[1])
+        self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
 
 #------Delete Parametros--------------------------------------------------------------------------------------
     def fnDeleteParametros(self):
