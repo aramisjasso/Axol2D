@@ -212,7 +212,7 @@ class Semantico():
         
         #Validad si el id es del tipo que se pasa
         #Validar si es arreglo o método
-        if len(tipo_id)==2:
+        if len(tipo_id)==2 and id != var:
             #print(tipo_id)
             tipo=valores[0]
             if tipo=='fila':
@@ -227,7 +227,6 @@ class Semantico():
             if tipo_id[0]=='metodo':
                 self.errores.append([f'Error Semántico al identificador {id} es de tipo método y no se puede asignar nigún valor.',0,1])
                 return
-            
             elif tipo_id[0]=='arreglo':
                 if tipo != tipo_id[0]:
                   self.errores.append([f'Error Semántico al identificador {id} es de tipo Arreglo y no se puede asignar una Matriz.',0,1])
@@ -308,6 +307,9 @@ class Semantico():
                                         x1+=1
                                  
         else:
+            if id ==var:
+                tipo_id=tipo_id[1]
+                
             # tipo=self.fnRetornaValor(valores,tipo_id)
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
                 # Asignación de una Expresión
@@ -400,7 +402,7 @@ class Semantico():
                 parteReturn=contenido[2]
             else: 
                 parteReturn=contenido[1]
-            #self.fnReturn(parteReturn,id)
+            self.fnReturn(parteReturn,id)
         else:#Si la lista tiene más metodos
             for x in lista_metodos:
                 metodo=x[1]
@@ -417,7 +419,7 @@ class Semantico():
                 instrucciones=contenido[1]
                 self.fnInstrucciones(instrucciones, id)
                 parteReturn=contenido[2]
-                #self.fnReturn(parteReturn,id)
+                self.fnReturn(parteReturn,id)
             
 
 #---------Separación de Métodos -------------------------------------------------------
@@ -552,7 +554,7 @@ class Semantico():
                 if id in ['READ_BIN', 'READ_TEC','SAVE_BIN','PRINT', 'PRINT_CON', 'SHOW', 'POSITIONX','POSITIONY', 'RANDOM', 'GETPOSITION']:
                     print('Método Axol')
                 else:
-                    self.fnLlamadaMetodo(x[1],x[2],x[3])
+                    self.fnLlamadaMetodo(x[1],x[2],x[3],llamada)
             elif x[0] == 'llamadaStart':
                 if llamada != 'axol':
                     self.errores.append([f'Error Semántico. El método start() solo puede ser llamado desde el método principal axol2D play().', 0, 1])
@@ -568,20 +570,43 @@ class Semantico():
                     return
                 print(x)
 #----------Asignación Metodo ()--------------------------------------------------------------
-    def fnLlamadaMetodo(self,id,cantidad,argumentos,):
+    def fnLlamadaMetodo(self,id,cantidad,argumentos,id_desdellamado ):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
         #Validación si es un método
         tipo=self.fnEncontrarTipo(id)
         if not (isinstance(tipo, tuple) and tipo[0] in ['metodo']):
             self.errores.append([f'Error Semántico. La variable llamada no es un método [{id}].', 0, 1])
             return
-        print('Tipo',tipo)
+        #Validar cantidad de argumentos
+        indice=self.fnIndice(id)
+        cantidad_metodo = int(self.ts[indice][3][0])
+        # print('Catidad método: ',cantidad_metodo)
+        if cantidad!=cantidad_metodo:
+            self.errores.append([f'Error Semántico. La cantidad de argumentos proporcionados, no corresponde con la cantidad de argumentos declarados.', 0, 1])
+            return
+        #Validar tipo de argumento
+        lista_argumentos=self.fnListaArgumentos(argumentos,cantidad)
+        for x in range(cantidad_metodo):
+            temp_id=self.ts[indice+x+1][0]
+            print('indice: ',temp_id)
+            print('valor: ', lista_argumentos[x])
+            self.fnAsignar(lista_argumentos[x],temp_id,True,id_desdellamado)
+
+        print('Tipo',tipo[1])
         #lista_argumentos = fnSeparacionArgumentos(argumentos)
 
+    def fnListaArgumentos(self,argumentos,cantidad):
+        lista_argumentos=[]
+        for x in range(cantidad):
+            lista_argumentos.append(argumentos[1])
+            if x<=cantidad-1:
+                argumentos=argumentos[2]
+        return lista_argumentos
 
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):
         print('Return Metodo: ',id,regreso)
+        self.fnAsignar(regreso,id,True,id)
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):

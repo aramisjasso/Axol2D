@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
         level MiPrimerNivel {
             int numeros [5] = [0, 1, 2, 3, 4];
-            string nombre;
+            string nombre = "cadena";
             //byte b;
             int identificador = 0; 
             boolean resultado = true;
@@ -45,28 +45,28 @@ if __name__ == "__main__":
             int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
             int b1 = arreglo2[1][1];
  
-            method boolean miMetodo1(string b,int a1){
+            method boolean miMetodo1(string b,int a1,int c){
                 a1 = 12;
                 arreglo = [1,1,a,a,a,a];
                 //arreglo2 = [['a',b,a],[a,a,a]];
                 //b2 = a1;
                 //arreglo1[0]=1;
-                return flag;
+                return resultado;
             }
 
-            method boolean miMetodo2(string b,int a1, int b2) {
+            method int miMetodo2(string b,int a1, int c) {
                 a1 = 12;
                 arreglo[1]=1;
                 arreglo = [1,1,a,a,a,a];
                 //arreglo2 = [['a',b,a],[a,a,a]];
                 //b2 = a1;
                 arreglo1[0]=1;
-                this.miMetodo1 (b,x,c);
-                return flag;
+                this.miMetodo1 (nombre,a,c);
+                return nombre;
             }
 
            axol2D play () {
-                b = 10;
+                a = 10;
                 MiPrimerNivel1.start();
            }
         }'''

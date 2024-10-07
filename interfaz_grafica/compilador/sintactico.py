@@ -551,6 +551,22 @@ class Sintactico():
                     | GETPOSITION'''
         p[0] = ('metodoAxol', p[1])
 
+    # def p_instrucciones(self,p):
+    #     '''instrucciones : instruccion
+    #                      | instruccion instrucciones'''
+    #     if len(p) == 2:
+    #         p[0] = [p[1]]  # Lista con una instrucción
+    #     else:
+    #         p[0] = [p[1]] + p[2]  # Concatenar las instrucciones
+
+    # #<instruccion> ::=  ( <expresionAsignacion> | (<llamadaMetodo>) ; | <estructuraControl>
+    # def p_instruccion(self,p):
+    #     '''instruccion : expresionAsignacion PUNTO_Y_COMA
+    #                    | llamadaMetodo PUNTO_Y_COMA
+    #                    | estructuraControl
+    #                    | expresion PUNTO_Y_COMA
+    #                    | llamadaStart'''
+    #     p[0] = ('instruccion', p[1])
 
     # <argumentos> ::= (expresion | objeto) <restoArgumentos> PARENTESIS_CIERRA
     def p_argumentos(self,p):
@@ -575,11 +591,27 @@ class Sintactico():
                         | COMA direction restoArgumentos
                         | empty'''
         if len(p) == 4:
-            p[0] = ('restoArgumentos', p[2])  # Caso con argumentos adicionales
+            p[0] = ('restoArgumentos', p[2],p[3])  # Caso con argumentos adicionales
             self.parametros+=1
         else:
             p[0]   # Caso ε (sin más argumentos)
     
+    # # <elementosFila> ::= <expresion> <restoElementosFila>
+    # def p_elementosFila(self,p):
+    #     '''elementosFila : expresion restoElementosFila
+    #                     | valorCadena restoElementosFila
+    #                     | booleano restoElementosFila'''
+    #     self.fila+=1
+    #     p[0] = [p[1]] + p[2]
+
+    # # <restoElementosFila> ::= , <elementosFila> | ε
+    # def p_restoElementosFila(self,p):
+    #     '''restoElementosFila : COMA elementosFila
+    #                         | empty'''
+    #     if len(p) == 2:  # Caso de ε
+    #         p[0] = []
+    #     else:  # Caso con coma
+    #         p[0] = p[2]
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------- V A L O R E S -----------------------------------------------
