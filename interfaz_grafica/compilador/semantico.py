@@ -396,7 +396,7 @@ class Semantico():
             contenido = metodo[4]
             if len(contenido) == 3: 
                 instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones, 'metodo')
+                self.fnInstrucciones(instrucciones, id)
                 parteReturn=contenido[2]
             else: 
                 parteReturn=contenido[1]
@@ -415,7 +415,7 @@ class Semantico():
                 contenido = metodo[4]
                 #print(contenido)
                 instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones, 'metodo')
+                self.fnInstrucciones(instrucciones, id)
                 parteReturn=contenido[2]
                 #self.fnReturn(parteReturn,id)
             
@@ -533,7 +533,7 @@ class Semantico():
                 temp = self.fnComprobarDeclaracion(id)
                 if not self.fnComprobarDeclaracion(id):
                     temp_id=id
-                    id=f'{var},{id}'
+                    id=f'{llamada},{id}'
                     if 'NoId'== self.fnComprobarDeclaracion(id):
                         self.errores.append([f'Error Semántico. La variable [{temp_id}] no ha sido declarada.', 0, 1])
                         return
