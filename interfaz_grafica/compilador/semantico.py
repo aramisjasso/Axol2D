@@ -316,7 +316,7 @@ class Semantico():
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
                 # Asignación de una Expresión
                 #print(valores)
-                if valores[0] == 'expresion':
+                if valores[0] == 'expresion' and valores[1] != 'error':
                     #print(valores)
                     self.postorden(valores)
                     #print(self.pila_semantica)
@@ -353,11 +353,11 @@ class Semantico():
                 elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
                     if inMetodo is False:
                         self.ts[indice][3] = valores
-                # elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
-                #     if valores:
-                #         self.ts[indice][3] = 'true'
-                #     else: 
-                #         self.ts[indice][3] = 'false'
+                elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
+                    if valores:
+                        self.ts[indice][3] = 'true'
+                    else: 
+                        self.ts[indice][3] = 'false'
                 elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
                     print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
                     if inMetodo is False:

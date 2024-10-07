@@ -18,6 +18,7 @@ class Sintactico():
         #Lista de errores
         self.errores = []
         self.parser = None
+        self.error_Expresion = False
     
     def build(self):
         self.parser = yacc.yacc(module=self,method='LALR', debug=True)
@@ -370,7 +371,7 @@ class Sintactico():
             p[0] = ('restoExpresionComparacion', p[2], p[3])
         else:
             p[0] = ('restoExpresionComparacion', p[1], p[2], p[3])
-
+#------------------------------------------------------------------------------------------
     #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
     def p_expresionAritmetica(self, p):
         '''expresion : termino restoExpresionAritmetica
@@ -380,6 +381,10 @@ class Sintactico():
         elif p[2] is None:
             p[0] = ('expresion', p[1])
         else:
+            if p[1] is None:
+                self.errores.append([f'Error Sintáctico. Se esperaba un operador antes del resto de la expresión aritmética. ', 0, 1])
+                if self.error_Expresion:
+                    p[0] = ('expresion', 'error')
             p[0] = ('expresion', p[1], p[2])
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
@@ -442,7 +447,7 @@ class Sintactico():
     def p_expresionParentesis(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion PARENTESIS_CIERRA'''
         p[0] = ('expresionParentesis', p[2])
-
+#------------------------------------------------------------------------------------------------
     def p_expresionRelacionalParentesis(self,p):
         '''expresionRelacionalParentesis : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
         p[0] = ('expresionRelacionalParentesis', p[2])

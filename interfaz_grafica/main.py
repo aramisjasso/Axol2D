@@ -38,7 +38,7 @@ if __name__ == "__main__":
             byte a123 = 1;
             int identificador = 0; 
             boolean resultado = true;
-            //boolean resultado2 = resultado;
+            boolean resultado2 = resultado;
             string nombre2 = nombre;
             
             int arreglo [6] = [1,2,3,4,5,6];
