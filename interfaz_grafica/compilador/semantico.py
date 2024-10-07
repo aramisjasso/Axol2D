@@ -457,9 +457,20 @@ class Semantico():
                         self.fnInstrucciones(x[1][3])
                     
                 elif x[1][0] == 'switch':
+                    #Validar que x[1][1] esté declarada
+                    if not self.fnComprobarDeclaracion((x[1][1])):
+                        self.errores.append([f'Error Semántico. La variable [{(x[1][1])}] no ha sido declarada.', 0, 1])
+                        return
+                    #Validar que x[1][1] sea de tipo numérica
+                    if not self.fnEncontrarTipo(x[1][1]) in ['int', 'byte']:
+                        self.errores.append([f'Error Semántico. La estructura [switch] solo acepta variables numéricas como variable de control.', 0, 1])
+                        return
+                    #Advertir si x[1][1] no ha sido inicializada
+                    if self.fnRetornaValor(x[1][1]) == 'Null':
+                        self.errores.append([f'Advertencia. La variable [{x[1][1]}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', 0, 1])
                     print(x[1])
-                elif x[1][0] == 'for':
-                    print(x[1])
+                # elif x[1][0] == 'for':
+                #     print(x[1])
                 elif x[1][0] == 'forEach':
                     #Validar que x[1][2] no esté declarada
                     if self.fnComprobarDeclaracion(x[1][2]):
@@ -474,7 +485,13 @@ class Semantico():
                         self.errores.append([f'Error Semántico. La variable [{x[1][3]}] no es una estructura de datos, por lo tanto no es posible recorrerla en la estructura de contol [for each]. ', 0, 1])
                         return
                     #Validar que x[1][1] y x[1][3] sean del mismo tipo
-                    print(x[1])
+                    if not x[1][1] == ed[1]:
+                        self.errores.append([f'Error Semántico. La variable de control de tipo [{x[1][1]}] no coincide con el tipo de dato de la estructura de control de tipo {ed[1]}. ', 0, 1])
+                        return
+                    
+                    if len(x[1]) == 5:
+                         self.fnInstrucciones(x[1][4])
+
                 elif x[1][0] == 'while':
                     condicion = x[1][1]
                     self.postorden(condicion)
@@ -495,12 +512,13 @@ class Semantico():
                          self.fnInstrucciones(x[1][2])
 
             elif x[0]=='expresionAsignacion':
-                id=x[1][1]
+                id = x[1][1]
                 if not self.fnComprobarDeclaracion(id):
                     self.errores.append([f'Error Semántico. La variable [{id}] no ha sido declarada.', 0, 1])
                     return
                 valores= x[2]
-                self.fnAsignar(valores,id)
+                print(valores, id)
+                self.fnAsignar(valores, id)
             # elif x[0]=='llamadaMetodo':
             #     print('Es una llamada de Metodo', x[1],x[2])
             elif x[0] == 'llamadaStart':

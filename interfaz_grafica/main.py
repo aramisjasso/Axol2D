@@ -33,13 +33,17 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-            int numero; 
-            int numers [5] = [0, 1, 2, 3, 4];
+            int numeros [5] = [0, 1, 2, 3, 4];
+            string nombre;
+            byte b;
+            int identificador = 0; 
 
             method boolean miMetodo () {
-                print(nombre);
-                for (int n : numero ) {
-
+                switch ( identificador ) {
+                    case 1: 
+                        a = a + 1; break;
+                    default: 
+                        a = 0;
                 }
                 return flag;
             }
