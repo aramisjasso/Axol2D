@@ -704,12 +704,12 @@ class Sintactico():
     # <accesoLineal> ::= <identificador> [ numero ]
     def p_accesoLineal(self,p):
         '''accesoLineal : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ('accesoLineal', p[1], p[3])  # Tupla con el identificador y el índice
+        p[0] = ( f'{p[1]},{p[3]}')  # Tupla con el identificador y el índice
 
     # <accesoMatriz> ::= <identificador> [ numero  ] [ numero ]
     def p_accesoMatriz(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ('accesoMatriz', p[1], p[2])
+        p[0] = (f'{p[1]},{p[3]},{p[6]}')
     #----------------------------------------------------------------------------------------------------------
 
     #---------------------------------------------- V A C I O -------------------------------------------------
