@@ -353,7 +353,7 @@ class Semantico():
                 elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
                     if inMetodo is False:
                         self.ts[indice][3] = valores
-                elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
+                elif isinstance(valores, bool) and tipo_id == 'boolean':
                     if valores:
                         self.ts[indice][3] = 'true'
                     else: 
