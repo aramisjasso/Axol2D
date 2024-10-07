@@ -1,10 +1,10 @@
 import ply.yacc as yacc
 import compilador.lexico as le
+
 class Sintactico():
     def __init__(self):
         #tokens
         self.tokens = le.tokens
-        # Orden de Procedencia
         # Orden de Procedencia
         self.precedence = (
             ('left', 'MAS', 'MENOS'),
@@ -225,7 +225,6 @@ class Sintactico():
     def p_estructuraControl(self,p):
         '''estructuraControl : ifElse
                              | switch
-                             | for
                              | forEach
                              | while
                              | doWhile'''
@@ -252,8 +251,8 @@ class Sintactico():
     #<switch> ::= switch ( identificador ) { <casos> }
     def p_switch(self,p):
         #aquí probar con parentesis abre identificador parentesis cierra
-        '''switch : SWITCH expresion LLAVE_ABRE casos LLAVE_CIERRA'''
-        p[0] = ('switch', p[2], p[4])
+        '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
+        p[0] = ('switch', p[3], p[6])
 
     #<casos> ::= <caso> <restoCasos>
     def p_casos(self,p):
@@ -267,21 +266,25 @@ class Sintactico():
     def p_caso(self,p):
         #aquí puede ser número, cadena o char
         '''caso : CASE NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA'''
-        p[0] = ('caso', p[4])
+        p[0] = ('caso', p[2], p[4])
 
     #<restoCasos> ::= <casos> | default : <instrucciones> }
     def p_restoCasos(self,p):
         '''restoCasos : casos
-                    | DEFAULT DOS_PUNTOS instrucciones'''
+                      | DEFAULT DOS_PUNTOS instrucciones'''
         if len(p) == 2:  #casos
             p[0] = p[1]
         else:  #default
             p[0] = ('default', p[3])
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
-    def p_for(self,p):
-        '''for : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR IGUAL NUMERO PUNTO_Y_COMA condicion PUNTO_Y_COMA expresionAsignacion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        p[0] = ('for', p[8], p[10], p[13])
+    # def p_for(self,p):
+    #     '''for : FOR PARENTESIS_ABRE declaracion condicion PUNTO_Y_COMA expresionAsignacion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
+    #            | FOR PARENTESIS_ABRE declaracion condicion PUNTO_Y_COMA expresionAsignacion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+    #     if len(p) == 10:
+    #         p[0] = ('for', p[3], p[4], p[6])
+    #     else: 
+    #         p[0] = ('for', p[3], p[4], p[6], p[9])
 
     #<forEach> ::= for ( <tipoDato> identificador : identificador ) { <instrucciones> }
     def p_forEach(self,p):
@@ -478,10 +481,8 @@ class Sintactico():
     #----------------------------------------------------------------------------------------------------------
 
     #---------------------------- E X P R E S I O N   D E   A S I G N A C I O N -------------------------------
-    # 
     def p_izqAsignacion(self,p):
         '''izqAsignacion : IDENTIFICADOR operadorAsignacion
-                        | THIS PUNTO IDENTIFICADOR operadorAsignacion
                         | accesoLineal operadorAsignacion
                         | accesoMatriz operadorAsignacion'''
         if len(p) == 3 and p[1] == 'IDENTIFICADOR':
@@ -493,17 +494,16 @@ class Sintactico():
 
     #<expresionAsignacion> ::= <identificador> <operadorAsignacion> <expresion> |
     #                          <identificador> = (<llamadaMetodo>  | <definicionArreglo>)
-    #                          <identificador> = <expresionPostfijo> |
-    #                          this . <identificador> <operadorAsignacion> <expresion>  | 
-    #                          <clase> identificador = <objeto>
-    def p_expresionAsignacion(self,p):
+    #                          <expresionPostfijo>
+    def p_expresionAsignacion(self, p):
         '''expresionAsignacion : izqAsignacion expresion
-                            | izqAsignacion llamadaMetodo
-                            | izqAsignacion objeto
-                            | definicionArreglo
-                            | definicionMatriz
-                            | expresionPostfijo
-                            '''
+                               | izqAsignacion llamadaMetodo
+                               | izqAsignacion VALOR_CHAR
+                               | izqAsignacion VALOR_STRING
+                               | izqAsignacion booleano
+                               | definicionArreglo
+                               | definicionMatriz
+                               | expresionPostfijo'''
         if len(p) == 3:
             p[0] = ('expresionAsignacion', p[1], p[2])  
         else:  

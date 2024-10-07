@@ -33,6 +33,10 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
+            int numeros [5] = [0, 1, 2, 3, 4];
+            string nombre;
+            byte b;
+            int identificador = 0; 
             boolean resultado = true;
             
             int arreglo [6] = [1,2,3,4,5,6];
@@ -41,6 +45,13 @@ if __name__ == "__main__":
             int arreglo2 [2][3] = [[1,2,3],[4,5,6]];
             int b1 = arreglo2[1][1];
 
+            method boolean miMetodo () {
+                switch ( identificador ) {
+                    case 1: 
+                        a = a + 1; break;
+                    default: 
+                        a = 0;
+                }
             method boolean miMetodo1(string b,int a1){
                 a1 = 12;
                 arreglo = [1,1,a,a,a,a];
