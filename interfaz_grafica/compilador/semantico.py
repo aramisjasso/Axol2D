@@ -203,16 +203,17 @@ class Semantico():
             self.fnDeclararTipo(id,tipo,tamaño)
 
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
-    def fnAsignar(self,valores,id,inMetodo = False, var = None):
+    def fnAsignar(self,valores,id,inMetodo = False, var = None,renin=None):
         #Validar su declaración
+        print('Prueba: ', id,valores,inMetodo, var,renin)
         indice=self.fnIndice(id)
-        
+        print('Prueba: ', id,valores,inMetodo, var,renin,indice)
         tipo_id=self.ts[indice][2]
-
+        print('Prueba: ', id,valores,inMetodo, var,renin,indice,tipo_id)
         
         #Validad si el id es del tipo que se pasa
         #Validar si es arreglo o método
-        if len(tipo_id)==2 and id != var:
+        if len(tipo_id)==2 and renin is None:
             #print(tipo_id)
             tipo=valores[0]
             if tipo=='fila':
@@ -307,9 +308,10 @@ class Semantico():
                                         x1+=1
                                  
         else:
-            if id ==var:
+            print('tipo en asignación',tipo_id)
+            if renin:
                 tipo_id=tipo_id[1]
-                
+            print('tipo en asignación',tipo_id)
             # tipo=self.fnRetornaValor(valores,tipo_id)
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
                 # Asignación de una Expresión
@@ -325,7 +327,7 @@ class Semantico():
 
                 # Asignación de un Valor Diferente a Expresión
                 # String, Char, Llamada a Método, Booleano
-                if not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'int':
+                if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
                     if (valores >= 0 and valores <= 65535):
                         if inMetodo is False:
                             self.ts[indice][3] = valores
@@ -335,7 +337,7 @@ class Semantico():
                             self.ts[indice][3] = 0
                     else: 
                         self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
-                elif not isinstance(valores, bool) and isinstance(valores, int) and self.ts[indice][2] == 'byte':
+                elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
                     if valores >= 0 and valores <= 255:
                         if inMetodo is False:
                          self.ts[indice][3] = valores
@@ -345,10 +347,10 @@ class Semantico():
                             self.ts[indice][3] = 0
                     else: 
                         self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
-                elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and self.ts[indice][2] == 'char':
+                elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
                     if inMetodo is False:
                         self.ts[indice][3] = valores
-                elif isinstance(valores, str) and self.ts[indice][2] == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
+                elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
                     if inMetodo is False:
                         self.ts[indice][3] = valores
                 # elif isinstance(valores, bool) and self.ts[indice][2] == 'boolean':
@@ -356,13 +358,15 @@ class Semantico():
                 #         self.ts[indice][3] = 'true'
                 #     else: 
                 #         self.ts[indice][3] = 'false'
-                elif isinstance(valores, tuple) and valores[0] == 'booleano' and self.ts[indice][2] == 'boolean':
+                elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
+                    print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
                     if inMetodo is False:
                         self.ts[indice][3] = valores[1]
                 # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
                 #     #Error de inicialización
                 #     self.ts[indice][3] = valores
                 else:
+                    print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
                     if valores != 'Null':
                         if not isinstance(valores, tuple):
                             #print(valores)
@@ -370,9 +374,9 @@ class Semantico():
                                 valores = 'true'
                             elif isinstance(valores, bool) and not valores:  
                                 valores = 'false'
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].', 0, 1])  
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado hola a todos[{valores}].', 0, 1])  
                         else: 
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado hola los quiero[{valores[1]}].', 0, 1])  
 
 #---------Funcion que Retorna Valor----------------------------
     def fnRetornaValor(self, id):
@@ -533,19 +537,22 @@ class Semantico():
             elif x[0]=='expresionAsignacion':
                 id=x[1][1]
                 temp = self.fnComprobarDeclaracion(id)
-                if not self.fnComprobarDeclaracion(id):
+                print('id:',id)
+                print('Declaración antes', temp)
+                if not temp or 'NoId'== temp:
+                    print('Declaración', temp)
                     temp_id=id
                     id=f'{llamada},{id}'
                     if 'NoId'== self.fnComprobarDeclaracion(id):
                         self.errores.append([f'Error Semántico. La variable [{temp_id}] no ha sido declarada.', 0, 1])
-                        return
-                if len(x)==3:
-                    valores= x[2]
-                elif len(x)==2:
-                    valores= x[1][2]
-                print('id:',id)
-                print('valor:',valores)
-                self.fnAsignar(valores,id,True, llamada)
+                else:        
+                    if len(x)==3:
+                        valores= x[2]
+                    elif len(x)==2:
+                        valores= x[1][2]
+                    print('id:',id)
+                    print('valor:',valores)
+                    self.fnAsignar(valores,id,True, llamada)
             elif x[0]=='llamadaMetodo':
                 id = x[1]
                 cantidad = x[2]
@@ -595,6 +602,7 @@ class Semantico():
         print('Tipo',tipo[1])
         #lista_argumentos = fnSeparacionArgumentos(argumentos)
 
+#---------Lista de Argumentos --------------------------------------------------------
     def fnListaArgumentos(self,argumentos,cantidad):
         lista_argumentos=[]
         for x in range(cantidad):
@@ -606,7 +614,9 @@ class Semantico():
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):
         print('Return Metodo: ',id,regreso)
-        self.fnAsignar(regreso,id,True,id)
+        #self.fnAsignar(regreso,id,True,id)
+        print('Retorno', regreso,id)
+        self.fnAsignar(regreso,id,False, renin=True)#Porque el id nunca se puede llamar for
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):
