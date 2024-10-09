@@ -366,7 +366,7 @@ class Semantico():
                 #     #Error de inicialización
                 #     self.ts[indice][3] = valores
                 else:
-                    print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
+                    #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
                     if valores != 'Null':
                         if not isinstance(valores, tuple):
                             #print(valores)
@@ -374,9 +374,9 @@ class Semantico():
                                 valores = 'true'
                             elif isinstance(valores, bool) and not valores:  
                                 valores = 'false'
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado hola a todos[{valores}].', 0, 1])  
-                        else: 
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado hola los quiero[{valores[1]}].', 0, 1])  
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].', 0, 1])  
+                        elif valores[1] != 'error': 
+                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
 
 #---------Funcion que Retorna Valor----------------------------
     def fnRetornaValor(self, id):

@@ -136,10 +136,21 @@ class Lexico():
     t_LLAVE_CIERRA = r'}'
     t_CORCHETE_ABRE = r'\['
     t_CORCHETE_CIERRA = r']'
-    t_PUNTO = r'\.'
     t_COMA = r','
-    t_PUNTO_Y_COMA = r';'
     t_DOS_PUNTOS = r':'
+    t_PUNTO_Y_COMA = r';'
+
+    # Error número decimal no permitido en Axol2D
+    def t_ERROR_LEXICO_NUMEROS_DECIMALES(self,t):
+        r'( [0-9]+ \. ( (\.)* [0-9]* )* ) | (( (\.)+ [0-9]+ )+)'
+        #r'([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)'
+        mensaje_error=(f"Error Léxico en la línea {t.lineno}. Axol2D no permite números decimales.")
+        self.errores.append([mensaje_error,t.lineno,t.lexpos])
+        t.lexer.skip(1)
+
+    #Punto
+    t_PUNTO = r'\.'
+   
 
     # Números int
     def t_NUMERO(self,t):
@@ -199,23 +210,16 @@ class Lexico():
         t.lexer.skip(1)
 
     # Error tamaño (número demasiado grande)
-    def t_ERROR_LEXICO_10(self,t):
-        r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4}){Digito}'
-        mensaje_error=(f"Error Léxico (10) en la línea {t.lineno}. El número supera el máximo valor permitido en Axol2D. Solo se permiten números entre 0 y 6553.")
-        self.errores.append([mensaje_error,t.lineno,t.lexpos])
-        t.lexer.skip(1)
+    # def t_ERROR_LEXICO_10(self,t):
+    #     r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4}){Digito}'
+    #     mensaje_error=(f"Error Léxico (10) en la línea {t.lineno}. El número supera el máximo valor permitido en Axol2D. Solo se permiten números entre 0 y 6553.")
+    #     self.errores.append([mensaje_error,t.lineno,t.lexpos])
+    #     t.lexer.skip(1)
 
     # Error número decimal no válido
     def t_ERROR_LEXICO_11(self,t):
         r'[0-9]*("\."* [0-9]*)("\."* [0-9]*)'
         mensaje_error=(f"Error Léxico (11) en la línea {t.lineno}. El número ingresado no es válido en el lenguaje Axol2D.")
-        self.errores.append([mensaje_error,t.lineno,t.lexpos])
-        t.lexer.skip(1)
-
-    # Error número decimal no permitido en Axol2D
-    def t_ERROR_LEXICO_3(self,t):
-        r'([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)'
-        mensaje_error=(f"Error Léxico (3) en la línea {t.lineno}. Axol2D no permite números decimales.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 

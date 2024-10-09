@@ -121,6 +121,14 @@ class Sintactico():
         else: 
             p[0] = ('declaracion', p[1],'')#vacio para el manejo más adelante
 
+    #Validar que no se evalue y el valor sea 'Null'
+    def p_declaracion_error(self,p):
+        '''declaracion : declaracionTipo valorDeclaracion PARENTESIS_CIERRA PUNTO_Y_COMA
+                       | declaracionTipo valorDeclaracion PARENTESIS_CIERRA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico. Falta parentesis de apertura en la expresión aritmética. ', 0, 1])
+        p[0] = ('declaracion', p[1], ('expresion', 'error'))
+        self.error_Expresion = True
+
     #<declaracionTipo> ::= <tipoDato> idenfiticador
     def p_declaracionTipo(self,p):
         '''declaracionTipo : tipoDato IDENTIFICADOR'''
@@ -134,6 +142,12 @@ class Sintactico():
                             | IGUAL VALOR_CHAR
                             | IGUAL VALOR_STRING'''
         p[0] = p[2]
+
+    # def p_valorDeclaracion_error(self,p):
+    #     '''valorDeclaracion : IGUAL error restoTermino'''
+    #     self.errores.append([f'Error Sintáctico. Se esperaba un [operando] antes del operador en la expresión aritmética. ', 0, 1])
+    #     p[0] = ('expresion', 'error')
+    #     self.error_Expresion = True
 
     #<tipoDato> ::= int | string | boolean | char | byte 
     def p_tipoDato(self,p):
@@ -316,7 +330,7 @@ class Sintactico():
 
     #-------------------------------------- E X P R E S I O N -------------------------------------------------
     #<expresion> ::= <expresionAritmetica> | <expresionLogica> | <expresionPostfijo> | <expresionParentesis>
-    def p_expresion(self, p):
+    def p_condicion(self, p):
         '''condicion : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
         p[0] = ('condicion', p[2])
 
@@ -372,20 +386,48 @@ class Sintactico():
         else:
             p[0] = ('restoExpresionComparacion', p[1], p[2], p[3])
 #------------------------------------------------------------------------------------------
-    #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
-    def p_expresionAritmetica(self, p):
+   #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
+    def p_expresion(self, p):
         '''expresion : termino restoExpresionAritmetica
-                     | expresionUnitaria '''
-        if len(p) == 2:
+                     | expresionUnitaria restoExpresionAritmetica'''
+        if p[2] is None:
             p[0] = ('expresion', p[1])
-        elif p[2] is None:
-            p[0] = ('expresion', p[1])
+        elif self.error_Expresion:
+            p[0] = ('expresion', 'error')
+            self.error_Expresion = False
         else:
-            if p[1] is None:
-                self.errores.append([f'Error Sintáctico. Se esperaba un operador antes del resto de la expresión aritmética. ', 0, 1])
-                if self.error_Expresion:
-                    p[0] = ('expresion', 'error')
             p[0] = ('expresion', p[1], p[2])
+
+    #int a = 4 5 5 5 * 3;
+    def p_expresion_error(self, p):
+        '''expresion : errorFactores error'''
+        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        p[0] = ('expresion', 'error')
+
+    #int a =  1 2 2 3 + 5;
+    def p_expresion_error1(self, p):
+        '''expresion : errorFactores restoExpresionAritmetica'''
+        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        p[0] = ('expresion', 'error')
+        self.error_Expresion = True
+
+    #int a =  * 5;
+    def p_termino_error1(self,p):
+        '''termino : error restoTermino'''
+        self.errores.append([f'Error Sintáctico. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
+    #<errorFactores> ::= <factor> <factor> <restoErrorFactores>
+    def p_errorFactores_error(self, p):
+        '''errorFactores : factor factor restoErrorFactores'''
+        p[0] = ('errorFactores', 'error')
+
+    #<restoErrorFactores> :: <factor> <restoErrorFactores> | ε
+    def p_restoErrorFactores_error(self, p):
+        '''restoErrorFactores : factor restoErrorFactores
+                              | empty'''
+        p[0] = ('restoErrorFactores', 'error')
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionAritmetica(self, p):
@@ -398,6 +440,29 @@ class Sintactico():
         else:
             p[0] = ('restoExpresionAritmetica', p[1], p[2], p[3])
 
+    #int a = 4 * 3 + (12 - 8) + 5 5 6 6 ;
+    #int a = 4 * 3 + (12 - 8) + 5 3 ;
+    def p_restoExpresionAritmetica_error1(self, p):
+        '''restoExpresionAritmetica : errorFactores restoExpresionAritmetica 
+                                    | restoExpresionAritmetica operadorAdicion errorFactores 
+                                    | restoExpresionAritmetica operadorAdicion factor error factor'''
+        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
+    # int a = 4 + ;
+    # int a = 4 * 3 + (12 - 8) + ;
+    def p_restoExpresionAritmetica_error2(self, p):
+        '''restoExpresionAritmetica : restoExpresionAritmetica operadorAdicion error
+                                    | restoExpresionAritmetica MENOS_MENOS error
+                                    | restoExpresionAritmetica MAS_MAS error'''
+        if len(self.errores) != 0:
+            if self.errores[-1] == [f'Error Sintáctico. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ', 0, 1]:
+                self.errores.pop()
+        self.errores.append(['Error Sintáctico. Se esperaba un [operando] después del operador [+, -] en la expresión aritmética. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
     #<termino> ::= <factor> <restoTermino>
     def p_termino(self,p):
         '''termino : factor restoTermino'''
@@ -406,7 +471,13 @@ class Sintactico():
         else:
             p[0] = ('termino', p[1], p[2])
 
-    #<restoTermino> ::= <operadorMultiplicacion> <factor> <restoTermino> | ε
+    #int a =  1 2 2 3 * 5;
+    def p_termino_error2(self,p):
+        '''termino : errorFactores restoTermino'''
+        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
     def p_restoTermino(self,p):
         '''restoTermino : restoTermino operadorMultiplicacion factor
                         | empty'''
@@ -417,6 +488,24 @@ class Sintactico():
         else:
             p[0] = ('restoTermino', p[1], p[2], p[3])
 
+    # int a = 5 * ;
+    def p_restoTermino_error1(self,p):
+        '''restoTermino : restoTermino operadorMultiplicacion error'''
+        self.errores.append([f'Error Sintáctico. Se esperaba un [operando] después del operador de multiplicación [*, /, %]. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
+    #int a = 5 * 3 4 5 6;
+    #int a = 5 * 3 4;
+    def p_restoTermino_error2(self,p):
+        '''restoTermino : restoTermino operadorMultiplicacion factor error errorFactores
+                        | restoTermino operadorMultiplicacion factor error factor 
+                        | restoTermino operadorMultiplicacion factor factor
+                        | restoTermino operadorMultiplicacion errorFactores'''
+        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
+
     #<factor> ::= IDENTIFICADOR | NUMERO
     def p_factor(self,p):
         '''factor : IDENTIFICADOR
@@ -424,11 +513,21 @@ class Sintactico():
                   | accesoLineal
                   | accesoMatriz
                   | expresionParentesis'''
-        p[0] = ('factor', p[1])
+        if p[1] != 'error':
+            p[0] = ('factor', p[1])
+        else: 
+            p[0] = 'error'
 
     def p_expresionUnitaria(self, p):
         '''expresionUnitaria : operadorAdicion factor'''
         p[0] = ('expresionUnitaria', ('factor', '0'), p[1], p[2])
+
+    # int a = - ;
+    def p_expresionUnitaria_error(self, p):
+        '''expresionUnitaria : operadorAdicion error'''
+        self.errores.append([f'Error Sintáctico. Se esperaba un [factor] después del operador unitario [+, -]. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
 
     #<operadorAdicion> ::= MAS | MENOS
     def p_operadorAdicion(self,p):
@@ -447,6 +546,13 @@ class Sintactico():
     def p_expresionParentesis(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion PARENTESIS_CIERRA'''
         p[0] = ('expresionParentesis', p[2])
+
+    #int a = ((2 + 3) * 4;
+    def p_expresionParentesis_error(self,p):
+        '''expresionParentesis : PARENTESIS_ABRE expresion error'''
+        self.errores.append([f'Error Sintáctico. Falta parentesis de cierre en la expresión aritmética. ', 0, 1])
+        p[0] = 'error'
+        self.error_Expresion = True
 #------------------------------------------------------------------------------------------------
     def p_expresionRelacionalParentesis(self,p):
         '''expresionRelacionalParentesis : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
@@ -522,10 +628,10 @@ class Sintactico():
     #<operadorAsignacionAritmetico> ::= += | -= | *= | /=
     def p_operadorAsignacion(self,p):
         '''operadorAsignacion : IGUAL
-                            | MAS_IGUAL
-                            | MENOS_IGUAL
-                            | POR_IGUAL
-                            | DIVISION_IGUAL'''
+                              | MAS_IGUAL
+                              | MENOS_IGUAL
+                              | POR_IGUAL
+                              | DIVISION_IGUAL'''
         p[0] = p[1]   
     #----------------------------------------------------------------------------------------------------------
 
@@ -759,8 +865,9 @@ class Sintactico():
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
         if p:
-            mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
-            self.errores.append([mensaje_error,p.lineno,p.lexpos])
+            print(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
+            # mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
+            # self.errores.append([mensaje_error,p.lineno,p.lexpos])
         else:
             print("Error de sintaxis al final de la entrada")
     #----------------------------------------------------------------------------------------------------------
