@@ -29,12 +29,31 @@ if __name__ == "__main__":
         # 'int a[3] = [cadena1,cadena, cadena2]; ', 
         # 'int a [5] ;'
         '''
-        import Controllers;
-        import enemies;
-
+        import enemies;//2
+//        import Controllers enemies;//3
+//        import ;//4
+//        import enemies //5 
+//        Controllers ; //6
+//        Controllers Controllers ;//7
+//        Controllers Controllers //8
+//        import Controllers;//9
+//        ; //10
+//        import //11 
+//        holaaa + hola //12
+//        import //11 
         level MiPrimerNivel {
-           int a = 4 5 5 5 * 3;
-
+            int b = 1 ;
+            
+            int a = 455 * 3;
+            int b2
+            int b1 = 1
+            = 1
+            = 2;
+            int = 1
+            int = 1;//23
+            a2 = 1 //24
+            int a3 = 1;//25 
+            a3 = 1;//25 
             method int miMetodo1(){
                 a = 123;
                 return 0;
