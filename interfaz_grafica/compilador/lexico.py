@@ -27,8 +27,8 @@ class Lexico():
             # Palabras Reservadas
             'IF', 'ELSE', 'SWITCH', 'CASE', 'BREAK', 'DEFAULT', 'FOR', 'WHILE', 'DOWHILE', 'METHOD', 'RETURN',
             'START', 'SHOW', 'PRINT', 'READ_TEC', 'READ_BIN', 'READ_MP3', 'READ_MG', 'SAVE_BIN', 'GETPOSITION', 'RANDOM',
-            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'ENEMIES', 'MUSIC',
-            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'CONTROLLERS', 'UP', 'DOWN', 'LEFT', 'RIGHT',
+            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS', 'MUSIC',
+            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'BACKGROUND_LIBRERIA', 'UP', 'DOWN', 'LEFT', 'RIGHT',
             'CONSTANT', 'THIS', 'NULL',
         ]
 
@@ -71,7 +71,7 @@ class Lexico():
             'platform': 'PLATFORM',
             'obstacles': 'OBSTACLES',
             'player': 'PLAYER',
-            'enemies': 'ENEMIES',
+            'Players': 'PLAYERS',
             'music': 'MUSIC',
             'axol2D': 'AXOL2D',
             'positionY': 'POSITIONY',
@@ -80,7 +80,7 @@ class Lexico():
             'class': 'CLASS',
             'from': 'FROM',
             'new': 'NEW',
-            'Controllers': 'CONTROLLERS',
+            'Background': 'BACKGROUND_LIBRERIA',
             'up': 'UP',
             'down': 'DOWN',
             'left': 'LEFT',
@@ -294,7 +294,7 @@ tokens = [
             # Palabras Reservadas
             'IF', 'ELSE', 'SWITCH', 'CASE', 'BREAK', 'DEFAULT', 'FOR', 'WHILE', 'DOWHILE', 'METHOD', 'RETURN',
             'START', 'SHOW', 'PRINT', 'READ_TEC', 'READ_BIN', 'READ_MP3', 'READ_MG', 'SAVE_BIN', 'GETPOSITION', 'RANDOM',
-            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'ENEMIES', 'MUSIC',
-            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'CONTROLLERS', 'UP', 'DOWN', 'LEFT', 'RIGHT',
+            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS', 'MUSIC',
+            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'BACKGROUND_LIBRERIA', 'UP', 'DOWN', 'LEFT', 'RIGHT',
             'CONSTANT', 'THIS', 'NULL',
         ]

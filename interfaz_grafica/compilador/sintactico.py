@@ -36,7 +36,10 @@ class Sintactico():
                     | empty
                     '''
         if(len(p) == 2):
-            p[0] = p[1]
+            if (p.slice[1].type=='nivel'):
+                p[0] = ('programa', p[1])
+            else:   
+                p[0] = p[1]
         else:
             p[0] = ('programa', p[1], p[2])
     #----------------------------------------------------------------------------------------------------------
@@ -59,54 +62,55 @@ class Sintactico():
     #<importacion> ::= import <libreriaAxol> ;
     def p_importacion(self,p):
         '''importacion : IMPORT libreriaAxol PUNTO_Y_COMA
+                        | IMPORT IDENTIFICADOR PUNTO_Y_COMA
                         | IMPORT PUNTO_Y_COMA
                         | IMPORT libreriaAxol 
+                        | IMPORT IDENTIFICADOR
                         | libreriaAxol PUNTO_Y_COMA
                         | libreriaAxol 
-                        | IMPORT
-                        | error'''
+                        | IMPORT'''
         if len(p)==4:
-            if not (p[2] == 'Controllers' or p[2] == 'enemies') :
-                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]} {p[3]}"".. En la importación:  solo se puede importar una librería a la vez. \n \t Solución: {p[1]} "[Controllers | enemies]" ;',p.lineno(0),p.lexpos(0)])
+            if not (p[2] == 'Background' or p[2] == 'Players') :
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]} {p[3]}"". En la importación: solo se puede importar una librería AXOL. \n \t Solución: {p[1]} "[Background | Players]" ;',p.lineno(0),p.lexpos(0)])
             else: 
                 p[0] = p[2]
             
         elif len(p)==3:
             print('pruebaaaa',p[1])
             if p.slice[2].type == 'libreriaAxol':
-                if not (p[2] == 'Controllers' or p[2] == 'enemies') :
-                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]}"". En la importación solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: {p[1]} "[Controllers | enemies] ;"',p.lineno(0),p.lexpos(0)])
+                if not (p[2] == 'Background' or p[2] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]}"". En la importación solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: {p[1]} "[Background | Players] ;"',p.lineno(0),p.lexpos(0)])
                 else: 
                     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación falta punto y coma [;].\n \t Solución:  {p[1]} "{p[2]}" ; ',p.lineno(0),p.lexpos(0)])
 
             elif p.slice[1].type=='libreriaAxol':
-                if not (p[1] == 'Controllers' or p[1] == 'enemies') :
-                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación no se tiene la palabra [import] y solo se puede importar una librería a la vez. \n \t Solución: "import [Controllers | enemies]" ;',p.lineno(0),p.lexpos(0)])
+                if not (p[1] == 'Background' or p[1] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación no se tiene la palabra [import] y solo se puede importar una librería a la vez. \n \t Solución: "import [Background | Players]" ;',p.lineno(0),p.lexpos(0)])
                 else: 
                     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación no se tiene la palabra [import].\n \t Solución:  "import" {p[1]} ; ',p.lineno(0),p.lexpos(0)])
             else:
-                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación falta la libería Axol a importar.\n \t Solución: {p[1]} "[Controllers | enemies]" ; ',p.lineno(0),p.lexpos(0)])
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación falta la libería Axol a importar.\n \t Solución: {p[1]} "[Background | Players]" ; ',p.lineno(0),p.lexpos(0)])
             
         else:
             if p.slice[1].type=='libreriaAxol':
-                if not (p[1] == 'Controllers' or p[1] == 'enemies') :
-                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación no se tiene la palabra [import], solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: "import [Controllers | enemies] ;"',p.lineno(0),p.lexpos(0)])
+                if not (p[1] == 'Background' or p[1] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación no se tiene la palabra [import], solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: "import [Background | Players] ;"',p.lineno(0),p.lexpos(0)])
                 else: 
                     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación no se tiene la palabra [import] y falta el  punto y coma[;].\n \t Solución:  "import {p[1]} ;" ',p.lineno(0),p.lexpos(0)])
             # elif p[1]==';':
-            #     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la parlabra [import] y la libería Axol a importar. \n \t Solución:  "import[Controllers | enemies]" ; ',p.lineno(0),p.lexpos(0)])
+            #     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la parlabra [import] y la libería Axol a importar. \n \t Solución:  "import[Background | Players]" ; ',p.lineno(0),p.lexpos(0)])
             elif p[1]=='import':   
-                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la libería Axol a importar y el punto y coma [;]. \n \t Solución:  {p[1]} "[Controllers | enemies] ;" ',p.lineno(0),p.lexpos(0)])
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la libería Axol a importar y el punto y coma [;]. \n \t Solución:  {p[1]} "[Background | Players] ;" ',p.lineno(0),p.lexpos(0)])
             else:
                 self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". Esto no puede estar en importación." ',p.lineno(0),p.lexpos(0)])
 
 
-    #<libreriaAxol> ::= Controllers | Enemies
+    #<libreriaAxol> ::= Background | Enemies
     def p_libreriaAxol(self,p):
-        '''libreriaAxol : CONTROLLERS
-                        | ENEMIES
-                        | CONTROLLERS libreriaAxol
-                        | ENEMIES libreriaAxol'''
+        '''libreriaAxol : BACKGROUND_LIBRERIA
+                        | PLAYERS
+                        | BACKGROUND_LIBRERIA libreriaAxol
+                        | PLAYERS libreriaAxol'''
         if p.slice[1].type == 'error':
             self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. El valor [{p[1]}] no puede ser importado.',p.lineno(0),p.lexpos(0)])
             #print("Error de sintaxis detectado en libreriaAxol")
@@ -135,16 +139,20 @@ class Sintactico():
 
     #<contenidoNivel> ::= <atributos> <metodos> <metodoPrincipal>
     def p_contenidoNivel(self,p):
-        '''contenidoNivel : bloqueDeclaracion bloqueMetodos metodoPrincipal'''
-        p[0] = ('contenidoNivel', p[1], p[2], p[3])
+        '''contenidoNivel : bloqueDeclaracion bloqueMetodos metodoPrincipal
+                        |   bloqueDeclaracion metodoPrincipal'''
+        if len(p)==4:
+            p[0] = ('contenidoNivel', p[1], p[2], p[3])
+        else:
+            p[0] = ('contenidoNivel', p[1], p[2])
 
     #<metodoPrincipal> ::= axol2D play ( ) { <instrucciones>  identificador.start(); }
     def p_metodoPrincipal(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
         p[0] = ('metodoPrincipal', p[6], p[7])
-
+#(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
     def p_llamadaStart(self,p):
-        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
         p[0] = ('llamadaStart', p[1])
     #----------------------------------------------------------------------------------------------------------
 
@@ -243,7 +251,8 @@ class Sintactico():
                             | IGUAL booleano
                             | IGUAL llamadaMetodo
                             | IGUAL VALOR_CHAR
-                            | IGUAL VALOR_STRING'''
+                            | IGUAL VALOR_STRING
+                            | IGUAL fila'''
         p[0] = p[2]
 
     # def p_valorDeclaracion_error(self,p):
@@ -258,27 +267,33 @@ class Sintactico():
                     | STRING
                     | BOOLEANO
                     | CHAR
-                    | BYTE'''
+                    | BYTE
+                    | PLATFORM
+                    | OBSTACLES
+                    | BACKGROUND
+                    | PLAYER'''
         p[0] = p[1]
     #----------------------------------------------------------------------------------------------------------
 
     #----------------------------------- B L O Q U E   D E   M E T O D O S  -----------------------------------
     #<bloqueMetodos> ::= <metodoDeclaracion> <restoMetodos> | ε
     def p_bloqueMetodos(self,p):
-        '''bloqueMetodos : metodo'''
+        '''bloqueMetodos : metodos'''
         p[0] = ('bloqueMetodos', p[1])
+
+    def p_metodos(self,p):
+        '''metodos : metodoDeclaracion restoMetodos'''
+        p[0] = [p[1]] + p[2]  # Concatenamos la importación actual con las importaciones restantes
+
 
     #<restoMetodos> ::= <metodosDeclaracion> | ε
     def p_restoMetodos(self,p):
-        '''metodo : metodoDeclaracion metodo
-                  | metodoDeclaracion
+        '''restoMetodos : metodoDeclaracion restoMetodos
                   | empty'''
-        if p[1] =='empty':
-            p[0]=None
-        elif len(p) == 2:
-            p[0] = ('metodo',(p[1]))
-        elif len(p) == 3:
-            p[0] = ('metodo',(p[1] )), p[2]
+        if len(p) == 3: 
+            p[0] = [p[1]] + p[2]
+        else:
+            p[0] = []
 
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
@@ -715,6 +730,7 @@ class Sintactico():
                                | izqAsignacion VALOR_CHAR
                                | izqAsignacion VALOR_STRING
                                | izqAsignacion booleano
+                               | izqAsignacion fila
                                | definicionArreglo
                                | definicionMatriz
                                | expresionPostfijo'''
@@ -957,8 +973,12 @@ class Sintactico():
 
     # <accesoLineal> ::= <identificador> [ numero ]
     def p_accesoLineal(self,p):
-        '''accesoLineal : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ( f'{p[1]},{p[3]}')  # Tupla con el identificador y el índice
+        '''accesoLineal : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA
+                        | IDENTIFICADOR CORCHETE_ABRE LLAVE_ABRE IDENTIFICADOR LLAVE_CIERRA CORCHETE_CIERRA'''
+        if len(p)==5:
+            p[0] = ( f'{p[1]},{p[3]}')  # Tupla con el identificador y el índice
+        else:
+            p[0] = (f'{p[1]},{p[4]}')
 
     # <accesoMatriz> ::= <identificador> [ numero  ] [ numero ]
     def p_accesoMatriz(self,p):

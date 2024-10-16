@@ -28,39 +28,86 @@ if __name__ == "__main__":
         # }''', 
         # 'int a[3] = [cadena1,cadena, cadena2]; ', 
         # 'int a [5] ;'
-        '''
-        import enemies;//2
-//        import Controllers enemies;//3
-//        import ;//4
-//        import enemies //5 
-//        Controllers ; //6
-//        Controllers Controllers ;//7
-//        Controllers Controllers //8
-//        import Controllers;//9
-//        ; //10
-//        import //11 
-//        holaaa + hola //12
-//        import //11 
-        level MiPrimerNivel {
-            int b = 1 ;
+        # '''
+        # import Background;
+        # import Players;
+
+        # level MiPrimerNivel {
+        #     int x = 0;
+        #                 // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+        #     platform pl = [140  ,   10 ,   10  , 10     , 150 , 150  ,  150 ];
+        #     platform pl = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+        #     platform plarreglo[5];
+        #     platform elementos_fondo[0];
+
+        #     obstacles obs [0];
+        #     background fondo = Background.castel;
+        #                    //[inicio x, inicio y, vidas, personaje       ]
+        #     player jugador = [   0    ,    0    ,   3  , Players.mario   ];
+        #     method int llenadoObs(){
+        #         x=0
+        #         while (x<5){
+        #         obs[x]=[140  ,   10 ,   x*10  , 10     , 150 , 150  ,  150 ]
+        #         }
+
+
+        #         return 0;
+        #     }
             
-            int a = 455 * 3;
-            int b2
-            int b1 = 1
-            = 1
-            = 2;
-            int = 1
-            int = 1;//23
-            a2 = 1 //24
-            int a3 = 1;//25 
-            a3 = 1;//25 
+        #    axol2D play () {
+        #         this.llenadoObs()
+        #                         // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+        #         MiPrimerNivel.start(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     );
+        #    }
+        # }'''
+                '''
+        import Background;
+        import Players;
+
+
+        level MiPrimerNivel {
+            int x = 0;
+            int y = 1;
+            int a1 = 0;
+            string b = "cadena";
+                        // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+            platform pl = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+            platform p2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+            platform plarreglo[2] = [pl,p2];
+            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+            obstacles obs [2] = [obs1,obs2];
+            
+            background fondo = Castle;
+            int fin [2] = [100,100];
+                           //[inicio x, inicio y, vidas, personaje       ]
+            player jugador = [   0    ,    0    ,   3  , knight   ];
             method int miMetodo1(){
-                a = 123;
+                a1 = 12;
+                pl = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
+                while (x<5){
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                }
+                
                 return 0;
             }
+
+            method int miMetodo2(){
+                a1 = 12;
+
+                return 0;
+            }  
+            method int miMetodo3(int a){
+                a1 = 12;
+                this.miMetodo3(a);
+                return 0;
+            }          
             
            axol2D play () {
-                MiPrimerNivel.start();
+                //this.miMetodo3(a);
+                // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
            }
         }'''
     ]
