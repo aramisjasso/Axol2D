@@ -69,6 +69,7 @@ if __name__ == "__main__":
             int x = 0;
             int y = 1;
             int a1 = 0;
+            int a3 = 0;
             string b = "cadena";
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
             platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
@@ -90,7 +91,7 @@ if __name__ == "__main__":
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
                 while (x<5){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                 }
                 
@@ -102,14 +103,15 @@ if __name__ == "__main__":
 
                 return 0;
             }  
-            method int miMetodo3(int a){
+            method int miMetodo3(int a , int c){
                 a1 = 12;
-                this.miMetodo3(a);
+                this.miMetodo3(a,12);
                 return 0;
             }          
             
            axol2D play () {
-                //this.miMetodo3(a);
+                b = 'a';
+                a1 = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
            }

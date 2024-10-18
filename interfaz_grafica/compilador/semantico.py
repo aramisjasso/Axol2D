@@ -36,21 +36,21 @@ class Semantico():
             if indice !=0:
                 if valor[0]== 'nivel':
                     self.parteNivel= valor
-                    print('Nivel:',valor)
+                    #print('Nivel:',valor)
                 if valor[0] == 'importaciones':
                     self.parteImportaciones = valor
-                    print('Importaciones:',valor)
+                    #print('Importaciones:',valor)
         
         if self.parteNivel != None:
             for indice, valor in enumerate(self.parteNivel[2]):
                 if indice !=0:
                     if valor[0]== 'bloqueDeclaracion':
                         self.parteDeclaracion = list(valor)
-                        print('bloqueDeclaracion',valor)
+                        #print('bloqueDeclaracion',valor)
                                                                
                     if valor[0] == 'bloqueMetodos':
                         self.parteMetodos = valor
-                        print('bloqueMetodos',valor) 
+                        #print('bloqueMetodos',valor) 
 
                     if valor[0] == 'metodoPrincipal':
                         self.parteMetodoPrincipal = valor
@@ -242,6 +242,7 @@ class Semantico():
                 for x,valor in enumerate(self.listaParametros):
                     id_m = valor[1]
                     parametros.append(id_m)
+                    
                 #Se guarda la cantidad de errores
                 temp_errores = len(self.errores)
                 if len(parametros) != len(set(parametros)):
@@ -259,8 +260,11 @@ class Semantico():
                             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
                             simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
                             self.ts.insert(indice+x+1,simbolo)
-                    if temp_errores ==len(self.errores):
+
+                    if temp_errores == len(self.errores):
+                        print('creación de un método',self.ts[indice])
                         self.ts[indice][3]=(x+1, atributos)
+                        print('creación de un método',self.ts[indice])
             elif tipo in ['obstacles', 'platform']:
                 atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
                 for x in range(len(atributos)):
@@ -299,7 +303,7 @@ class Semantico():
         #Validar su declaración
         indice=self.fnIndice(id)
         tipo_id=self.ts[indice][2]
-        print('calcular valores adentro, ',valores,id,tipo_id,indice,self.ts[indice])
+        #print('calcular valores adentro, ',valores,id,tipo_id,indice,self.ts[indice])
         #Validad si el id es del tipo que se pasa
         #Validar si es arreglo o método
         if len(tipo_id)==2 and renin is None:
@@ -337,7 +341,7 @@ class Semantico():
                                 temp_valores.append(self.ts[indice+x+1][3])
                                 temp_valor = valores[2][x]
                                 self.fnAsignar(temp_valor,temp_id, inMetodo,var)
-                                print('valor temporal',temp_valor,'id a actualizar',temp_id, inMetodo,var)
+                                #print('valor temporal',temp_valor,'id a actualizar',temp_id, inMetodo,var)
                                     #self.ts[indice+x+1][3]=temp_valor[1][1]
                                 #self.ts[indice+x+1][3]=valores[2][x]
                             if tamaño_errores != len(self.errores) or inMetodo:
@@ -422,7 +426,7 @@ class Semantico():
                 tipo=valores[0]
                 valortemp = valores 
                 if tipo == 'fila' and tipo_id in ['obstacles', 'platform']:
-                    print ('Entro en filas',id)
+                    #print ('Entro en filas',id)
                     #Validación por Tamaño
                     tamaño=int(valores[1])
                     tamaño_arreglo= 7
@@ -511,16 +515,16 @@ class Semantico():
                         else: 
                             self.ts[indice][3] = 'false'
                     elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
-                        print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
                         if inMetodo is False:
                             self.ts[indice][3] = valores[1]
                     elif valores=='asignadoblo' and tipo_id in ['platform','obstacles']:
                         id_buscar = valortemp[1][1]
                         indice_buscar = self.fnIndice(id_buscar)
                         for x in range(8):
-                            print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
+                            #print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
                             self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
-                        print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
 
                     elif tipo_id =='background' and valores in ['Forest', 'Mountain', 'Ocean', 'Desert', 'City', 'Village', 'Cave','Swamp', 'River', 'Island','Castle']:
                         self.ts[indice][3] = valores
@@ -632,7 +636,7 @@ class Semantico():
         #Se analizan todas las intrucciones para ver su tratamiento
         #print(lista_instrucciones)
         for x in lista_instrucciones:
-            print(lista_instrucciones)
+            #print(lista_instrucciones)
             if x[0] == 'estructuraControl':
                 if x[1][0] == 'ifElse': 
                     condicion = x[1][1]
@@ -691,7 +695,7 @@ class Semantico():
                     condicion = x[1][1]
                     self.postorden(condicion)
                     condEval = self.evaluar_pila(self.pila_semantica,llamada)
-                    print(condEval)
+                    #print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
@@ -700,7 +704,7 @@ class Semantico():
                     condicion = x[1][1]
                     self.postorden(condicion)
                     condEval = self.evaluar_pila(self.pila_semantica,llamada)
-                    print(condEval)
+                    #print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
@@ -710,10 +714,10 @@ class Semantico():
                 id=x[1][1]
                 
                 temp = self.fnComprobarDeclaracion(id)
-                print('id:',id)
-                print('Declaración antes', temp)
+                #print('id:',id)
+                #print('Declaración antes', temp)
                 if not temp or 'NoId'== temp:
-                    print('Declaración', temp)
+                    #print('Declaración', temp)
                     temp_id=id
                     id=f'{llamada},{id}'
                     if 'NoId'== self.fnComprobarDeclaracion(id):
@@ -721,11 +725,14 @@ class Semantico():
                 else:        
                     if len(x)==3:
                         valores= x[2]
+                        if x[2][0] == 'llamadaMetodo':
+                            print('Aqui se hizo una llamada a Metodo' , x)
+                            self.fnAsignar(valores,id,True, llamada,True)
+                        else:
+                            self.fnAsignar(valores,id,True, llamada)
                     elif len(x)==2:
                         valores= x[1][2]
-                    print('id:',id)
-                    print('valor:',valores)
-                    self.fnAsignar(valores,id,True, llamada)
+                        self.fnAsignar(valores,id,True, llamada)
             elif x[0]=='llamadaMetodo':
                 id = x[1]
                 cantidad = x[2]
@@ -748,7 +755,7 @@ class Semantico():
                         nombreNivel = 'Nivel sin Idenficador'
                     self.errores.append([f'Error Semántico. El identificador de llamada al método start() [{x[1]}] no coincide con el identificador del nivel [{nombreNivel}].', 0, 1])
                     return
-                print(x)
+                #print(x)
 #----------Asignación Metodo ()--------------------------------------------------------------
     def fnLlamadaMetodo(self,id,cantidad,argumentos,id_desdellamado ):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
@@ -768,11 +775,11 @@ class Semantico():
         lista_argumentos=self.fnListaArgumentos(argumentos,cantidad)
         for x in range(cantidad_metodo):
             temp_id=self.ts[indice+x+1][0]
-            print('indice: ',temp_id)
-            print('valor: ', lista_argumentos[x])
+            #print('indice: ',temp_id)
+            #print('valor: ', lista_argumentos[x])
             self.fnAsignar(lista_argumentos[x],temp_id,True,id_desdellamado)
 
-        print('Tipo',tipo[1])
+        # print('Tipo',tipo[1])
         #lista_argumentos = fnSeparacionArgumentos(argumentos)
 
 #---------Lista de Argumentos --------------------------------------------------------
@@ -786,10 +793,10 @@ class Semantico():
 
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):
-        print('Return Metodo: ',id,regreso)
+        # print('Return Metodo: ',id,regreso)
         #self.fnAsignar(regreso,id,True,id)
-        print('Retorno', regreso,id)
-        self.fnAsignar(regreso,id,False, renin=True)#Porque el id nunca se puede llamar for
+        # print('Retorno', regreso,id)
+        self.fnAsignar(regreso,id,inMetodo = True, renin=True)#Porque el id nunca se puede llamar for
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):

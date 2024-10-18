@@ -153,7 +153,7 @@ class Sintactico():
 #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
     def p_llamadaStart(self,p):
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        p[0] = ('llamadaStart', p[1])
+        p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------- B L O Q U E   D E   D E C L A R A C I O N  ------------------------------
