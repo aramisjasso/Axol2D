@@ -266,7 +266,7 @@ class Semantico():
                 for x in range(len(atributos)):
                     in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int','Null', 'Linea declaración']
                     self.ts.insert(indice+x+1,in_simbolo)
-                self.ts[indice][3]=tipo
+                #self.ts[indice][3]=tipo
             elif tipo == 'player':
                 #[inicio_x, inicio_y, vidas, personaje]
                 atributos=[['inicio_x','int'], ['inicio_y','int'], ['vidas','int'], ['personaje','character']]
@@ -310,6 +310,7 @@ class Semantico():
             elif tipo=='filas':
                 tipo='matriz'
             else:
+
                 self.errores.append([f'Error Semántico, el valor no puede ser asignado a un arreglo, una matriz o un identificador.', 0, 1])
             #Sacar tipo de valores
             
@@ -332,14 +333,12 @@ class Semantico():
                             temp_valores=[]
                             #validar tipo
                             for x in range(tamaño):
+                                temp_id = self.ts[indice+x*8+1][0]
+                                temp_valores.append(self.ts[indice+x+1][3])
                                 temp_valor = valores[2][x]
-                                if tipo_id[1]==self.fnEncontrarTipo(temp_valor[1][1]):
-                                    temp_id = self.ts[indice+x+1][0]
-                                    temp_valores.append(self.ts[indice+x+1][3])
-                                    temp_valor = valores[2][x]
-                                    self.ts[indice+x+1][3]=temp_valor[1][1]
-                                else:
-                                    self.errores.append([f'Error Semántico, el elementos del arreglo {id} debe de ser puede ser de tipo {tipo_id[1]}.',0,1])
+                                self.fnAsignar(temp_valor,temp_id, inMetodo,var)
+                                print('valor temporal',temp_valor,'id a actualizar',temp_id, inMetodo,var)
+                                    #self.ts[indice+x+1][3]=temp_valor[1][1]
                                 #self.ts[indice+x+1][3]=valores[2][x]
                             if tamaño_errores != len(self.errores) or inMetodo:
                                 for x in range(tamaño):
@@ -418,77 +417,12 @@ class Semantico():
             if renin:
                 tipo_id=tipo_id[1]
             # tipo=self.fnRetornaValor(valores,tipo_id)
-            if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
-                # Asignación de una Expresión
-                #print(valores)
-                if valores[0] == 'expresion' and valores[1] != 'error':
-                    #print(valores)
-                    self.postorden(valores)
-                    #print(self.pila_semantica)
-                    valores = self.evaluar_pila(self.pila_semantica,var)
-                    #print(valores)
-                    # self.ts[indice][3] = self.pila_semantica
-                    self.pila_semantica = []
-
-                # Asignación de un Valor Diferente a Expresión
-                # String, Char, Llamada a Método, Booleano
-                if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
-                    if (valores >= 0 and valores <= 65535):
-                        if inMetodo is False:
-                            self.ts[indice][3] = valores
-                    elif valores < 0:
-                        self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
-                        if inMetodo is False:
-                            self.ts[indice][3] = 0
-                    else: 
-                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
-                elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
-                    if valores >= 0 and valores <= 255:
-                        if inMetodo is False:
-                         self.ts[indice][3] = valores
-                    elif valores < 0:
-                        self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
-                        if inMetodo is False:
-                            self.ts[indice][3] = 0
-                    else: 
-                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
-                elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores
-                elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores
-                elif valores in ['true', 'false'] and tipo_id == 'boolean':
-                    if valores:
-                        self.ts[indice][3] = 'true'
-                    else: 
-                        self.ts[indice][3] = 'false'
-                elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
-                    print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores[1]
-                # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
-                #     #Error de inicialización
-                #     self.ts[indice][3] = valores
-                else:
-                    #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
-                    if valores != 'Null':
-                        if not isinstance(valores, tuple):
-                            #print(valores)
-                            if isinstance(valores, bool) and valores: 
-                                valores = 'true'
-                            elif isinstance(valores, bool) and not valores:  
-                                valores = 'false'
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].', 0, 1])  
-                        elif valores[1] != 'error': 
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
-                #Si es de un tipo especial pero no array:
-
-            elif tipo_id in ['obstacles', 'platform']:
+            if tipo_id in ['int', 'byte', 'boolean', 'char', 'string','obstacles', 'platform','background','character']:
+                    #Valida que sea un arreglo el que se manda
                 tipo=valores[0]
-                if tipo != 'fila':
-                  self.errores.append([f'Error Semántico al identificador {id} es de tipo {tipo_id} y solo se puede asignar una fila.{tipo}',0,1])
-                else:
+                valortemp = valores 
+                if tipo == 'fila' and tipo_id in ['obstacles', 'platform']:
+                    print ('Entro en filas',id)
                     #Validación por Tamaño
                     tamaño=int(valores[1])
                     tamaño_arreglo= 7
@@ -507,11 +441,10 @@ class Semantico():
                         if tamaño_errores != len(self.errores) or inMetodo:
                             for x in range(tamaño):
                                 self.ts[indice+x+1][3]=temp_valores[x]
-            elif tipo_id =='player':
-                tipo=valores[0]
-                if tipo != 'fila':
-                  self.errores.append([f'Error Semántico al identificador {id} es de tipo {tipo_id} y no solo se puede asignar una fila.',0,1])
-                else:
+                        else:
+                            self.ts[indice][3] = 'asignadoblo'
+                
+                elif tipo == 'fila' and tipo_id =='player':
                     #Validación por Tamaño
                     tamaño=int(valores[1])
                     tamaño_arreglo= 4
@@ -530,18 +463,90 @@ class Semantico():
                         if tamaño_errores != len(self.errores) or inMetodo:
                             for x in range(tamaño):
                                 self.ts[indice+x+1][3]=temp_valores[x]
-            elif tipo_id =='character':
-                print('jugador  efef',valores[1][1])
-                if 'character'==self.fnEncontrarTipo(valores[1][1]):
-                    self.ts[indice][3]=valores[1][1]
-                else:
-                    self.errores.append([f'Error Semántico, el 5 elemento de la fila solo puede ser de tipo {tipo_id} de la librería Players.',0,1])
-            elif tipo_id =='background':
-                print('jugador  efef',valores[1][1])
-                if 'background'==self.fnEncontrarTipo(valores[1][1]):
-                    self.ts[indice][3]=valores[1][1]
-                else:
-                    self.errores.append([f'Error Semántico, el valor para el id {id} debde de formar parte de la de la librería Background.',0,1])
+
+                # Asignación de una Expresión
+                #print(valores)
+                if valores[0] == 'expresion' and valores[1] != 'error':
+                    #print(valores)
+                    self.postorden(valores)
+                    #print(self.pila_semantica)
+                    valores = self.evaluar_pila(self.pila_semantica,var)
+                    #print(valores)
+                    # self.ts[indice][3] = self.pila_semantica
+                    self.pila_semantica = []
+
+                # Asignación de un Valor Diferente a Expresión
+                # String, Char, Llamada a Método, Booleano
+                if tipo != 'fila':
+
+                    if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
+                        if (valores >= 0 and valores <= 65535):
+                            if inMetodo is False:
+                                self.ts[indice][3] = valores
+                        elif valores < 0:
+                            self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
+                            if inMetodo is False:
+                                self.ts[indice][3] = 0
+                        else: 
+                            self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
+                    elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
+                        if valores >= 0 and valores <= 255:
+                            if inMetodo is False:
+                                self.ts[indice][3] = valores
+                        elif valores < 0:
+                            self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
+                            if inMetodo is False:
+                                self.ts[indice][3] = 0
+                        else: 
+                            self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
+                    elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
+                        if inMetodo is False:
+                            self.ts[indice][3] = valores
+                    elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
+                        if inMetodo is False:
+                            self.ts[indice][3] = valores
+                    elif valores in ['true', 'false'] and tipo_id == 'boolean':
+                        if valores:
+                            self.ts[indice][3] = 'true'
+                        else: 
+                            self.ts[indice][3] = 'false'
+                    elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
+                        print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
+                        if inMetodo is False:
+                            self.ts[indice][3] = valores[1]
+                    elif valores=='asignadoblo' and tipo_id in ['platform','obstacles']:
+                        id_buscar = valortemp[1][1]
+                        indice_buscar = self.fnIndice(id_buscar)
+                        for x in range(8):
+                            print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
+                            self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
+                        print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
+
+                    elif tipo_id =='background' and valores in ['Forest', 'Mountain', 'Ocean', 'Desert', 'City', 'Village', 'Cave','Swamp', 'River', 'Island','Castle']:
+                        self.ts[indice][3] = valores
+                    elif tipo_id =='character' and valores in ['wizard', 'archer', 'rogue', 'paladin', 'barbarian','assassin', 'druid', 'samurai', 'ninja', 'priest', 'knight']:
+                        self.ts[indice][3] = valores
+                        # buscar id que se asigana
+                        
+
+                    # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
+                    #     #Error de inicialización
+                    #     self.ts[indice][3] = valores
+                    else:
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
+                        if valores != 'Null':
+                            if not isinstance(valores, tuple):
+                                #print(valores)
+                                if isinstance(valores, bool) and valores: 
+                                    valores = 'true'
+                                elif isinstance(valores, bool) and not valores:  
+                                    valores = 'false'
+                                self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores},].', 0, 1])  
+                            elif valores[1] != 'error': 
+                                self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
+                    #Si es de un tipo especial pero no array:
+
+            
 #---------Funcion que Retorna Valor----------------------------
     def fnRetornaValor(self, id):
         for simbolo in self.ts:

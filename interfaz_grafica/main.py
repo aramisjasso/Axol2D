@@ -71,9 +71,13 @@ if __name__ == "__main__":
             int a1 = 0;
             string b = "cadena";
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
-            platform p2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-            platform plarreglo[2] = [pl,p2];
+            platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+            platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+            platform pl3 = pl2;
+            platform pl4 = pl1;
+            platform pl5 = pl4;
+
+            platform plarreglo[3] = [pl1,pl2,pl3];
             obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
             obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
             obstacles obs [2] = [obs1,obs2];
@@ -84,9 +88,9 @@ if __name__ == "__main__":
             player jugador = [   0    ,    0    ,   3  , knight   ];
             method int miMetodo1(){
                 a1 = 12;
-                pl = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
+                pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
                 while (x<5){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                 }
                 
