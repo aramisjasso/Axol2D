@@ -33,9 +33,26 @@ if __name__ == "__main__":
         import enemies;
 
         level MiPrimerNivel {
-           int a = 4 5 5 5 * 3;
+            int a = 6 + 3;
+            int b; 
+            method int miMetodo1() {
+                a = a + b;
+                if ( b &  a < 7 ) {
+                
+                
+                 
 
-            method int miMetodo1(){
+                switch (a) 
+                    case 1: a = b ; break; 
+                    default : a - 6; 
+                }
+
+                
+
+                while ( a < 7 )  {
+                
+                }
+
                 a = 123;
                 return 0;
             }

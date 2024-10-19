@@ -19,6 +19,7 @@ class Sintactico():
         self.errores = []
         self.parser = None
         self.error_Expresion = False
+        self.error_Condicion = False
     
     def build(self):
         self.parser = yacc.yacc(module=self,method='LALR', debug=True)
@@ -262,12 +263,137 @@ class Sintactico():
             p[0] = ('ifElse', p[2], p[4])
         else: 
             p[0] = ('ifElse', p[2], p[4], p[8])
+    
+    def p_ifElse_error1(self,p):
+        '''ifElse : IF condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta parentesis de apertura en la condición. ', 0, 1])
+        p[0] = 'error'
+        self.error_Condicion = True
+
+    def p_ifElse_error2(self, p):
+        '''ifElse : IF condicion LLAVE_CIERRA
+                  | IF condicion instrucciones LLAVE_CIERRA
+                  | IF condicion LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA
+                  | IF condicion  error '''
+        self.errores.append(['Error Sintáctico. Falta llave de apertura en la estructura [if]. ', 0, 1])
+        if len(p) == 3:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 4:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 5:
+            p[0] = ('ifElse', p[2], p[3])
+        elif len(p) == 7:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2], p[3])
+        else: 
+            p[0] = ('ifElse', p[2], p[3], p[7])
+
+    def p_ifElse_error3(self, p):
+        '''ifElse : IF condicion LLAVE_ABRE 
+                  | IF condicion LLAVE_ABRE instrucciones 
+                  | IF condicion LLAVE_ABRE ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta llave de cierre en la estructura [if]. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 5:
+            p[0] = ('ifElse', p[2], p[4])
+        elif len(p) == 7:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2], p[4])
+        else: 
+            p[0] = ('ifElse', p[2], p[4], p[7])
+
+    def p_ifElse_error4(self, p):
+        '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE instrucciones LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta llave de apertura en la subestructura [else]. ', 0, 1])
+        if len(p) == 7:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2], p[4])
+        else: 
+            p[0] = ('ifElse', p[2], p[4], p[7])
+
+    def p_ifElse_error5(self, p):
+        '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta la palabra reservada [else] en la estructura [if]. ', 0, 1])
+        if len(p) == 7:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2], p[4])
+        else: 
+            p[0] = ('ifElse', p[2], p[4], p[7])
+
+    def p_ifElse_error6(self, p):
+        '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE 
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE
+                  | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones'''
+        self.errores.append(['Error Sintáctico. Falta llave de cierre en la subestructura [else]. ', 0, 1])
+        if len(p) == 7:
+            p[0] = ('ifElse', p[2])
+        elif len(p) == 8:
+            p[0] = ('ifElse', p[2], p[4])
+        else: 
+            p[0] = ('ifElse', p[2], p[4], p[8])
 
     #<switch> ::= switch ( identificador ) { <casos> }
     def p_switch(self,p):
-        #aquí probar con parentesis abre identificador parentesis cierra
         '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
         p[0] = ('switch', p[3], p[6])
+
+    def p_switch_error1(self,p):
+        '''switch : PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA
+                  | IDENTIFICADOR PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta palabra reservada [switch] en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[2], p[5])
+
+    def p_switch_error2(self,p):
+        '''switch : SWITCH IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta paréntesis de apertura en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[2], p[5])  
+
+    def p_switch_error3(self,p):
+        '''switch : SWITCH PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta variable de control en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[5])  
+    
+    def p_switch_error4(self,p):
+        '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR LLAVE_ABRE casos LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta paréntesis de cierre en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[3], p[5])  
+
+    def p_switch_error5(self,p):
+        '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA casos LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Falta llave de apertura en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[3], p[5])
+    
+    def p_switch_error6(self,p):
+        '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
+        self.errores.append(['Error Sintáctico. Faltan los distintos casos en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[3])
+
+    def p_switch_error7(self,p):
+        '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos'''
+        self.errores.append(['Error Sintáctico. Falta llave de cierre en la estructura [switch]. ', 0, 1])
+        p[0] = ('switch', p[3], p[5])
 
     #<casos> ::= <caso> <restoCasos>
     def p_casos(self,p):
@@ -279,9 +405,38 @@ class Sintactico():
 
     #<caso> ::= case numero : <instrucciones> break ;
     def p_caso(self,p):
-        #aquí puede ser número, cadena o char
-        '''caso : CASE NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA'''
-        p[0] = ('caso', p[2], p[4])
+        '''caso : CASE NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA
+                | CASE NUMERO DOS_PUNTOS BREAK PUNTO_Y_COMA'''
+        if (len(p) == 7):
+            p[0] = ('caso', p[2], p[4])
+        else: 
+            p[0] = ('caso', p[2])
+
+    def p_caso_error1(self,p):
+        '''caso : NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA
+                | NUMERO DOS_PUNTOS BREAK PUNTO_Y_COMA'''
+        self.errores.append(['Error Sintáctico. Falta la palabra reservada [case] en la estructura [switch]. ', 0, 1])
+        if (len(p) == 6):
+            p[0] = ('caso', p[1], p[3])
+        else: 
+            p[0] = ('caso', p[1])
+
+    def p_caso_error2(self,p):
+        '''caso : CASE NUMERO instrucciones BREAK PUNTO_Y_COMA
+                | CASE NUMERO BREAK PUNTO_Y_COMA'''
+        self.errores.append(['Error Sintáctico. Faltan los dos puntos [:] después del número de caso en la estructura [switch]. ', 0, 1])
+        if (len(p) == 6):
+            p[0] = ('caso', p[2], p[3])
+        else: 
+            p[0] = ('caso', p[2])
+
+    def p_caso_error3(self,p):
+        '''caso : CASE NUMERO DOS_PUNTOS instrucciones'''
+        self.errores.append(["Advertencia. Ha olvidado la instrucción 'break;' al final del caso en la estructura [switch]. ", 0, 1])
+        if (len(p) == 6):
+            p[0] = ('caso', p[2], p[4])
+        else: 
+            p[0] = ('caso', p[2])
 
     #<restoCasos> ::= <casos> | default : <instrucciones> }
     def p_restoCasos(self,p):
@@ -291,6 +446,21 @@ class Sintactico():
             p[0] = p[1]
         else:  #default
             p[0] = ('default', p[3])
+
+    def p_restoCasos_error1(self,p):
+        '''restoCasos : DOS_PUNTOS instrucciones'''
+        self.errores.append(['Error Sintáctico. Falta la palabra reservada [default] en la estructura [switch]. ', 0, 1])
+        p[0] = ('default', p[2])
+    
+    def p_restoCasos_error2(self,p):
+        '''restoCasos : DEFAULT : '''
+        self.errores.append(['Error Sintáctico. Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
+        p[0] = ('default', p[2])
+
+    def p_restoCasos_error3(self,p):
+        '''restoCasos : DEFAULT instrucciones'''
+        self.errores.append(['Error Sintáctico. El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
+        p[0] = ('default', p[2])
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
     # def p_for(self,p):
@@ -305,6 +475,16 @@ class Sintactico():
     def p_forEach(self,p):
         '''forEach : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
+        if len(p) == 10:
+            p[0] = ('forEach', p[3], p[4], p[6])
+        else:
+            p[0] = ('forEach', p[3], p[4], p[6], p[9])
+
+    def p_forEach_error1(self, p):
+        '''forEach : PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
+                   | PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
+                   | IDENTIFICADOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
+                   | IDENTIFICADOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
         if len(p) == 10:
             p[0] = ('forEach', p[3], p[4], p[6])
         else:
@@ -330,18 +510,28 @@ class Sintactico():
 
     #-------------------------------------- E X P R E S I O N -------------------------------------------------
     #<expresion> ::= <expresionAritmetica> | <expresionLogica> | <expresionPostfijo> | <expresionParentesis>
-    def p_condicion(self, p):
-        '''condicion : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
-        p[0] = ('condicion', p[2])
+    # def p_condicion(self, p):
+    #     '''condicion : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
+    #     if self.error_Expresion:
+    #         p[0] = ('condicion', 'error')
+    #         self.error_Condicion = False
+    #     else: 
+    #         p[0] = ('condicion', p[2])
+    
+    # def p_condicion(self, p):
+    #     '''condicion : PARENTESIS_ABRE expresionLogica error'''
+    #     self.errores.append(['Error Sintáctico. Falta parentesis de cierre en la expresión lógica/relacional. ', 0, 1])
+    #     p[0] = 'error'
+    #     self.error_Condicion = True
 
     #<expresionLogica> ::= <expresionComparacion> <restoExpresionLogica> 
     #                         | NOT <expresionComparacion> | <booleano> <restoExpresionLogica>
-    def p_expresionLogica(self, p):
-        '''expresionLogica : elementoExpresionLogica restoExpresionLogica'''
+    def p_condicion(self, p):
+        '''condicion : elementoExpresionLogica restoExpresionLogica'''
         if len(p) == 3 and p[2] is None:
             p[0] = p[1]
         else:
-            p[0] = ('expresionLogica', p[1], p[2])
+            p[0] = ('condicion', p[1], p[2])
 
     #<restoExpresionLogica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionLogica(self, p):
@@ -356,11 +546,11 @@ class Sintactico():
 
     def p_elementoExpresionLogica(self, p):
         '''elementoExpresionLogica : expresionComparacion
-                                | booleano
-                                | NOT expresionComparacion 
-                                | NOT booleano
-                                | expresionRelacionalParentesis
-                                | NOT expresionRelacionalParentesis'''
+                                   | booleano
+                                   | NOT expresionComparacion 
+                                   | NOT booleano
+                                   | expresionRelacionalParentesis
+                                   | NOT expresionRelacionalParentesis'''
         if len(p) == 2:
             p[0] = ('elementoExpresionLogica', p[1])
         else:
@@ -368,9 +558,15 @@ class Sintactico():
 
     #<expresionComparacion> ::= <expresionAritmetica> <restoExpresionComparacion>
     def p_expresionComparacion(self, p):
-        '''expresionComparacion : expresion restoExpresionComparacion'''
+        '''expresionComparacion : expresion restoExpresionComparacion
+                                | valorCadena restoExpresionComparacion
+                                | booleano restoExpresionComparacion'''
         if p[2] is None:
             p[0] = p[1]
+        elif p[1][0] == 'booleano': 
+            self.errores.append(['Error Sintáctico. Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Condicion = True
         else:
             p[0] = ('expresionComparacion', p[1], p[2])
 
@@ -378,25 +574,65 @@ class Sintactico():
     def p_restoExpresionComparacion(self, p):
         '''restoExpresionComparacion : restoExpresionComparacion operadorComparacion expresion
                                      | restoExpresionComparacion operadorComparacion valorCadena
+                                     | restoExpresionComparacion operadorComparacion booleano
                                      | empty'''
         if len(p) == 2:
             p[0] = None 
-        elif p[1] is None:
-            p[0] = ('restoExpresionComparacion', p[2], p[3])
-        else:
-            p[0] = ('restoExpresionComparacion', p[1], p[2], p[3])
+        elif p[3][0] == 'booleano': 
+            self.errores.append(['Error Sintáctico. Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Condicion = True
+        else: 
+            if p[1] is None:
+                p[0] = ('restoExpresionComparacion', p[2], p[3])
+            else:
+                p[0] = ('restoExpresionComparacion', p[1], p[2], p[3])
+
+    def p_expresionRelacionalParentesis(self,p):
+        '''expresionRelacionalParentesis : PARENTESIS_ABRE condicion PARENTESIS_CIERRA'''
+        p[0] = ('expresionRelacionalParentesis', p[2])
+
+    # #int a = ((2 + 3) * 4;
+    def p_expresionRelacionalParentesis_error(self,p):
+        '''expresionRelacionalParentesis : PARENTESIS_ABRE condicion error'''
+        self.errores.append(['Error Sintáctico. Falta parentesis de cierre en la condición. ', 0, 1])
+        p[0] = 'error'
+        self.error_Condicion = True
+
+    # Producción para <operadorComparacion>
+    def p_operadorComparacion(self,p):
+        '''operadorComparacion : DOBLE_IGUAL
+                               | DIFERENTE
+                               | MENOR_QUE
+                               | MENOR_IGUAL_QUE
+                               | MAYOR_QUE
+                               | MAYOR_IGUAL_QUE'''
+        p[0] = p[1]
+
+    # Producción para <operadorLogico>
+    def p_operadorLogico(self,p):
+        '''operadorLogico : AND
+                        | OR'''
+        p[0] = p[1]
 #------------------------------------------------------------------------------------------
    #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
     def p_expresion(self, p):
         '''expresion : termino restoExpresionAritmetica
+                     | booleano restoExpresionAritmetica
+                     | valorCadena restoExpresionAritmetica
                      | expresionUnitaria restoExpresionAritmetica'''
-        if p[2] is None:
-            p[0] = ('expresion', p[1])
-        elif self.error_Expresion:
+        if not p[1][0] in ['factor', 'termino'] and p[2] != None:
+            self.errores.append(['Error Sintáctico. Un operador de adición [+,-] no puede ir precedido de un valor [boolean, string o char]. ', 0, 1])
             p[0] = ('expresion', 'error')
-            self.error_Expresion = False
-        else:
-            p[0] = ('expresion', p[1], p[2])
+        else: 
+            if p[2] is None:
+                p[0] = ('expresion', p[1])
+            elif self.error_Expresion:
+                p[0] = ('expresion', 'error')
+                self.error_Expresion = False
+            else:
+                p[0] = ('expresion', p[1], p[2])
+        self.error_Expresion = False
 
     #int a = 4 5 5 5 * 3;
     def p_expresion_error(self, p):
@@ -432,13 +668,20 @@ class Sintactico():
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionAritmetica(self, p):
         '''restoExpresionAritmetica : restoExpresionAritmetica operadorAdicion termino
+                                    | restoExpresionAritmetica operadorAdicion booleano
+                                    | restoExpresionAritmetica operadorAdicion valorCadena
                                     | empty'''
         if len(p) == 2:
             p[0] = None  # ε
-        elif p[1] is None:
-            p[0] = ('restoExpresionAritmetica', p[2], p[3])
-        else:
-            p[0] = ('restoExpresionAritmetica', p[1], p[2], p[3])
+        elif not p[3][0] in ['factor', 'termino']:
+            self.errores.append(['Error Sintáctico. Un operador de adición [+,-] no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Expresion = True
+        else: 
+            if p[1] is None:
+                p[0] = ('restoExpresionAritmetica', p[2], p[3])
+            else:
+                p[0] = ('restoExpresionAritmetica', p[1], p[2], p[3])
 
     #int a = 4 * 3 + (12 - 8) + 5 5 6 6 ;
     #int a = 4 * 3 + (12 - 8) + 5 3 ;
@@ -465,9 +708,15 @@ class Sintactico():
 
     #<termino> ::= <factor> <restoTermino>
     def p_termino(self,p):
-        '''termino : factor restoTermino'''
+        '''termino : factor restoTermino
+                   | booleano restoTermino
+                   | valorCadena restoTermino'''
         if p[2] is None:
             p[0] = p[1]
+        elif p[1][0] != 'factor':
+            self.errores.append(['Error Sintáctico. Un operador de multiplicación [*,/,%] no puede ir precedido de un valor [boolean, string o char]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Expresion = True
         else:
             p[0] = ('termino', p[1], p[2])
 
@@ -480,13 +729,20 @@ class Sintactico():
 
     def p_restoTermino(self,p):
         '''restoTermino : restoTermino operadorMultiplicacion factor
+                        | restoTermino operadorMultiplicacion booleano
+                        | restoTermino operadorMultiplicacion valorCadena
                         | empty'''
         if len(p) == 2:
-            p[0] = None  # ε
-        elif p[1] is None:
-            p[0] = ('restoTermino', p[2], p[3])
-        else:
-            p[0] = ('restoTermino', p[1], p[2], p[3])
+                p[0] = None  # ε
+        elif p[3][0] != 'factor':
+            self.errores.append(['Error Sintáctico. Un operador de multiplicación [*,/,%] no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Expresion = True
+        else: 
+            if p[1] is None:
+                p[0] = ('restoTermino', p[2], p[3])
+            else:
+                p[0] = ('restoTermino', p[1], p[2], p[3])
 
     # int a = 5 * ;
     def p_restoTermino_error1(self,p):
@@ -519,8 +775,15 @@ class Sintactico():
             p[0] = 'error'
 
     def p_expresionUnitaria(self, p):
-        '''expresionUnitaria : operadorAdicion factor'''
-        p[0] = ('expresionUnitaria', ('factor', '0'), p[1], p[2])
+        '''expresionUnitaria : operadorAdicion factor
+                             | operadorAdicion booleano
+                             | operadorAdicion valorCadena'''
+        if p[2][0] != 'factor':
+            self.errores.append(['Error Sintáctico. Un operador unitario no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            p[0] = 'error'
+            self.error_Expresion = True
+        else: 
+            p[0] = ('expresionUnitaria', ('factor', '0'), p[1], p[2])
 
     # int a = - ;
     def p_expresionUnitaria_error(self, p):
@@ -554,48 +817,28 @@ class Sintactico():
         p[0] = 'error'
         self.error_Expresion = True
 #------------------------------------------------------------------------------------------------
-    def p_expresionRelacionalParentesis(self,p):
-        '''expresionRelacionalParentesis : PARENTESIS_ABRE expresionLogica PARENTESIS_CIERRA'''
-        p[0] = ('expresionRelacionalParentesis', p[2])
-
-    # Producción para <operadorComparacion>
-    def p_operadorComparacion(self,p):
-        '''operadorComparacion : DOBLE_IGUAL
-                            | DIFERENTE
-                            | MENOR_QUE
-                            | MENOR_IGUAL_QUE
-                            | MAYOR_QUE
-                            | MAYOR_IGUAL_QUE'''
-        p[0] = p[1]
-
-    # Producción para <operadorLogico>
-    def p_operadorLogico(self,p):
-        '''operadorLogico : AND
-                        | OR'''
-        p[0] = p[1]
-
     #<expresionPostfijo> ::= identificador <operadorPostfijo> |
     #                        this . <identificador> <operadorPostfijo>
-    def p_expresionPostfijo(self,p):
-        '''expresionPostfijo : IDENTIFICADOR operadorPostfijo
-                            | THIS PUNTO IDENTIFICADOR operadorPostfijo'''
-        if len(p) == 3:
-            p[0] = ('expresionPostfijo', p[1], p[2])  # identificador operadorPostfijo
-        else:
-            p[0] = ('expresionPostfijoThis', p[3], p[4])  # this.identificador operadorPostfijo
+    # def p_expresionPostfijo(self,p):
+    #     '''expresionPostfijo : IDENTIFICADOR operadorPostfijo
+    #                         | THIS PUNTO IDENTIFICADOR operadorPostfijo'''
+    #     if len(p) == 3:
+    #         p[0] = ('expresionPostfijo', p[1], p[2])  # identificador operadorPostfijo
+    #     else:
+    #         p[0] = ('expresionPostfijoThis', p[3], p[4])  # this.identificador operadorPostfijo
 
-    #<operadorPostfijo> ::= ++ | ––
-    def p_operadorPostfijo(self,p):
-        '''operadorPostfijo : MAS_MAS
-                            | MENOS_MENOS'''
-        p[0] = p[1]
+    # #<operadorPostfijo> ::= ++ | ––
+    # def p_operadorPostfijo(self,p):
+    #     '''operadorPostfijo : MAS_MAS
+    #                         | MENOS_MENOS'''
+    #     p[0] = p[1]
     #----------------------------------------------------------------------------------------------------------
 
     #---------------------------- E X P R E S I O N   D E   A S I G N A C I O N -------------------------------
     def p_izqAsignacion(self,p):
         '''izqAsignacion : IDENTIFICADOR operadorAsignacion
-                        | accesoLineal operadorAsignacion
-                        | accesoMatriz operadorAsignacion'''
+                         | accesoLineal operadorAsignacion
+                         | accesoMatriz operadorAsignacion'''
         if len(p) == 3 and p[1] == 'IDENTIFICADOR':
             p[0] = ('izqAsignacion', p[2])
         elif len(p) == 5:
@@ -613,8 +856,7 @@ class Sintactico():
                                | izqAsignacion VALOR_STRING
                                | izqAsignacion booleano
                                | definicionArreglo
-                               | definicionMatriz
-                               | expresionPostfijo'''
+                               | definicionMatriz'''
         if len(p) == 3:
             p[0] = ('expresionAsignacion', p[1], p[2])  
         else:  
@@ -627,11 +869,11 @@ class Sintactico():
 
     #<operadorAsignacionAritmetico> ::= += | -= | *= | /=
     def p_operadorAsignacion(self,p):
-        '''operadorAsignacion : IGUAL
-                              | MAS_IGUAL
-                              | MENOS_IGUAL
-                              | POR_IGUAL
-                              | DIVISION_IGUAL'''
+        '''operadorAsignacion : IGUAL '''
+                            #   | MAS_IGUAL
+                            #   | MENOS_IGUAL
+                            #   | POR_IGUAL
+                            #   | DIVISION_IGUAL'''
         p[0] = p[1]   
     #----------------------------------------------------------------------------------------------------------
 

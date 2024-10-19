@@ -107,10 +107,10 @@ class Lexico():
 
     #Operadores de Asignacion
     t_IGUAL = r'='
-    t_MAS_IGUAL = r'\+='
-    t_MENOS_IGUAL = r'-='
-    t_POR_IGUAL = r'\*='
-    t_DIVISION_IGUAL = r'/='
+    # t_MAS_IGUAL = r'\+='
+    # t_MENOS_IGUAL = r'-='
+    # t_POR_IGUAL = r'\*='
+    # t_DIVISION_IGUAL = r'/='
 
     # Operadores de Comparacion
     t_DOBLE_IGUAL = r'=='
@@ -126,8 +126,8 @@ class Lexico():
     t_NOT = r'!'
 
     # Operadores de Incremento y Decremento
-    t_MAS_MAS = r'\+\+'
-    t_MENOS_MENOS = r'--'
+    # t_MAS_MAS = r'\+\+'
+    # t_MENOS_MENOS = r'--'
 
     #Delimitadores
     t_PARENTESIS_ABRE = r'\('
