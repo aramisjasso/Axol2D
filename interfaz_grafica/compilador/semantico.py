@@ -23,7 +23,7 @@ class Semantico():
         self.compilo = True
         self.ts=TS
         self.fnSepararArbol()
-        #self.fnParteImport()
+        self.fnParteImport()
         self.fnParteNivel()
         self.fnPrintTs()
         if len(self.errores)!=0:
@@ -36,30 +36,94 @@ class Semantico():
             if indice !=0:
                 if valor[0]== 'nivel':
                     self.parteNivel= valor
+                    #print('Nivel:',valor)
                 if valor[0] == 'importaciones':
                     self.parteImportaciones = valor
+                    #print('Importaciones:',valor)
         
         if self.parteNivel != None:
             for indice, valor in enumerate(self.parteNivel[2]):
                 if indice !=0:
                     if valor[0]== 'bloqueDeclaracion':
                         self.parteDeclaracion = list(valor)
-                        
-
+                        #print('bloqueDeclaracion',valor)
                                                                
                     if valor[0] == 'bloqueMetodos':
                         self.parteMetodos = valor
+                        #print('bloqueMetodos',valor) 
+
                     if valor[0] == 'metodoPrincipal':
                         self.parteMetodoPrincipal = valor
                                 
-        
-        
+    #Parte Import
+    def fnParteImport(self):
+        if self.parteImportaciones != None:
+            listaImportaciones = self.parteImportaciones[1]
+            for x in listaImportaciones:
+                if x == 'Background':
+                    self.fnIsertarImportaciones(x)
+                elif x == 'Players':
+                    self.fnIsertarImportaciones(x)
+
+    # Insertar importaciones
+    def fnIsertarImportaciones(self,tipo):
+        if tipo == 'Background':
+            if not self.fnChecharImportaciones('background',tipo):
+                fondos = [
+                ['Forest', 'id_import', 'background', 'Forest', 'Linea declación'],
+                ['Mountain', 'id_import', 'background', 'Mountain', 'Linea declación'],
+                ['Ocean', 'id_import', 'background', 'Ocean', 'Linea declación'],
+                ['Desert', 'id_import', 'background', 'Desert', 'Linea declación'],
+                ['City', 'id_import', 'background', 'City', 'Linea declación'],
+                ['Village', 'id_import', 'background', 'Village', 'Linea declación'],
+                ['Cave', 'id_import', 'background', 'Cave', 'Linea declación'],
+                ['Swamp', 'id_import', 'background', 'Swamp', 'Linea declación'],
+                ['River', 'id_import', 'background', 'River', 'Linea declación'],
+                ['Island', 'id_import', 'background', 'Island', 'Linea declación'],
+                ['Castle', 'id_import','background', 'Castle','Linea declación']]
+                self.fnIsertarArrayImportaciones(fondos)
+        else:
+            if not self.fnChecharImportaciones('character',tipo):
+                jugadores = [
+                    ['wizard', 'id_import', 'character', 'wizard', 'Línea de declaración'],
+                    ['archer', 'id_import', 'character', 'archer', 'Línea de declaración'],
+                    ['rogue', 'id_import', 'character', 'rogue', 'Línea de declaración'],
+                    ['paladin', 'id_import', 'character', 'paladin', 'Línea de declaración'],
+                    ['barbarian', 'id_import', 'character', 'barbarian', 'Línea de declaración'],
+                    ['assassin', 'id_import', 'character', 'assassin', 'Línea de declaración'],
+                    ['druid', 'id_import', 'character', 'druid', 'Línea de declaración'],
+                    ['samurai', 'id_import', 'character', 'samurai', 'Línea de declaración'],
+                    ['ninja', 'id_import', 'character', 'ninja', 'Línea de declaración'],
+                    ['priest', 'id_import', 'character', 'priest', 'Línea de declaración'],
+                    ['knight', 'id_import','character', 'knight','Linea declación']
+                ]
+                self.fnIsertarArrayImportaciones(jugadores)
+
+
+    # Checa si ya se hizo la declaración de importaciones
+    def fnChecharImportaciones(self,tipo,lib):
+        for x in self.ts:
+            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
+            if x[2] == tipo:
+                self.errores.append([f'Error semantico, la librería {lib} ya ha sido importada.',0,1])
+                return True # La librería ya fue declarada
+
+    #Inserta todas las importaciones en orden alfabetico
+    def fnIsertarArrayImportaciones(self,elementos):
+        for x in elementos:
+            indice =  self.fnIndice(x[0])
+            if indice is None or isinstance(indice, list):
+                self.ts.append(x)
+            else:
+                self.ts[indice]=x
+        self.ts = sorted(self.ts, key=lambda x: x[0])
     #Parte de nivel
     def fnParteNivel(self):
         #Validación en TS del nombre de nivel
         self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         self.fnBloqueDeclaracion()
-        self.fnbloqueMetodos()
+        if not(self.parteMetodos is None):
+            self.fnbloqueMetodos()
         self.fnMetodoPrincipal()
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
@@ -141,10 +205,24 @@ class Semantico():
                     break
             #Checa si es de un tipo arreglo
             if tipo[0]=='arreglo':
-                self.ts[indice][3]=var
-                for x in range(int(var)):
-                    in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
-                    self.ts.insert(indice+x+1,in_simbolo)
+                if tipo[1]in ['obstacles','platform']:
+                    self.ts[indice][3]=var
+                    y = 0
+                    for x in range(int(var)):
+                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
+                        self.ts.insert(indice+y+1,in_simbolo)
+                        y+=1
+                        atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
+                        for k in range(len(atributos)):
+                            in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int','Null', 'Linea declaración']
+                            self.ts.insert(indice+y+1,in_simbolo)
+                            y+=1
+                        
+                else:
+                    self.ts[indice][3]=var
+                    for x in range(int(var)):
+                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
+                        self.ts.insert(indice+x+1,in_simbolo)
             #Checa si es de un tipo matriz
             elif tipo[0]=='matriz':
                 self.ts[indice][3]=var
@@ -164,6 +242,7 @@ class Semantico():
                 for x,valor in enumerate(self.listaParametros):
                     id_m = valor[1]
                     parametros.append(id_m)
+                    
                 #Se guarda la cantidad de errores
                 temp_errores = len(self.errores)
                 if len(parametros) != len(set(parametros)):
@@ -181,8 +260,25 @@ class Semantico():
                             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
                             simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
                             self.ts.insert(indice+x+1,simbolo)
-                    if temp_errores ==len(self.errores):
+
+                    if temp_errores == len(self.errores):
+                        print('creación de un método',self.ts[indice])
                         self.ts[indice][3]=(x+1, atributos)
+                        print('creación de un método',self.ts[indice])
+            elif tipo in ['obstacles', 'platform']:
+                atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
+                for x in range(len(atributos)):
+                    in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int','Null', 'Linea declaración']
+                    self.ts.insert(indice+x+1,in_simbolo)
+                #self.ts[indice][3]=tipo
+            elif tipo == 'player':
+                #[inicio_x, inicio_y, vidas, personaje]
+                atributos=[['inicio_x','int'], ['inicio_y','int'], ['vidas','int'], ['personaje','character']]
+                for x in range(len(atributos)):
+                    in_simbolo=[f'{id},{atributos[x][0]}',f'{simbolo[1]},{atributos[x][0]}',atributos[x][1],'Null', 'Linea declaración']
+                    self.ts.insert(indice+x+1,in_simbolo)
+                self.ts[indice][3]=tipo
+                #
         else:
             #Error dos veces declarado
             self.compilo = False
@@ -205,12 +301,9 @@ class Semantico():
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
     def fnAsignar(self,valores,id,inMetodo = False, var = None,renin=None):
         #Validar su declaración
-        print('Prueba: ', id,valores,inMetodo, var,renin)
         indice=self.fnIndice(id)
-        print('Prueba: ', id,valores,inMetodo, var,renin,indice)
         tipo_id=self.ts[indice][2]
-        print('Prueba: ', id,valores,inMetodo, var,renin,indice,tipo_id)
-        
+        #print('calcular valores adentro, ',valores,id,tipo_id,indice,self.ts[indice])
         #Validad si el id es del tipo que se pasa
         #Validar si es arreglo o método
         if len(tipo_id)==2 and renin is None:
@@ -221,6 +314,7 @@ class Semantico():
             elif tipo=='filas':
                 tipo='matriz'
             else:
+
                 self.errores.append([f'Error Semántico, el valor no puede ser asignado a un arreglo, una matriz o un identificador.', 0, 1])
             #Sacar tipo de valores
             
@@ -237,18 +331,34 @@ class Semantico():
                     tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
                         self.errores.append([f'Error Semántico, la fila no se puede asignar al identificador {id} los tamaños no coinciden el tamaño declaro es: {tamaño_arreglo}',0,1])
-                    else:#Validación de inserción
-                        tamaño_errores = len(self.errores)
-                        temp_valores=[]
-                        for x in range(tamaño):
-                            temp_id = self.ts[indice+x+1][0]
-                            temp_valores.append(self.ts[indice+x+1][3])
-                            temp_valor = valores[2][x]
-                            self.fnAsignar(temp_valor,temp_id,inMetodo,var)
-                            #self.ts[indice+x+1][3]=valores[2][x]
-                        if tamaño_errores != len(self.errores) or inMetodo:
+                    else:
+                        if tipo_id[1]in['obstacles', 'platform']:
+                            tamaño_errores = len(self.errores)
+                            temp_valores=[]
+                            #validar tipo
                             for x in range(tamaño):
-                                self.ts[indice+x+1][3]=temp_valores[x]
+                                temp_id = self.ts[indice+x*8+1][0]
+                                temp_valores.append(self.ts[indice+x+1][3])
+                                temp_valor = valores[2][x]
+                                self.fnAsignar(temp_valor,temp_id, inMetodo,var)
+                                #print('valor temporal',temp_valor,'id a actualizar',temp_id, inMetodo,var)
+                                    #self.ts[indice+x+1][3]=temp_valor[1][1]
+                                #self.ts[indice+x+1][3]=valores[2][x]
+                            if tamaño_errores != len(self.errores) or inMetodo:
+                                for x in range(tamaño):
+                                    self.ts[indice+x+1][3]=temp_valores[x]
+                        else:#Validación de inserción
+                            tamaño_errores = len(self.errores)
+                            temp_valores=[]
+                            for x in range(tamaño):
+                                temp_id = self.ts[indice+x+1][0]
+                                temp_valores.append(self.ts[indice+x+1][3])
+                                temp_valor = valores[2][x]
+                                self.fnAsignar(temp_valor,temp_id,inMetodo,var)
+                                #self.ts[indice+x+1][3]=valores[2][x]
+                            if tamaño_errores != len(self.errores) or inMetodo:
+                                for x in range(tamaño):
+                                    self.ts[indice+x+1][3]=temp_valores[x]
                         
 
             else:
@@ -308,12 +418,56 @@ class Semantico():
                                         x1+=1
                                  
         else:
-            print('tipo en asignación',tipo_id)
             if renin:
                 tipo_id=tipo_id[1]
-            print('tipo en asignación',tipo_id)
             # tipo=self.fnRetornaValor(valores,tipo_id)
-            if tipo_id in ['int', 'byte', 'boolean', 'char', 'string']:
+            if tipo_id in ['int', 'byte', 'boolean', 'char', 'string','obstacles', 'platform','background','character']:
+                    #Valida que sea un arreglo el que se manda
+                tipo=valores[0]
+                valortemp = valores 
+                if tipo == 'fila' and tipo_id in ['obstacles', 'platform']:
+                    #print ('Entro en filas',id)
+                    #Validación por Tamaño
+                    tamaño=int(valores[1])
+                    tamaño_arreglo= 7
+                    #[Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+                    if tamaño_arreglo!=tamaño:
+                        self.errores.append([f'Error Semántico, la fila no se puede asignar al identificador {id} de tipo de {tipo_id} solo se pueden asignar arreglos de tamaño: {tamaño_arreglo}',0,1])
+                    else:#Validación de inserción
+                        tamaño_errores = len(self.errores)
+                        temp_valores=[]
+                        for x in range(tamaño):
+                            temp_id = self.ts[indice+x+1][0]
+                            temp_valores.append(self.ts[indice+x+1][3])
+                            temp_valor = valores[2][x]
+                            self.fnAsignar(temp_valor,temp_id,inMetodo,var)
+                            #self.ts[indice+x+1][3]=valores[2][x]
+                        if tamaño_errores != len(self.errores) or inMetodo:
+                            for x in range(tamaño):
+                                self.ts[indice+x+1][3]=temp_valores[x]
+                        else:
+                            self.ts[indice][3] = 'asignadoblo'
+                
+                elif tipo == 'fila' and tipo_id =='player':
+                    #Validación por Tamaño
+                    tamaño=int(valores[1])
+                    tamaño_arreglo= 4
+                    #[inicio_x, inicio_y, vidas, personaje]
+                    if tamaño_arreglo!=tamaño:
+                        self.errores.append([f'Error Semántico, la fila no se puede asignar al identificador {id} de tipo de {tipo_id} solo se pueden asignar arreglos de tamaño: {tamaño_arreglo}',0,1])
+                    else:#Validación de inserción
+                        tamaño_errores = len(self.errores)
+                        temp_valores=[]
+                        for x in range(tamaño):
+                            temp_id = self.ts[indice+x+1][0]
+                            temp_valores.append(self.ts[indice+x+1][3])
+                            temp_valor = valores[2][x]
+                            self.fnAsignar(temp_valor,temp_id,inMetodo,var)
+                            #self.ts[indice+x+1][3]=valores[2][x]
+                        if tamaño_errores != len(self.errores) or inMetodo:
+                            for x in range(tamaño):
+                                self.ts[indice+x+1][3]=temp_valores[x]
+
                 # Asignación de una Expresión
                 #print(valores)
                 if valores[0] == 'expresion' and valores[1] != 'error':
@@ -327,57 +481,76 @@ class Semantico():
 
                 # Asignación de un Valor Diferente a Expresión
                 # String, Char, Llamada a Método, Booleano
-                if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
-                    if (valores >= 0 and valores <= 65535):
+                if tipo != 'fila':
+
+                    if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
+                        if (valores >= 0 and valores <= 65535):
+                            if inMetodo is False:
+                                self.ts[indice][3] = valores
+                        elif valores < 0:
+                            self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
+                            if inMetodo is False:
+                                self.ts[indice][3] = 0
+                        else: 
+                            self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
+                    elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
+                        if valores >= 0 and valores <= 255:
+                            if inMetodo is False:
+                                self.ts[indice][3] = valores
+                        elif valores < 0:
+                            self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
+                            if inMetodo is False:
+                                self.ts[indice][3] = 0
+                        else: 
+                            self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
+                    elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
                         if inMetodo is False:
                             self.ts[indice][3] = valores
-                    elif valores < 0:
-                        self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
+                    elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
                         if inMetodo is False:
-                            self.ts[indice][3] = 0
-                    else: 
-                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [int] es de 65535. ', 0, 1])
-                elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
-                    if valores >= 0 and valores <= 255:
+                            self.ts[indice][3] = valores
+                    elif valores in ['true', 'false'] and tipo_id == 'boolean':
+                        if valores:
+                            self.ts[indice][3] = 'true'
+                        else: 
+                            self.ts[indice][3] = 'false'
+                    elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
                         if inMetodo is False:
-                         self.ts[indice][3] = valores
-                    elif valores < 0:
-                        self.errores.append([f'Error Semántico. Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ', 0, 1])
-                        if inMetodo is False:
-                            self.ts[indice][3] = 0
-                    else: 
-                        self.errores.append([f'Error Semántico. El máximo valor permitido para una variable de tipo [byte] es de 255. ', 0, 1])
-                elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores
-                elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores
-                elif valores in ['true', 'false'] and tipo_id == 'boolean':
-                    if valores:
-                        self.ts[indice][3] = 'true'
-                    else: 
-                        self.ts[indice][3] = 'false'
-                elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
-                    print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
-                    if inMetodo is False:
-                        self.ts[indice][3] = valores[1]
-                # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
-                #     #Error de inicialización
-                #     self.ts[indice][3] = valores
-                else:
-                    #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
-                    if valores != 'Null':
-                        if not isinstance(valores, tuple):
-                            #print(valores)
-                            if isinstance(valores, bool) and valores: 
-                                valores = 'true'
-                            elif isinstance(valores, bool) and not valores:  
-                                valores = 'false'
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].', 0, 1])  
-                        elif valores[1] != 'error': 
-                            self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
+                            self.ts[indice][3] = valores[1]
+                    elif valores=='asignadoblo' and tipo_id in ['platform','obstacles']:
+                        id_buscar = valortemp[1][1]
+                        indice_buscar = self.fnIndice(id_buscar)
+                        for x in range(8):
+                            #print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
+                            self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
 
+                    elif tipo_id =='background' and valores in ['Forest', 'Mountain', 'Ocean', 'Desert', 'City', 'Village', 'Cave','Swamp', 'River', 'Island','Castle']:
+                        self.ts[indice][3] = valores
+                    elif tipo_id =='character' and valores in ['wizard', 'archer', 'rogue', 'paladin', 'barbarian','assassin', 'druid', 'samurai', 'ninja', 'priest', 'knight']:
+                        self.ts[indice][3] = valores
+                        # buscar id que se asigana
+                        
+
+                    # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
+                    #     #Error de inicialización
+                    #     self.ts[indice][3] = valores
+                    else:
+                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
+                        if valores != 'Null':
+                            if not isinstance(valores, tuple):
+                                #print(valores)
+                                if isinstance(valores, bool) and valores: 
+                                    valores = 'true'
+                                elif isinstance(valores, bool) and not valores:  
+                                    valores = 'false'
+                                self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores},].', 0, 1])  
+                            elif valores[1] != 'error': 
+                                self.errores.append([f'Error Semántico. El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].', 0, 1])  
+                    #Si es de un tipo especial pero no array:
+
+            
 #---------Funcion que Retorna Valor----------------------------
     def fnRetornaValor(self, id):
         for simbolo in self.ts:
@@ -388,28 +561,8 @@ class Semantico():
 #-----------Bloque Metodos--------------------------------------------------------------
     def fnbloqueMetodos(self):
         lista_metodos=self.fnSeparacionMetodos()
-        #print(lista_metodos)
-        if lista_metodos[0]=='metodo':#si la lista tiene solo un método
-            metodo=lista_metodos[1]
-            id = metodo[2]
-            tipo= metodo[1]
-            tipo=('metodo',tipo)
-            parametros = metodo[3]
-            #Separación de Parametros
-            self.fnSeparacionDeParametros(parametros[1])
-            #Declaracion Métodos
-            self.fnDeclararTipo(id,tipo,self.listaParametros)
-            contenido = metodo[4]
-            if len(contenido) == 3: 
-                instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones, id)
-                parteReturn=contenido[2]
-            else: 
-                parteReturn=contenido[1]
-            self.fnReturn(parteReturn,id)
-        else:#Si la lista tiene más metodos
-            for x in lista_metodos:
-                metodo=x[1]
+        for x in lista_metodos:
+                metodo=x
                 id = metodo[2]
                 tipo= metodo[1]
                 tipo=('metodo',tipo)
@@ -419,18 +572,41 @@ class Semantico():
                 #Declaracion Métodos
                 self.fnDeclararTipo(id,tipo,self.listaParametros)
                 contenido = metodo[4]
-                #print(contenido)
-                instrucciones=contenido[1]
-                self.fnInstrucciones(instrucciones, id)
-                parteReturn=contenido[2]
+                if len(contenido) == 3: 
+                    instrucciones=contenido[1]
+                    self.fnInstrucciones(instrucciones, id)
+                    parteReturn=contenido[2]
+                else: 
+                    parteReturn=contenido[1]
                 self.fnReturn(parteReturn,id)
+
+                
+        #print(lista_metodos)
+        # if lista_metodos[0]=='metodo':#si la lista tiene solo un método
+        #     metodo=lista_metodos[1]
+        #     id = metodo[2]
+        #     tipo= metodo[1]
+        #     tipo=('metodo',tipo)
+        #     parametros = metodo[3]
+        #     #Separación de Parametros
+        #     self.fnSeparacionDeParametros(parametros[1])
+        #     #Declaracion Métodos
+        #     self.fnDeclararTipo(id,tipo,self.listaParametros)
+        #     contenido = metodo[4]
+        #     if len(contenido) == 3: 
+        #         instrucciones=contenido[1]
+        #         self.fnInstrucciones(instrucciones, id)
+        #         parteReturn=contenido[2]
+        #     else: 
+        #         parteReturn=contenido[1]
+        #     self.fnReturn(parteReturn,id)
+        # else:#Si la lista tiene más metodos
+            
             
 
 #---------Separación de Métodos -------------------------------------------------------
     def fnSeparacionMetodos(self):
-        listaMetodos=[]
-        for x in self.parteMetodos[1]:
-            listaMetodos.append(x)
+        listaMetodos=self.parteMetodos[1]
         return listaMetodos
 
 #---------Separación de Parametros ----------------------------------------------------
@@ -460,7 +636,7 @@ class Semantico():
         #Se analizan todas las intrucciones para ver su tratamiento
         #print(lista_instrucciones)
         for x in lista_instrucciones:
-            print(lista_instrucciones)
+            #print(lista_instrucciones)
             if x[0] == 'estructuraControl':
                 if x[1][0] == 'ifElse': 
                     condicion = x[1][1]
@@ -520,7 +696,7 @@ class Semantico():
                     condicion = x[1][1]
                     self.postorden(condicion)
                     condEval = self.evaluar_pila(self.pila_semantica,llamada)
-                    print(condEval)
+                    #print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
@@ -529,7 +705,7 @@ class Semantico():
                     condicion = x[1][1]
                     self.postorden(condicion)
                     condEval = self.evaluar_pila(self.pila_semantica,llamada)
-                    print(condEval)
+                    #print(condEval)
                     self.pila_semantica = []
                     #Evaluar instrucciones
                     if len(x[1]) == 3:
@@ -537,11 +713,12 @@ class Semantico():
 
             elif x[0]=='expresionAsignacion':
                 id=x[1][1]
+                
                 temp = self.fnComprobarDeclaracion(id)
-                print('id:',id)
-                print('Declaración antes', temp)
+                #print('id:',id)
+                #print('Declaración antes', temp)
                 if not temp or 'NoId'== temp:
-                    print('Declaración', temp)
+                    #print('Declaración', temp)
                     temp_id=id
                     id=f'{llamada},{id}'
                     if 'NoId'== self.fnComprobarDeclaracion(id):
@@ -549,11 +726,14 @@ class Semantico():
                 else:        
                     if len(x)==3:
                         valores= x[2]
+                        if x[2][0] == 'llamadaMetodo':
+                            print('Aqui se hizo una llamada a Metodo' , x)
+                            self.fnAsignar(valores,id,True, llamada,True)
+                        else:
+                            self.fnAsignar(valores,id,True, llamada)
                     elif len(x)==2:
                         valores= x[1][2]
-                    print('id:',id)
-                    print('valor:',valores)
-                    self.fnAsignar(valores,id,True, llamada)
+                        self.fnAsignar(valores,id,True, llamada)
             elif x[0]=='llamadaMetodo':
                 id = x[1]
                 cantidad = x[2]
@@ -576,7 +756,7 @@ class Semantico():
                         nombreNivel = 'Nivel sin Idenficador'
                     self.errores.append([f'Error Semántico. El identificador de llamada al método start() [{x[1]}] no coincide con el identificador del nivel [{nombreNivel}].', 0, 1])
                     return
-                print(x)
+                #print(x)
 #----------Asignación Metodo ()--------------------------------------------------------------
     def fnLlamadaMetodo(self,id,cantidad,argumentos,id_desdellamado ):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
@@ -596,11 +776,11 @@ class Semantico():
         lista_argumentos=self.fnListaArgumentos(argumentos,cantidad)
         for x in range(cantidad_metodo):
             temp_id=self.ts[indice+x+1][0]
-            print('indice: ',temp_id)
-            print('valor: ', lista_argumentos[x])
+            #print('indice: ',temp_id)
+            #print('valor: ', lista_argumentos[x])
             self.fnAsignar(lista_argumentos[x],temp_id,True,id_desdellamado)
 
-        print('Tipo',tipo[1])
+        # print('Tipo',tipo[1])
         #lista_argumentos = fnSeparacionArgumentos(argumentos)
 
 #---------Lista de Argumentos --------------------------------------------------------
@@ -614,10 +794,10 @@ class Semantico():
 
  #---------Procesado de intrucciones----------------------------------------------------
     def fnReturn(self,regreso,id):
-        print('Return Metodo: ',id,regreso)
+        # print('Return Metodo: ',id,regreso)
         #self.fnAsignar(regreso,id,True,id)
-        print('Retorno', regreso,id)
-        self.fnAsignar(regreso,id,False, renin=True)#Porque el id nunca se puede llamar for
+        # print('Retorno', regreso,id)
+        self.fnAsignar(regreso,id,inMetodo = True, renin=True)#Porque el id nunca se puede llamar for
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):

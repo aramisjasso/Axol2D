@@ -37,7 +37,10 @@ class Sintactico():
                     | empty
                     '''
         if(len(p) == 2):
-            p[0] = p[1]
+            if (p.slice[1].type=='nivel'):
+                p[0] = ('programa', p[1])
+            else:   
+                p[0] = p[1]
         else:
             p[0] = ('programa', p[1], p[2])
     #----------------------------------------------------------------------------------------------------------
@@ -59,14 +62,73 @@ class Sintactico():
 
     #<importacion> ::= import <libreriaAxol> ;
     def p_importacion(self,p):
-        '''importacion : IMPORT libreriaAxol PUNTO_Y_COMA'''
-        p[0] = p[2]
+        '''importacion : IMPORT libreriaAxol PUNTO_Y_COMA
+                        | IMPORT IDENTIFICADOR PUNTO_Y_COMA
+                        | IMPORT PUNTO_Y_COMA
+                        | IMPORT libreriaAxol 
+                        | IMPORT IDENTIFICADOR
+                        | libreriaAxol PUNTO_Y_COMA
+                        | libreriaAxol 
+                        | IMPORT'''
+        if len(p)==4:
+            if not (p[2] == 'Background' or p[2] == 'Players') :
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]} {p[3]}"". En la importación: solo se puede importar una librería AXOL. \n \t Solución: {p[1]} "[Background | Players]" ;',p.lineno(0),p.lexpos(0)])
+            else: 
+                p[0] = p[2]
+            
+        elif len(p)==3:
+            print('pruebaaaa',p[1])
+            if p.slice[2].type == 'libreriaAxol':
+                if not (p[2] == 'Background' or p[2] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]}"". En la importación solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: {p[1]} "[Background | Players] ;"',p.lineno(0),p.lexpos(0)])
+                else: 
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación falta punto y coma [;].\n \t Solución:  {p[1]} "{p[2]}" ; ',p.lineno(0),p.lexpos(0)])
 
-    #<libreriaAxol> ::= Controllers | Enemies
+            elif p.slice[1].type=='libreriaAxol':
+                if not (p[1] == 'Background' or p[1] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación no se tiene la palabra [import] y solo se puede importar una librería a la vez. \n \t Solución: "import [Background | Players]" ;',p.lineno(0),p.lexpos(0)])
+                else: 
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación no se tiene la palabra [import].\n \t Solución:  "import" {p[1]} ; ',p.lineno(0),p.lexpos(0)])
+            else:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}  ""{p[1]} {p[2]}"". En la importación falta la libería Axol a importar.\n \t Solución: {p[1]} "[Background | Players]" ; ',p.lineno(0),p.lexpos(0)])
+            
+        else:
+            if p.slice[1].type=='libreriaAxol':
+                if not (p[1] == 'Background' or p[1] == 'Players') :
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación no se tiene la palabra [import], solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: "import [Background | Players] ;"',p.lineno(0),p.lexpos(0)])
+                else: 
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación no se tiene la palabra [import] y falta el  punto y coma[;].\n \t Solución:  "import {p[1]} ;" ',p.lineno(0),p.lexpos(0)])
+            # elif p[1]==';':
+            #     self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la parlabra [import] y la libería Axol a importar. \n \t Solución:  "import[Background | Players]" ; ',p.lineno(0),p.lexpos(0)])
+            elif p[1]=='import':   
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". En la importación falta la libería Axol a importar y el punto y coma [;]. \n \t Solución:  {p[1]} "[Background | Players] ;" ',p.lineno(0),p.lexpos(0)])
+            else:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]}"". Esto no puede estar en importación." ',p.lineno(0),p.lexpos(0)])
+
+
+    #<libreriaAxol> ::= Background | Enemies
     def p_libreriaAxol(self,p):
-        '''libreriaAxol : CONTROLLERS
-                        | ENEMIES'''
-        p[0] = p[1]
+        '''libreriaAxol : BACKGROUND_LIBRERIA
+                        | PLAYERS
+                        | BACKGROUND_LIBRERIA libreriaAxol
+                        | PLAYERS libreriaAxol'''
+        if p.slice[1].type == 'error':
+            self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. El valor [{p[1]}] no puede ser importado.',p.lineno(0),p.lexpos(0)])
+            #print("Error de sintaxis detectado en libreriaAxol")
+        if len(p) == 3:
+            p[0] = p[1] + ' '+ p[2]
+            
+        else:
+             p[0] = p[1]
+
+    # def p_axolError(self,p):
+    #     '''axolError: error axolError
+    #                 | empty '''
+    #     if len(p)==3:
+    #         p[0]= (p[1] + p[2])
+    #     else:
+    #         p[0]=''
+
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------- N I V E L ---------------------------------------------------
@@ -78,17 +140,21 @@ class Sintactico():
 
     #<contenidoNivel> ::= <atributos> <metodos> <metodoPrincipal>
     def p_contenidoNivel(self,p):
-        '''contenidoNivel : bloqueDeclaracion bloqueMetodos metodoPrincipal'''
-        p[0] = ('contenidoNivel', p[1], p[2], p[3])
+        '''contenidoNivel : bloqueDeclaracion bloqueMetodos metodoPrincipal
+                        |   bloqueDeclaracion metodoPrincipal'''
+        if len(p)==4:
+            p[0] = ('contenidoNivel', p[1], p[2], p[3])
+        else:
+            p[0] = ('contenidoNivel', p[1], p[2])
 
     #<metodoPrincipal> ::= axol2D play ( ) { <instrucciones>  identificador.start(); }
     def p_metodoPrincipal(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
         p[0] = ('metodoPrincipal', p[6], p[7])
-
+#(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
     def p_llamadaStart(self,p):
-        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        p[0] = ('llamadaStart', p[1])
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------- B L O Q U E   D E   D E C L A R A C I O N  ------------------------------
@@ -106,6 +172,7 @@ class Sintactico():
         else:
             p[0] = None
 
+
     #<declaracion> ::= ( <declaracionTipo> ( <valorDeclaracion> | ε ) ; ) | <declaracionEstructuraDatos>
     def p_declaracion(self,p):
         '''declaracion : declaracionTipo PUNTO_Y_COMA
@@ -121,14 +188,58 @@ class Sintactico():
         # Declaracion de Estructura de Datos
         else: 
             p[0] = ('declaracion', p[1],'')#vacio para el manejo más adelante
+        #Manejo de errores de declaración
+
+    def p_declaracion1(self,p):
+        '''declaracion : declaracionTipo 
+                        | declaracionTipo valorDeclaracion
+                        | valorDeclaracion PUNTO_Y_COMA
+                        | valorDeclaracion '''
+        if  p.slice[1].type=='declaracionTipo':
+            if len(p)==2:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1][1]} {p[1][2]}". Falta punto y coma en la declaración [;].\n\t Solución: {p[1][1]} {p[1][2]} ";"',p.lineno(0),p.lexpos(0)])
+            else:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1][1]} {p[1][2]} = valor". Falta punto y coma en la declaración [;].\n\t Solución: {p[1][1]} {p[1][2]} = valor ";"',p.lineno(0),p.lexpos(0)])
+        else: 
+            if len(p)==2:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta la declaración del tipo y el punto y coma en la declaración [;].\n\t Solución: "[Tipo] [id] "= valor ";"',p.lineno(0),p.lexpos(0)])
+            else:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta la declaración del tipo en la declaración.\n\t Solución: "[Tipo] [id] "= valor ;"',p.lineno(0),p.lexpos(0)])
+        p[0]=('error')
+        # Declaracion con Asignacion
 
     #Validar que no se evalue y el valor sea 'Null'
     def p_declaracion_error(self,p):
         '''declaracion : declaracionTipo valorDeclaracion PARENTESIS_CIERRA PUNTO_Y_COMA
                        | declaracionTipo valorDeclaracion PARENTESIS_CIERRA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico. Falta parentesis de apertura en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta parentesis de apertura en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracion', p[1], ('expresion', 'error'))
         self.error_Expresion = True
+
+    def p_declaracionTipo_Error(self,p):
+        '''declaracion : tipoDato  PUNTO_Y_COMA
+                       | IDENTIFICADOR PUNTO_Y_COMA
+                       | tipoDato  valorDeclaracion PUNTO_Y_COMA
+                       | IDENTIFICADOR valorDeclaracion PUNTO_Y_COMA
+                       | tipoDato  valorDeclaracion
+                       | IDENTIFICADOR valorDeclaracion'''
+        if p.slice[1].type=='tipoDato':
+            if len(p)==3:
+                if p.slice[2].type=='valorDeclaracion':
+                    #tipoDato  valorDeclaracion
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1]} = valor". Falta identificador y punto y coma en la declaración [;].\n\t Solución: {p[1]} "[id]" = valor ";"',p.lineno(0),p.lexpos(0)])
+            else:
+                #tipoDato  valorDeclaracion PUNTO_Y_COMA
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1]} = valor;". Falta identificador en declaración. \n\t Solución: {p[1]} "[id]" = valor ;',p.lineno(0),p.lexpos(0)])
+        else:
+            if len(p)==3:
+                if p.slice[2].type=='valorDeclaracion':
+                    #IDENTIFICADOR valorDeclaracion
+                    self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1]} = valor". Falta el tipo de dato y punto y coma en la declaración [;].\n\t Solución: "[Tipo]" {p[1]}  = valor ";"',p.lineno(0),p.lexpos(0)])
+            else:
+                self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} "{p[1]} = valor;". Falta el tipo de dato.\n\t Solución: "[Tipo]" {p[1]}  = valor ;',p.lineno(0),p.lexpos(0)])
+
+        p[0] = ('error')
 
     #<declaracionTipo> ::= <tipoDato> idenfiticador
     def p_declaracionTipo(self,p):
@@ -141,7 +252,8 @@ class Sintactico():
                             | IGUAL booleano
                             | IGUAL llamadaMetodo
                             | IGUAL VALOR_CHAR
-                            | IGUAL VALOR_STRING'''
+                            | IGUAL VALOR_STRING
+                            | IGUAL fila'''
         p[0] = p[2]
 
     # def p_valorDeclaracion_error(self,p):
@@ -156,27 +268,33 @@ class Sintactico():
                     | STRING
                     | BOOLEANO
                     | CHAR
-                    | BYTE'''
+                    | BYTE
+                    | PLATFORM
+                    | OBSTACLES
+                    | BACKGROUND
+                    | PLAYER'''
         p[0] = p[1]
     #----------------------------------------------------------------------------------------------------------
 
     #----------------------------------- B L O Q U E   D E   M E T O D O S  -----------------------------------
     #<bloqueMetodos> ::= <metodoDeclaracion> <restoMetodos> | ε
     def p_bloqueMetodos(self,p):
-        '''bloqueMetodos : metodo'''
+        '''bloqueMetodos : metodos'''
         p[0] = ('bloqueMetodos', p[1])
+
+    def p_metodos(self,p):
+        '''metodos : metodoDeclaracion restoMetodos'''
+        p[0] = [p[1]] + p[2]  # Concatenamos la importación actual con las importaciones restantes
+
 
     #<restoMetodos> ::= <metodosDeclaracion> | ε
     def p_restoMetodos(self,p):
-        '''metodo : metodoDeclaracion metodo
-                  | metodoDeclaracion
+        '''restoMetodos : metodoDeclaracion restoMetodos
                   | empty'''
-        if p[1] =='empty':
-            p[0]=None
-        elif len(p) == 2:
-            p[0] = ('metodo',(p[1]))
-        elif len(p) == 3:
-            p[0] = ('metodo',(p[1] )), p[2]
+        if len(p) == 3: 
+            p[0] = [p[1]] + p[2]
+        else:
+            p[0] = []
 
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
@@ -637,20 +755,20 @@ class Sintactico():
     #int a = 4 5 5 5 * 3;
     def p_expresion_error(self, p):
         '''expresion : errorFactores error'''
-        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('expresion', 'error')
 
     #int a =  1 2 2 3 + 5;
     def p_expresion_error1(self, p):
         '''expresion : errorFactores restoExpresionAritmetica'''
-        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('expresion', 'error')
         self.error_Expresion = True
 
     #int a =  * 5;
     def p_termino_error1(self,p):
         '''termino : error restoTermino'''
-        self.errores.append([f'Error Sintáctico. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -689,7 +807,7 @@ class Sintactico():
         '''restoExpresionAritmetica : errorFactores restoExpresionAritmetica 
                                     | restoExpresionAritmetica operadorAdicion errorFactores 
                                     | restoExpresionAritmetica operadorAdicion factor error factor'''
-        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -700,9 +818,9 @@ class Sintactico():
                                     | restoExpresionAritmetica MENOS_MENOS error
                                     | restoExpresionAritmetica MAS_MAS error'''
         if len(self.errores) != 0:
-            if self.errores[-1] == [f'Error Sintáctico. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ', 0, 1]:
+            if self.errores[-1] == [f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)]:
                 self.errores.pop()
-        self.errores.append(['Error Sintáctico. Se esperaba un [operando] después del operador [+, -] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] después del operador [+, -] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -723,7 +841,7 @@ class Sintactico():
     #int a =  1 2 2 3 * 5;
     def p_termino_error2(self,p):
         '''termino : errorFactores restoTermino'''
-        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -747,7 +865,7 @@ class Sintactico():
     # int a = 5 * ;
     def p_restoTermino_error1(self,p):
         '''restoTermino : restoTermino operadorMultiplicacion error'''
-        self.errores.append([f'Error Sintáctico. Se esperaba un [operando] después del operador de multiplicación [*, /, %]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] después del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -758,7 +876,7 @@ class Sintactico():
                         | restoTermino operadorMultiplicacion factor error factor 
                         | restoTermino operadorMultiplicacion factor factor
                         | restoTermino operadorMultiplicacion errorFactores'''
-        self.errores.append(['Error Sintáctico. Falta [operador] en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -788,7 +906,7 @@ class Sintactico():
     # int a = - ;
     def p_expresionUnitaria_error(self, p):
         '''expresionUnitaria : operadorAdicion error'''
-        self.errores.append([f'Error Sintáctico. Se esperaba un [factor] después del operador unitario [+, -]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [factor] después del operador unitario [+, -]. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -813,7 +931,7 @@ class Sintactico():
     #int a = ((2 + 3) * 4;
     def p_expresionParentesis_error(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion error'''
-        self.errores.append([f'Error Sintáctico. Falta parentesis de cierre en la expresión aritmética. ', 0, 1])
+        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta parentesis de cierre en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 #------------------------------------------------------------------------------------------------
@@ -855,6 +973,7 @@ class Sintactico():
                                | izqAsignacion VALOR_CHAR
                                | izqAsignacion VALOR_STRING
                                | izqAsignacion booleano
+                               | izqAsignacion fila
                                | definicionArreglo
                                | definicionMatriz'''
         if len(p) == 3:
@@ -996,6 +1115,14 @@ class Sintactico():
 
     #------------------------------- E S T R U C T U R A   D E   D A T O S ------------------------------------
     # <estructuraDatos> ::= <arreglo> | <matriz>
+
+    # def p_declaracion_error_EstructuraDatos(self,p):
+    #     '''declaracion : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA PUNTO_Y_COMA
+    #                     |tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA IGUAL fila PUNTO_Y_COMA
+    #                     |tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA PUNTO_Y_COMA
+    #                     |tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+    #     p[0] = ('declaracionEstructuraDatos', p[1])
+
     def p_declaracionEstructuraDatos(self,p):
         '''declaracionEstructuraDatos : declaracionArreglo
                                     | declaracionMatriz'''
@@ -1088,8 +1215,12 @@ class Sintactico():
 
     # <accesoLineal> ::= <identificador> [ numero ]
     def p_accesoLineal(self,p):
-        '''accesoLineal : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        p[0] = ( f'{p[1]},{p[3]}')  # Tupla con el identificador y el índice
+        '''accesoLineal : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA
+                        | IDENTIFICADOR CORCHETE_ABRE LLAVE_ABRE IDENTIFICADOR LLAVE_CIERRA CORCHETE_CIERRA'''
+        if len(p)==5:
+            p[0] = ( f'{p[1]},{p[3]}')  # Tupla con el identificador y el índice
+        else:
+            p[0] = (f'{p[1]},{p[4]}')
 
     # <accesoMatriz> ::= <identificador> [ numero  ] [ numero ]
     def p_accesoMatriz(self,p):
@@ -1106,10 +1237,14 @@ class Sintactico():
 
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
+        print('prueba sintanctica',p.value)
         if p:
-            print(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
-            # mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
-            # self.errores.append([mensaje_error,p.lineno,p.lexpos])
+            p = p
+            print('prueba sintanctica',p.value)
+            #print(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
+            #mensaje_error=(f"Error de sintaxis en '{p.value}', en la linea {p.lineno}")
+            #self.errores.append([mensaje_error,p.lineno(0),p.lexpos(0)])
         else:
+            print()
             print("Error de sintaxis al final de la entrada")
     #----------------------------------------------------------------------------------------------------------
