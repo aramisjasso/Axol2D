@@ -49,14 +49,14 @@ class Sintactico():
     #<importaciones> ::= <importacion> <restoImportaciones>
     def p_importaciones(self,p):
         '''importaciones : importacion restoImportaciones'''
-        p[0] = ('importaciones',[p[1]] + p[2])  # Concatenamos la importación actual con las importaciones restantes
+        p[0] = ('importaciones',p[1] + (p[2]))  # Concatenamos la importación actual con las importaciones restantes
 
     #<restoImportaciones> ::= <importacion> <restoImportaciones> | ε
     def p_restoImportaciones(self,p):
         '''restoImportaciones : importacion restoImportaciones
                             | empty'''
         if len(p) == 3:  # Hay una importación seguida de más importaciones
-            p[0] = [p[1]] + p[2]  # Concatenamos la importación actual con las importaciones restantes
+            p[0] = p[1] + (p[2])  # Concatenamos la importación actual con las importaciones restantes
         else:  # No hay más importaciones
             p[0] = []  # Lista vacía
 
@@ -74,7 +74,7 @@ class Sintactico():
             if not (p[2] == 'Background' or p[2] == 'Players') :
                 self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)} ""{p[1]} {p[2]} {p[3]}"". En la importación: solo se puede importar una librería AXOL. \n \t Solución: {p[1]} "[Background | Players]" ;',p.lineno(0),p.lexpos(0)])
             else: 
-                p[0] = p[2]
+                p[0] = [p[2], p.lineno(0),p.lexpos(0)]
             
         elif len(p)==3:
             print('pruebaaaa',p[1])
@@ -180,14 +180,14 @@ class Sintactico():
                        | declaracionEstructuraDatos '''
         # Declaracion Simple
         if len(p) == 3:
-            p[0] = ('declaracion', p[1])
+            p[0] = ('declaracion', p[1],(p.lineno(0),p.lexpos(0)))
         # Declaracion con Asignacion
         elif len(p) == 4:
-            p[0] = ('declaracion', p[1], p[2])
+            p[0] = ('declaracion', p[1], p[2],(p.lineno(0),p.lexpos(0)))
             #p[0] = ('declaracion', p[1], p[2], f'Linea: {p.lineno(1)}')
         # Declaracion de Estructura de Datos
         else: 
-            p[0] = ('declaracion', p[1],'')#vacio para el manejo más adelante
+            p[0] = ('declaracion', p[1],'',(p.lineno(0),p.lexpos(0)))#vacio para el manejo más adelante
         #Manejo de errores de declaración
 
     def p_declaracion1(self,p):
@@ -299,16 +299,16 @@ class Sintactico():
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8],(p.lineno(0),p.lexpos(0)))
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
     def p_contenidoMetodo(self,p):
         '''contenidoMetodo : instrucciones RETURN expresion PUNTO_Y_COMA
                            | RETURN expresion PUNTO_Y_COMA '''
         if len(p) == 5:
-            p[0] = ('contenidoMetodo', p[1], p[3])
+            p[0] = ('contenidoMetodo', p[1], p[3],(p.lineno(3),p.lexpos(3)))
         else: 
-            p[0] = ('contenidoMetodo', p[2])
+            p[0] = ('contenidoMetodo', p[2],(p.lineno(2),p.lexpos(2)))
 
     #<parametros> ::= <tipoDato> identificador |
     #                 <tipoDato> identificador , <parametros> | 
@@ -351,7 +351,7 @@ class Sintactico():
                        | estructuraControl
                        | expresion PUNTO_Y_COMA
                        | llamadaStart'''
-        p[0] = ('instruccion', p[1])
+        p[0] = ('instruccion', p[1],(p.lineno(1),p.lexpos(1)))
     #----------------------------------------------------------------------------------------------------------
 
     #------------------------------ E S T R U C T U R A S   D E   C O N T R O L -------------------------------
