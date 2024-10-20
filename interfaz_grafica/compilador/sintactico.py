@@ -240,6 +240,9 @@ class Sintactico():
         p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     
     #falta identificador
+    def p_llamadaStart_error1(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     #falta punto
     #falta start
     #falta parentesis abre
