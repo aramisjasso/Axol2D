@@ -240,9 +240,9 @@ class Sintactico():
         p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     
     #falta identificador
-    def p_llamadaStart_error1(self,p): 
-        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
+    # def p_llamadaStart_error1(self,p): 
+    #     '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+    #     p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     #falta punto
     #falta start
     #falta parentesis abre
@@ -1616,39 +1616,44 @@ class Sintactico():
     def p_accesoMatriz_error1(self,p):
         '''accesoMatriz : CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan identificador de la matriz en el acceso al elemento de la matriz. ', 0, 1])
-
+        p[0]=('error')
     # #falta corchete abre
     def p_accesoMatriz_error2(self,p):
         '''accesoMatriz : IDENTIFICADOR NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA
                         | IDENTIFICADOR LLAVE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA
                         | IDENTIFICADOR PARENTESIS_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en el acceso al elemento de la matriz. ', 0, 1])
-
+        p[0]=('error')
+        
     # #falta numero
     def p_accesoMatriz_error3(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de fila en el acceso al elemento de la matriz. ', 0, 1])
+        p[0]=('error')
 
     # #falta corchete cierra
     def p_accesoMatriz_error4(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el primer corchete de cierre en el acceso al elemento de la matriz. ', 0, 1])
+        p[0]=('error')
 
     # #falta corchete abre
     def p_accesoMatriz_error5(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA NUMERO CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de apertura en el acceso al elemento de la matriz. ', 0, 1])
+        p[0]=('error')
 
     # #falta numero
     def p_accesoMatriz_error6(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE CORCHETE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de columna en el acceso al elemento de la matriz. ', 0, 1])
+        p[0]=('error')
 
     # #falta corchete cierra
     def p_accesoMatriz_error7(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de cierre en el acceso al elemento de la matriz. ', 0, 1])
-
+        p[0]=('error')
     #----------------------------------------------------------------------------------------------------------
 
     #---------------------------------------------- V A C I O -------------------------------------------------
