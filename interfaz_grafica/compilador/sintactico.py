@@ -399,7 +399,7 @@ class Sintactico():
     #<metodoDeclaracion> ::= method <tipoDato> identificador ( <parametros> ) { <contenidoMetodo> }
     def p_metodoDeclaracion(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8], (p.lineno(0),p.lexpos(0)))
     #falta method (puede ser un identificador)
     #falta tipo dato del método
     #falta identificador del método

@@ -121,7 +121,7 @@ if __name__ == "__main__":
             int numeros [5][1];  
 
             method int sumar() {
-                numeros 0][0] = 1; 
+                numeros [0][0] = 1; 
 
                 return 0;
             }
