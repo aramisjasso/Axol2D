@@ -87,7 +87,9 @@ if __name__ == "__main__":
             int fin [2] = [100,100];
                            //[inicio x, inicio y, vidas, personaje       ]
             player jugador = [   0    ,    0    ,   3  , knight   ];
+            player jugador1 = jugador;
             method int miMetodo1(){
+                
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
                 while (x<5){
@@ -106,14 +108,14 @@ if __name__ == "__main__":
             method int miMetodo3(int a , int c){
                 a1 = 12;
                 this.miMetodo3(a,12);
-                return 0;
+                return b;
             }          
             
            axol2D play () {
-                b = 'a';
-                a1 = this.miMetodo3(123,2);
+                b = "cadena";
+                b = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
+                MiPrimerNivel.start( plarreglo, obs , jugador , fondo ,  plarreglo,     fin  );
            }
         }'''
     ]

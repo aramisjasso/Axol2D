@@ -4,6 +4,7 @@ import clases as cs
 import compilador.compilador as ts
 import tabla_static as ta
 import tabla_dinamica as td
+from tkinter import font
 
 
 
@@ -14,12 +15,18 @@ class InterfazCompilador:
         self.root = root
         self.current_file = None #Archivo cargado
         self.text_modified = False  # Estado de modificación del texto
+        # Definir fuente inicial
+        self.font_size = 12
+        self.font_style = font.Font(family="Monaco", size=self.font_size)
+        self.menu_font = font.Font(family="Arial", size=10)
         self.setup_ui() #Inicio de GUI
+        # Hacer que la ventana ocupe toda la pantalla
+        self.root.state('zoomed')  # Hacer la ventana a pantalla completa
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # Detecta Cierre de ventana
         self.root.bind("<Control-Shift-S>", self.guardar_archivo_como_evento)  # Detecta Ctrl + Shift + S
         self.cmplr = ts.Compilador()
         self.tabla_estatica = ta.TablaDatos()
-        self.tabla_dinamica = td.TablaDinamica(root)
+        self.tabla_dinamica = td.TablaDinamica(root, self.font_style)
         
         
         
@@ -28,14 +35,15 @@ class InterfazCompilador:
         
         # Menú
         menu_bar = Menu(self.root)
-        self.root.config(menu=menu_bar)
+        
         
         # Área de texto
         self.text_area = cs.LineNumberedText(self.root)
-        self.text_area.pack(fill=tk.BOTH, expand=True)
+        self.text_area.pack(fill=tk.BOTH, expand=True )
         self.root.bind("<KeyPress>", self.on_text_modified)  # Registrar cada pulsación de tecla para deshacer/rehacer más preciso
         
-        
+        self.text_area._text.config(font=self.font_style)
+        self.text_area._line_numbers.config(font=self.font_style)
 
         # Menú
         # Archivo
@@ -67,10 +75,18 @@ class InterfazCompilador:
         archivo_menu3.add_command(label="Tabla estatica ", command=self.mostrar_tabla_estatica)
         archivo_menu3.add_command(label="Tabla dinamica",command=self.mostrar_tabla_dinamica )
 
+        archivo_menu4 = Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Tablas de Simbolos", menu=archivo_menu4)
+        archivo_menu4.add_command(label="Más (Ctrl + +) ", command=self.aumentar_letra())
+        archivo_menu4.add_command(label="Menos (Ctrl + -)",command=self.disminuir_letra() )
 
+        
+        self.set_menu_font(menu_bar)
+
+        self.root.config(menu=menu_bar)
 
         # Consola
-        self.console = scrolledtext.ScrolledText(self.root, height=10, wrap=tk.WORD, state='disabled')
+        self.console = scrolledtext.ScrolledText(self.root, height=10, wrap=tk.WORD, state='disabled',font=self.font_style)
         self.console.pack(fill='x')
 
 
@@ -250,6 +266,25 @@ class InterfazCompilador:
     def mostrar_tabla_dinamica(self):
         self.tabla_dinamica.set_datos(self.cmplr.identificadores_ts)
         self.tabla_dinamica.mostrar_tabla()
+    
+    #Cambiar de tamaño
+    def aumentar_letra(self):
+        # Aumentar el tamaño de la fuente
+        self.font_size += 2
+        self.font_style.configure(size=self.font_size)
+
+    def disminuir_letra(self):
+        # Disminuir el tamaño de la fuente
+        if self.font_size > 2:  # Evitar un tamaño de letra menor a 2
+            self.font_size -= 2
+            self.font_style.configure(size=self.font_size)
+    #Tamaño de menu
+    def set_menu_font(self, menu):
+        """Función para aplicar la fuente personalizada a todos los elementos del menú."""
+        for item in menu.winfo_children():
+            item.config(font=self.menu_font)
+            for submenu in item.winfo_children():
+               submenu.config(font=self.menu_font)
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()
