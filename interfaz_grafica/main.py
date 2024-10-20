@@ -60,7 +60,7 @@ if __name__ == "__main__":
         #         MiPrimerNivel.start(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     );
         #    }
         # }'''
-                '''
+'''
         import Background;
         import Players;
         import Background;

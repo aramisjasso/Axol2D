@@ -565,20 +565,20 @@ class Sintactico():
         else:  #default
             p[0] = ('default', p[3])
 
-    def p_restoCasos_error1(self,p):
-        '''restoCasos : DOS_PUNTOS instrucciones'''
-        self.errores.append(['Error Sintáctico. Falta la palabra reservada [default] en la estructura [switch]. ', 0, 1])
-        p[0] = ('default', p[2])
+    # def p_restoCasos_error1(self,p):
+    #     '''restoCasos : DOS_PUNTOS instrucciones'''
+    #     self.errores.append(['Error Sintáctico. Falta la palabra reservada [default] en la estructura [switch]. ', 0, 1])
+    #     p[0] = ('default', p[2])
     
-    def p_restoCasos_error2(self,p):
-        '''restoCasos : DEFAULT : '''
-        self.errores.append(['Error Sintáctico. Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
-        p[0] = ('default', p[2])
+    # def p_restoCasos_error2(self,p):
+    #     '''restoCasos : DEFAULT : '''
+    #     self.errores.append(['Error Sintáctico. Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
+    #     p[0] = ('default', p[2])
 
-    def p_restoCasos_error3(self,p):
-        '''restoCasos : DEFAULT instrucciones'''
-        self.errores.append(['Error Sintáctico. El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
-        p[0] = ('default', p[2])
+    # def p_restoCasos_error3(self,p):
+    #     '''restoCasos : DEFAULT instrucciones'''
+    #     self.errores.append(['Error Sintáctico. El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
+    #     p[0] = ('default', p[2])
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
     # def p_for(self,p):
