@@ -15,6 +15,7 @@ class Semantico():
         self.listaDeclaraciones = []
         self.listaParametros = []
         self.pila_semantica = []
+        self.banderaStart = False
 
     #Run
     def correr(self,resultadoSemantico,TS):
@@ -24,7 +25,8 @@ class Semantico():
         self.ts=TS
         self.fnSepararArbol()
         self.fnParteImport()
-        self.fnParteNivel()
+        if self.parteNivel[2] != 'Sin Contenido Nivel':
+            self.fnParteNivel()
         self.fnPrintTs()
         if len(self.errores)!=0:
             self.compilo=False
@@ -42,6 +44,7 @@ class Semantico():
                     #print('Importaciones:',valor)
         
         if self.parteNivel != None:
+            #print(self.parteNivel[2])
             for indice, valor in enumerate(self.parteNivel[2]):
                 if indice !=0:
                     if valor[0]== 'bloqueDeclaracion':
@@ -124,7 +127,8 @@ class Semantico():
         self.fnBloqueDeclaracion()
         if not(self.parteMetodos is None):
             self.fnbloqueMetodos()
-        self.fnMetodoPrincipal()
+        if self.parteMetodoPrincipal[1] != 'Sin Método Axol': 
+            self.fnMetodoPrincipal()
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
     def fnSeparacionDeclaracion(self):
@@ -282,6 +286,8 @@ class Semantico():
         else:
             #Error dos veces declarado
             self.compilo = False
+            if id == 'Sin Nivel':
+                return
             tipoEn =self.fnEncontrarTipo(id)
             self.errores.append([f'Error Semántico. El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',0,1])
         #if temp_errores ==len(self.errores):
@@ -673,24 +679,36 @@ class Semantico():
                 #     print(x[1])
                 elif x[1][0] == 'forEach':
                     #Validar que x[1][2] no esté declarada
-                    if self.fnComprobarDeclaracion(x[1][2]):
+                    decVarControl = self.fnComprobarDeclaracion(x[1][2]) 
+                    if decVarControl and decVarControl != 'NoId':
                         self.errores.append([f'Error Semántico. La variable [{x[1][2]}] no puede ser utilizada como variable de control en la estructura [for each] porque ha sido declarada previamente. ', 0, 1])
                         return
                     #Validar que x[1][3] sea una estructura de datos
                     if not self.fnComprobarDeclaracion(x[1][3]):
                         self.errores.append([f'Error Semántico. La estructura de datos [{x[1][3]}] no ha sido declarada. ', 0, 1])
                         return
+                    if x[1][3] == 'Sin Estructura':
+                        if len(x[1]) == 5:
+                            self.fnInstrucciones(x[1][4], llamada)
+                        return
                     ed = self.fnEncontrarTipo(x[1][3])
                     if not (isinstance(ed, tuple) and ed[0] in ['arreglo', 'matriz']):
                         self.errores.append([f'Error Semántico. La variable [{x[1][3]}] no es una estructura de datos, por lo tanto no es posible recorrerla en la estructura de contol [for each]. ', 0, 1])
                         return
                     #Validar que x[1][1] y x[1][3] sean del mismo tipo
+                    if x[1][1] == 'Sin Tipo':
+                        if len(x[1]) == 5:
+                            self.fnInstrucciones(x[1][4], llamada)
+                        return
                     if not x[1][1] == ed[1]:
-                        self.errores.append([f'Error Semántico. La variable de control de tipo [{x[1][1]}] no coincide con el tipo de dato de la estructura de control de tipo {ed[1]}. ', 0, 1])
+                        self.errores.append([f'Error Semántico. La variable de control de tipo [{x[1][1]}] no coincide con el tipo de dato de la estructura de control de tipo [{ed[1]}]. ', 0, 1])
                         return
                     
+                    #for( n : numeros) { }
+                    #acachar este error podría ser más específico
+
                     if len(x[1]) == 5:
-                         self.fnInstrucciones(x[1][4], llamada)
+                        self.fnInstrucciones(x[1][4], llamada)
 
                 elif x[1][0] == 'while':
                     condicion = x[1][1]
@@ -756,7 +774,9 @@ class Semantico():
                         nombreNivel = 'Nivel sin Idenficador'
                     self.errores.append([f'Error Semántico. El identificador de llamada al método start() [{x[1]}] no coincide con el identificador del nivel [{nombreNivel}].', 0, 1])
                     return
+                self.banderaStart = True
                 #print(x)
+
 #----------Asignación Metodo ()--------------------------------------------------------------
     def fnLlamadaMetodo(self,id,cantidad,argumentos,id_desdellamado ):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
@@ -1065,6 +1085,9 @@ class Semantico():
         # Procesar instrucciones
         print(self.parteMetodoPrincipal[1])
         self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
+        if not self.banderaStart:
+            self.errores.append([f'Error Sintáctico (Línea ). Faltan llamada al método [start] en el método Axol2D. ', 0, 1])
+
 
 #------Delete Parametros--------------------------------------------------------------------------------------
     def fnDeleteParametros(self):

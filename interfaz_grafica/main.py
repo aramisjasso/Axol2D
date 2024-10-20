@@ -60,62 +60,77 @@ if __name__ == "__main__":
         #         MiPrimerNivel.start(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     );
         #    }
         # }'''
-                '''
-        import Background;
-        import Players;
+        #         '''
+        # import Background;
+        # import Players;
 
 
-        level MiPrimerNivel {
-            int x = 0;
-            int y = 1;
-            int a1 = 0;
-            int a3 = 0;
-            string b = "cadena";
-                        // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
-            platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-            platform pl3 = pl2;
-            platform pl4 = pl1;
-            platform pl5 = pl4;
+        # level MiPrimerNivel {
+        #     int x = 0;
+        #     int y = 1;
+        #     int a1 = 0;
+        #     int a3 = 0;
+        #     string b = "cadena";
+        #                 // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+        #     platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+        #     platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+        #     platform pl3 = pl2;
+        #     platform pl4 = pl1;
+        #     platform pl5 = pl4;
 
-            platform plarreglo[3] = [pl1,pl2,pl3];
-            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
-            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-            obstacles obs [2] = [obs1,obs2];
+        #     platform plarreglo[3] = [pl1,pl2,pl3];
+        #     obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+        #     obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+        #     obstacles obs [2] = [obs1,obs2];
             
-            background fondo = Castle;
-            int fin [2] = [100,100];
-                           //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   0    ,    0    ,   3  , knight   ];
-            method int miMetodo1(){
-                a1 = 12;
-                pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
-                while (x<5){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-                }
+        #     background fondo = Castle;
+        #     int fin [2] = [100,100];
+        #                    //[inicio x, inicio y, vidas, personaje       ]
+        #     player jugador = [   0    ,    0    ,   3  , knight   ];
+        #     method int miMetodo1(){
+        #         a1 = 12;
+        #         pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
+        #         while (x<5){
+        #             //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+        #             obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+        #         }
                 
+        #         return 0;
+        #     }
+
+        #     method int miMetodo2(){
+        #         a1 = 12;
+
+        #         return 0;
+        #     }  
+        #     method int miMetodo3(int a , int c){
+        #         a1 = 12;
+        #         this.miMetodo3(a,12);
+        #         return 0;
+        #     }          
+            
+        #    axol2D play () {
+        #         b = 'a';
+        #         a1 = this.miMetodo3(123,2);
+        #         // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+        #         MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
+        #    }
+        # }'''
+        '''
+        level MiPrimerNivel {
+            int numeros [5][1];  
+
+            method int sumar() {
+                numeros 0][0] = 1; 
+
                 return 0;
             }
 
-            method int miMetodo2(){
-                a1 = 12;
-
-                return 0;
-            }  
-            method int miMetodo3(int a , int c){
-                a1 = 12;
-                this.miMetodo3(a,12);
-                return 0;
-            }          
-            
-           axol2D play () {
-                b = 'a';
-                a1 = this.miMetodo3(123,2);
-                // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
-           }
-        }'''
+            axol2D play () {
+                0;
+            }
+        }
+        '''
     ]
     
     for prueba in pruebas:
