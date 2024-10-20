@@ -76,7 +76,7 @@ class InterfazCompilador:
         archivo_menu3.add_command(label="Tabla dinamica",command=self.mostrar_tabla_dinamica )
 
         archivo_menu4 = Menu(menu_bar, tearoff=0)
-        menu_bar.add_cascade(label="Tablas de Simbolos", menu=archivo_menu4)
+        menu_bar.add_cascade(label="Tamaño de letra", menu=archivo_menu4)
         archivo_menu4.add_command(label="Más (Ctrl + +) ", command=self.aumentar_letra())
         archivo_menu4.add_command(label="Menos (Ctrl + -)",command=self.disminuir_letra() )
 
