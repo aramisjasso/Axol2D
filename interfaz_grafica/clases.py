@@ -4,7 +4,7 @@ import re
 class LineNumberedText(tk.Frame):
     checar = False
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs,):
         tk.Frame.__init__(self, *args, **kwargs)
 
         self._line_numbers = tk.Text(self, width=4, padx=5, takefocus=0, border=0,
