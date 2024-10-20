@@ -465,9 +465,10 @@ class Sintactico():
                        | estructuraControl
                        | expresion PUNTO_Y_COMA
                        | llamadaStart'''
-        p[0] = ('instruccion', p[1])
+        p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     
     #punto y coma
+
     # def p_instruccion_error(self,p):
     #     '''instruccion : expresionAsignacion 
     #                    | llamadaMetodo 
