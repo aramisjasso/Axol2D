@@ -829,28 +829,28 @@ class Semantico():
                                     elif len(y)==2:
                                         valores= y[1][2]
                                         self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                else:
-                    if not temp or 'NoId'== temp:
-                        #print('Declaración', temp)
-                        temp_id=id
-                        id=f'{llamada},{id}'
-                        if 'NoId'== self.fnComprobarDeclaracion(id):
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                    else:        
-                        if len(y)==3:
-                            valores= y[2]
-                            
-                            if y[2][0] == 'llamadaMetodo':
-                                x2 = y[2]
-                                print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
-                                self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
-                            else:
+                    else:
+                        if not temp or 'NoId'== temp:
+                            #print('Declaración', temp)
+                            temp_id=id
+                            id=f'{llamada},{id}'
+                            if 'NoId'== self.fnComprobarDeclaracion(id):
+                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                        else:        
+                            if len(y)==3:
+                                valores= y[2]
+                                
+                                if y[2][0] == 'llamadaMetodo':
+                                    x2 = y[2]
+                                    print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                    self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                    self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                else:
+                                    self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                            elif len(y)==2:
+                                valores= y[1][2]
                                 self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                        elif len(y)==2:
-                            valores= y[1][2]
-                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                            
+                                
                     
             elif y[0]=='llamadaMetodo':
                 id = y[1]
