@@ -551,7 +551,7 @@ class Sintactico():
     #<instruccion> ::=  ( <expresionAsignacion> | (<llamadaMetodo>) ; | <estructuraControl>
     def p_instruccion(self,p):
         '''instruccion : expresionAsignacion
-                       | llamadaMetodo PUNTO_Y_COMA
+                       | llamadaMetodo
                        | estructuraControl
                        | expresion PUNTO_Y_COMA
                        | llamadaStart'''
@@ -1381,7 +1381,7 @@ class Sintactico():
     #                          <expresionPostfijo>
     def p_expresionAsignacion(self, p):
         '''expresionAsignacion : izqAsignacion expresion PUNTO_Y_COMA
-                               | izqAsignacion llamadaMetodo PUNTO_Y_COMA
+                               | izqAsignacion llamadaMetodo
                                | izqAsignacion VALOR_CHAR PUNTO_Y_COMA
                                | izqAsignacion VALOR_STRING PUNTO_Y_COMA
                                | izqAsignacion booleano PUNTO_Y_COMA
@@ -1389,6 +1389,8 @@ class Sintactico():
                                | definicionArreglo
                                | definicionMatriz'''
         if len(p) == 4:
+            p[0] = ('expresionAsignacion', p[1], p[2])  
+        elif len(p) == 3: 
             p[0] = ('expresionAsignacion', p[1], p[2])  
         else:  
             p[0] = ('expresionAsignacion', p[1])
@@ -1417,9 +1419,9 @@ class Sintactico():
     #---------------------------- L L A M A D A   A   M E T O D O S -------------------------------------------
     #<llamadaMetodo> ::= <metodoAxol> | this . IDENTIFICADOR 
     def p_llamadaMetodo(self,p):
-        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos  
-                         | metodoAxol PARENTESIS_ABRE argumentos '''
-        if len(p) == 6:
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA
+                         | metodoAxol PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        if len(p) == 7:
             p[0] = ('llamadaMetodo', p[3], self.parametros ,p[5]) 
             self.parametros =0
         else:
@@ -1427,8 +1429,8 @@ class Sintactico():
             self.parametros =0
 
     #falta this (puede ser un identificador)
-    def p_llamadaMetodo(self,p):
-        '''llamadaMetodo : PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos'''
+    def p_llamadaMetodo_error1(self,p):
+        '''llamadaMetodo : PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [this] en la llamada al método. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaMetodo', p[2], self.parametros ,p[4]) 
         self.parametros = 0
