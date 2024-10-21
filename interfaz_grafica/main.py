@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
             method int sumar (int a, int b) {
                 numeros [0][0] = 0;
+                pl1 = [200, 200, 200, 200, 200, 200, 200];
                 this.sumar(a,b);
                 return 0;
             }

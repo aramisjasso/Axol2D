@@ -1385,9 +1385,9 @@ class Sintactico():
                                | izqAsignacion VALOR_CHAR PUNTO_Y_COMA
                                | izqAsignacion VALOR_STRING PUNTO_Y_COMA
                                | izqAsignacion booleano PUNTO_Y_COMA
-                               | izqAsignacion fila PUNTO_Y_COMA
-                               | definicionArreglo 
-                               | definicionMatriz'''
+                               | definicionArreglo PUNTO_Y_COMA
+                               | definicionMatriz PUNTO_Y_COMA'''
+        # a = [1, 2, 3];
         if len(p) == 4:
             p[0] = ('expresionAsignacion', p[1], p[2])  
         elif len(p) == 3: 
@@ -1436,10 +1436,48 @@ class Sintactico():
         self.parametros = 0
 
     #falta punto
+    def p_llamadaMetodo_error2(self,p):
+        '''llamadaMetodo : THIS IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto [.] después de [this] en la llamada al método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[2], self.parametros ,p[4]) 
+        self.parametros = 0
+
+    #error thiside
+    def p_llamadaMetodo_error3(self,p):
+        '''llamadaMetodo : IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). La llamada a métodos propios requiere el formato [this.nombreMetodo]. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[1], self.parametros ,p[3]) 
+        self.parametros = 0
 
     #falta identificador
+    def p_llamadaMetodo_error4(self,p):
+        '''llamadaMetodo : THIS PUNTO PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del método en la llamada al método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', 'Sin Identificador', self.parametros ,p[4]) 
+        self.parametros = 0
+
     #falta parentesis abre
-    #falta método
+    def p_llamadaMetodo_error5(self,p):
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR argumentos PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la llamada al método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[3], self.parametros ,p[4]) 
+        self.parametros = 0
+
+    #this.sumara,b);
+
+    #faltan argumentos
+    def p_llamadaMetodo_error6(self,p):
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[3], self.parametros , ('argumentos')) 
+        self.parametros = 0
+
+    #falta punto y coma
+    def p_llamadaMetodo_error6(self,p):
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[3], self.parametros , ('argumentos')) 
+        self.parametros = 0
 
     #<metodoAxol> ::= (read_key | read_bin | read_tec | save_bin | print |print_con | pop | push | position |
     #               show | positionX | positionY | add | set | random | getPosition | size | rotate)
