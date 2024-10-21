@@ -1386,7 +1386,7 @@ class Sintactico():
                                | izqAsignacion VALOR_STRING PUNTO_Y_COMA
                                | izqAsignacion booleano PUNTO_Y_COMA
                                | izqAsignacion fila PUNTO_Y_COMA
-                               | definicionArreglo
+                               | definicionArreglo 
                                | definicionMatriz'''
         if len(p) == 4:
             p[0] = ('expresionAsignacion', p[1], p[2])  
