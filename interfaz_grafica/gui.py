@@ -5,7 +5,7 @@ import compilador.compilador as ts
 import tabla_static as ta
 import tabla_dinamica as td
 from tkinter import font
-
+import re
 
 
 
@@ -213,7 +213,9 @@ class InterfazCompilador:
         self.console.config(state='normal')
         self.console.delete(1.0, tk.END)
         self.console.insert(tk.END, f"{resultado}")
+        self._color_letra_consola()
         self.console.config(state='disabled')
+        
 
     #Detecta si se modifico el texto o se uso un shortcut
     def on_text_modified(self, event):
@@ -285,6 +287,42 @@ class InterfazCompilador:
             item.config(font=self.menu_font)
             for submenu in item.winfo_children():
                submenu.config(font=self.menu_font)
+
+        #Color letra para la consola
+    def _color_letra_consola(self):
+        # Limpiar resaltado anterior
+        self.console.tag_remove('resaltado', '1.0', tk.END)
+        self.console.tag_remove('resaltado_linea', '1.0', tk.END)
+
+        # Palabras clave a resaltar
+        palabras_clave = ["Error Sintáctico", "Error Semántico", "Error Léxico"]
+
+        # Obtener el texto del widget
+        contenido = self.console.get("1.0", tk.END)
+        
+        # Resaltar palabras clave
+        for palabra in palabras_clave:
+            patron = fr'\b{re.escape(palabra)}\b'
+
+            for match in re.finditer(patron, contenido):
+                inicio = match.start()
+                fin = match.end()
+                indice_inicio = self.console.index(f"1.0 + {inicio} chars")
+                indice_final = self.console.index(f"1.0 + {fin} chars")
+                self.console.tag_add('resaltado', indice_inicio, indice_final)
+
+        # Resaltar la palabra "Línea" con otro color
+        patron_linea = r'\bLínea\b'
+        for match in re.finditer(patron_linea, contenido):
+            inicio = match.start()
+            fin = match.end()
+            indice_inicio = self.console.index(f"1.0 + {inicio} chars")
+            indice_final = self.console.index(f"1.0 + {fin} chars")
+            self.console.tag_add('resaltado_linea', indice_inicio, indice_final)
+
+        # Configurar los estilos de las etiquetas
+        self.console.tag_configure('resaltado', foreground='red')  # Color para palabras clave
+        self.console.tag_configure('resaltado_linea', foreground='blue')  # Color para "Línea"
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()
