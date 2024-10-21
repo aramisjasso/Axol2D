@@ -550,7 +550,7 @@ class Sintactico():
 
     #<instruccion> ::=  ( <expresionAsignacion> | (<llamadaMetodo>) ; | <estructuraControl>
     def p_instruccion(self,p):
-        '''instruccion : expresionAsignacion PUNTO_Y_COMA
+        '''instruccion : expresionAsignacion
                        | llamadaMetodo PUNTO_Y_COMA
                        | estructuraControl
                        | expresion PUNTO_Y_COMA
@@ -558,12 +558,12 @@ class Sintactico():
         p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     
     #punto y coma
-    def p_instruccion_error(self,p):
-        '''instruccion : expresionAsignacion 
-                       | llamadaMetodo 
-                       | expresion '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ', 0, 1])
-        p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
+    # def p_instruccion_error(self,p):
+    #     '''instruccion : expresionAsignacion 
+    #                    | llamadaMetodo 
+    #                    | expresion '''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ', 0, 1])
+    #     p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     #probar con expresionAsignacion error
 
     #----------------------------------------------------------------------------------------------------------
@@ -1380,15 +1380,15 @@ class Sintactico():
     #                          <identificador> = (<llamadaMetodo>  | <definicionArreglo>)
     #                          <expresionPostfijo>
     def p_expresionAsignacion(self, p):
-        '''expresionAsignacion : izqAsignacion expresion
-                               | izqAsignacion llamadaMetodo
-                               | izqAsignacion VALOR_CHAR
-                               | izqAsignacion VALOR_STRING
-                               | izqAsignacion booleano
-                               | izqAsignacion fila
+        '''expresionAsignacion : izqAsignacion expresion PUNTO_Y_COMA
+                               | izqAsignacion llamadaMetodo PUNTO_Y_COMA
+                               | izqAsignacion VALOR_CHAR PUNTO_Y_COMA
+                               | izqAsignacion VALOR_STRING PUNTO_Y_COMA
+                               | izqAsignacion booleano PUNTO_Y_COMA
+                               | izqAsignacion fila PUNTO_Y_COMA
                                | definicionArreglo
                                | definicionMatriz'''
-        if len(p) == 3:
+        if len(p) == 4:
             p[0] = ('expresionAsignacion', p[1], p[2])  
         else:  
             p[0] = ('expresionAsignacion', p[1])
@@ -1417,7 +1417,7 @@ class Sintactico():
     #---------------------------- L L A M A D A   A   M E T O D O S -------------------------------------------
     #<llamadaMetodo> ::= <metodoAxol> | this . IDENTIFICADOR 
     def p_llamadaMetodo(self,p):
-        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos 
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos  
                          | metodoAxol PARENTESIS_ABRE argumentos '''
         if len(p) == 6:
             p[0] = ('llamadaMetodo', p[3], self.parametros ,p[5]) 
