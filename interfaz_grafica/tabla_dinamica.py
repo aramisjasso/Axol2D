@@ -68,24 +68,40 @@ class TablaDinamica:
         tree = event.widget
         selected_item = tree.selection()[0]
         valores_fila = tree.item(selected_item, "values")
-        print(valores_fila)
+        #print(valores_fila)
         ar='arreglo'
         ma='matriz'
         me='metodo'
         temp_id=valores_fila[0]
+        tipo=valores_fila[2]
+        tipos_especiales = ['players','obstacles','platform']
         if  ar in valores_fila[2]:
             self.ventana(temp_id,ar)
-        elif 'matriz'in valores_fila[2]:
+        elif ma in valores_fila[2]:
             self.ventana(temp_id, ma)
-        elif 'metodo' in valores_fila[2]:
+        elif me in valores_fila[2]:
             self.ventana(temp_id, me)
+        elif tipo in tipos_especiales:
+            self.ventana(temp_id,tipo)
         
     def ventana(self, id, tipo):
         indice = self.fnIndice(id)
         # Crear una nueva ventana con los detalles del elemento seleccionado
         ventana_detalle = tk.Toplevel(self.root)
         ventana_detalle.title(f"Detalles de {tipo} el identificador \"{id}\"")
+        
+        # Calcular el tamaño de la pantalla
+        screen_width = ventana_detalle.winfo_screenwidth()
+        screen_height = ventana_detalle.winfo_screenheight()
 
+         # Calcular el tamaño y posición de la ventana
+        width = int(screen_width * 0.7)  # 50% del ancho de la pantalla
+        height = int(screen_height * 0.5)  # 50% de la altura de la pantalla
+        x = int((screen_width - width) / 2)  # Centrado horizontalmente
+        y = int((screen_height - height) / 2)  # Centrado verticalmente
+
+        # Establecer tamaño y posición de la ventana
+        ventana_detalle.geometry(f"{width}x{height}+{x}+{y}")
         # Mostrar los detalles del elemento en la nueva ventana
         texto = ''
         for idx, col in enumerate(["Lexema", "NO. ID", "Tipo de Datos", "Elementos", "Declaración"]):

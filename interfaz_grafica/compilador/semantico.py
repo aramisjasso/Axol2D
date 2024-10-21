@@ -626,21 +626,22 @@ class Semantico():
                 #Separación de Parametros
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
-                self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
-                contenido = metodo[4]
-                if contenido == 'Sin Contenido':
-                    return
-                if len(contenido) == 4: 
-                    instrucciones=contenido[1]
-                    self.fnInstrucciones(instrucciones, id)
-                    parteReturn=contenido[2]
-                    line  = contenido[3][0]
-                    lexpos =contenido[3][1]
-                else: 
-                    parteReturn=contenido[1]
-                    line  = contenido[2][0]
-                    lexpos =contenido[2][1]
-                self.fnReturn(parteReturn,id,line=line,lexpos=lexpos)
+                if self.listaParametros !='Error':
+                    self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
+                    contenido = metodo[4]
+                    if contenido == 'Sin Contenido':
+                        return
+                    if len(contenido) == 4: 
+                        instrucciones=contenido[1]
+                        self.fnInstrucciones(instrucciones, id)
+                        parteReturn=contenido[2]
+                        line  = contenido[3][0]
+                        lexpos =contenido[3][1]
+                    else: 
+                        parteReturn=contenido[1]
+                        line  = contenido[2][0]
+                        lexpos =contenido[2][1]
+                    self.fnReturn(parteReturn,id,line=line,lexpos=lexpos)
 
                 
         #print(lista_metodos)
@@ -679,9 +680,18 @@ class Semantico():
             if parametros is not None:
                 if len(parametros[0])==2 :
                     self.listaParametros.append(parametros[0][1])
+                    print('Checar parametros',parametros[0][1] )
+                    if parametros[0][1][1] =='Sin Identificador':
+                        self.listaParametros ='Error'
+                        compara=False
                     parametros = parametros[1]
+                    
+
                 else:
                     self.listaParametros.append(parametros[1])
+                    print('Checar parametros',parametros[1] )
+                    if parametros[1][1] =='Sin Identificador':
+                        self.listaParametros ='Error'
                     compara = False
             else:
                     compara=False
@@ -834,28 +844,28 @@ class Semantico():
                                     elif len(y)==2:
                                         valores= y[1][2]
                                         self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                else:
-                    if not temp or 'NoId'== temp:
-                        #print('Declaración', temp)
-                        temp_id=id
-                        id=f'{llamada},{id}'
-                        if 'NoId'== self.fnComprobarDeclaracion(id):
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                    else:        
-                        if len(y)==3:
-                            valores= y[2]
-                            
-                            if y[2][0] == 'llamadaMetodo':
-                                x2 = y[2]
-                                print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
-                                self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
-                            else:
+                    else:
+                        if not temp or 'NoId'== temp:
+                            #print('Declaración', temp)
+                            temp_id=id
+                            id=f'{llamada},{id}'
+                            if 'NoId'== self.fnComprobarDeclaracion(id):
+                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                        else:        
+                            if len(y)==3:
+                                valores= y[2]
+                                
+                                if y[2][0] == 'llamadaMetodo':
+                                    x2 = y[2]
+                                    print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                    self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                    self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                else:
+                                    self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                            elif len(y)==2:
+                                valores= y[1][2]
                                 self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                        elif len(y)==2:
-                            valores= y[1][2]
-                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                            
+                                
                     
             elif y[0]=='llamadaMetodo':
                 id = y[1]
@@ -944,6 +954,7 @@ class Semantico():
         lista_argumentos=[]
         for x in range(cantidad):
             lista_argumentos.append(argumentos[1])
+            print('Checar Argumentos',argumentos[1])
             if x<=cantidad-1:
                 argumentos=argumentos[2]
         return lista_argumentos

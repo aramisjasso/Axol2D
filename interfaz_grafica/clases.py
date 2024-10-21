@@ -6,7 +6,7 @@ class LineNumberedText(tk.Frame):
     
     def __init__(self, *args, **kwargs,):
         tk.Frame.__init__(self, *args, **kwargs)
-
+        self.numero_lineas = 0
         self._line_numbers = tk.Text(self, width=4, padx=5, takefocus=0, border=0,
                                      background='lightgrey', state='disabled')
         self._line_numbers.pack(side=tk.LEFT, fill=tk.Y)
@@ -17,6 +17,7 @@ class LineNumberedText(tk.Frame):
 
         # Caja de texto
         self._text = tk.Text(self, wrap='word', undo=True, autoseparators=False, yscrollcommand=self._on_scroll)
+        self._text.configure(tabs=('1c'))
         self._text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         # Configurar la barra de desplazamiento para que controle el widget de texto
         self.scrollbar.config(command=self._yview)
@@ -34,8 +35,10 @@ class LineNumberedText(tk.Frame):
 
     #Para checar cada  cambio en el documento
     def _on_change(self, event=None):
-        
-        self._update_line_numbers()
+        num_lines = int(self._text.index('end-1c').split('.')[0])
+        if num_lines!= self.numero_lineas:
+            self.numero_lineas=num_lines
+            self._update_line_numbers()
         tecla = event
         if event.state == 4:
             self.checar = self.key_pressed(tecla)
@@ -48,7 +51,7 @@ class LineNumberedText(tk.Frame):
                          'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Insert','XF86AudioMute',
                          'XF86AudioLowerVolume', 'XF86AudioRaiseVolume', 'Win_L', '??']:
             self.checar = True  # Regresa true
-            self._color_letra()
+            #self._color_letra()
             return
         self.checar = False
 
@@ -59,35 +62,37 @@ class LineNumberedText(tk.Frame):
             return True
 
     #Cambia el color si se modifico
-    def _color_letra(self):
-        # Limpiar resaltado anterior
-        self._text.tag_remove('resaltado', '1.0', tk.END)
+    # def _color_letra(self):
+    #     # Limpiar resaltado anterior
+    #     self._text.tag_remove('resaltado', '1.0', tk.END)
 
-        # Palabras clave a resaltar
-        palabras_clave = ["Python", "Tkinter", "color"]
+    #     # Palabras clave a resaltar
+    #     palabras_clave = ["Python", "Tkinter", "color"]
 
-        # Obtener el texto del widget
-        contenido = self._text.get("1.0", tk.END)
+    #     # Obtener el texto del widget
+    #     contenido = self._text.get("1.0", tk.END)
         
-        # Iterar sobre cada palabra clave
-        for palabra in palabras_clave:
-            # Crear una expresión regular que busque la palabra exacta
-            # Asegurando que la palabra esté separada por un delimitador como espacio, inicio o fin de línea
-            patron = fr'\b{re.escape(palabra)}\b'
+    #     # Iterar sobre cada palabra clave
+    #     for palabra in palabras_clave:
+    #         # Crear una expresión regular que busque la palabra exacta
+    #         # Asegurando que la palabra esté separada por un delimitador como espacio, inicio o fin de línea
+    #         patron = fr'\b{re.escape(palabra)}\b'
 
-            # Buscar todas las ocurrencias de la palabra clave en el texto
-            for match in re.finditer(patron, contenido):
-                # Calcular las posiciones inicial y final de la coincidencia
-                inicio = match.start()
-                fin = match.end()
+    #         # Buscar todas las ocurrencias de la palabra clave en el texto
+    #         for match in re.finditer(patron, contenido):
+    #             # Calcular las posiciones inicial y final de la coincidencia
+    #             inicio = match.start()
+    #             fin = match.end()
 
-                # Convertir las posiciones a índices compatibles con Tkinter
-                indice_inicio = f"1.0 + {inicio}c"
-                indice_final = f"1.0 + {fin}c"
+    #             # Convertir las posiciones a índices compatibles con Tkinter
+    #             indice_inicio = f"1.0 + {inicio}c"
+    #             indice_final = f"1.0 + {fin}c"
 
-                # Aplicar la etiqueta "resaltado" al texto encontrado
-                self._text.tag_add('resaltado', indice_inicio, indice_final)    
+    #             # Aplicar la etiqueta "resaltado" al texto encontrado
+    #             self._text.tag_add('resaltado', indice_inicio, indice_final)    
     
+
+
     #checar si el código de modifico y se guardo
     def _get_checar(self):
         return self.checar
@@ -128,6 +133,7 @@ class LineNumberedText(tk.Frame):
         self._text.delete(1.0, tk.END)
         self._text.insert(tk.END, contenido)
         self._text.edit_reset()
+        self._update_line_numbers()
     
     #Borrar Texto
     def delete_text(self):
