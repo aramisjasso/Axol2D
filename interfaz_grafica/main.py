@@ -120,9 +120,9 @@ if __name__ == "__main__":
         level MiPrimerNivel {
             int numeros [5][1];  
 
-            method int sumar() {
-                numeros 0][0] = 1; 
-
+            method int sumar (int a, int b) {
+                numeros [0][0] = 0;
+                .sumar(a,b);
                 return 0;
             }
 
