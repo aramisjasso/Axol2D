@@ -62,34 +62,34 @@ class LineNumberedText(tk.Frame):
             return True
 
     #Cambia el color si se modifico
-    # def _color_letra(self):
-    #     # Limpiar resaltado anterior
-    #     self._text.tag_remove('resaltado', '1.0', tk.END)
+    def _color_letra(self):
+        # Limpiar resaltado anterior
+        self._text.tag_remove('resaltado', '1.0', tk.END)
 
-    #     # Palabras clave a resaltar
-    #     palabras_clave = ["Python", "Tkinter", "color"]
+        # Palabras clave a resaltar
+        palabras_clave = []
 
-    #     # Obtener el texto del widget
-    #     contenido = self._text.get("1.0", tk.END)
+        # Obtener el texto del widget
+        contenido = self._text.get("1.0", tk.END)
         
-    #     # Iterar sobre cada palabra clave
-    #     for palabra in palabras_clave:
-    #         # Crear una expresión regular que busque la palabra exacta
-    #         # Asegurando que la palabra esté separada por un delimitador como espacio, inicio o fin de línea
-    #         patron = fr'\b{re.escape(palabra)}\b'
+        # Iterar sobre cada palabra clave
+        for palabra in palabras_clave:
+            # Crear una expresión regular que busque la palabra exacta
+            # Asegurando que la palabra esté separada por un delimitador como espacio, inicio o fin de línea
+            patron = fr'\b{re.escape(palabra)}\b'
 
-    #         # Buscar todas las ocurrencias de la palabra clave en el texto
-    #         for match in re.finditer(patron, contenido):
-    #             # Calcular las posiciones inicial y final de la coincidencia
-    #             inicio = match.start()
-    #             fin = match.end()
+            # Buscar todas las ocurrencias de la palabra clave en el texto
+            for match in re.finditer(patron, contenido):
+                # Calcular las posiciones inicial y final de la coincidencia
+                inicio = match.start()
+                fin = match.end()
 
-    #             # Convertir las posiciones a índices compatibles con Tkinter
-    #             indice_inicio = f"1.0 + {inicio}c"
-    #             indice_final = f"1.0 + {fin}c"
+                # Convertir las posiciones a índices compatibles con Tkinter
+                indice_inicio = f"1.0 + {inicio}c"
+                indice_final = f"1.0 + {fin}c"
 
-    #             # Aplicar la etiqueta "resaltado" al texto encontrado
-    #             self._text.tag_add('resaltado', indice_inicio, indice_final)    
+                # Aplicar la etiqueta "resaltado" al texto encontrado
+                self._text.tag_add('resaltado', indice_inicio, indice_final)    
     
 
 

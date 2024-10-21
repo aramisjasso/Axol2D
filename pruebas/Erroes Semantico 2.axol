@@ -41,12 +41,12 @@ level MiPrimerNivel {
 		}  
 		method int miMetodo3(int  a, int c){
 			a1 = 12;
-			this.miMetodo3(a,12);
+			//this.miMetodo3(a,12);
 			return 0;
 		}               
 		axol2D play () {
 			b = 'a';
-			a1 = this.miMetodo3(123,2);
+			//a1 = this.miMetodo3(123,2);
 			// (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
 				MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
 		}

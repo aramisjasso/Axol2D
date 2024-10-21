@@ -144,7 +144,7 @@ class Lexico():
     def t_ERROR_LEXICO_NUMEROS_DECIMALES(self,t):
         r'( [0-9]+ \. ( (\.)* [0-9]* )* ) | (( (\.)+ [0-9]+ )+)'
         #r'([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)'
-        mensaje_error=(f"Error Léxico en la línea {t.lineno}. Axol2D no permite números decimales.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Axol2D no permite números decimales.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
@@ -191,35 +191,35 @@ class Lexico():
     # Error cadena no cerrada
     def t_ERROR_LEXICO_7(self,t):
         r'\"([a-zA-Z0-9_\-\.])*'
-        mensaje_error=(f"Error Léxico (7) en la línea {t.lineno}. Faltan comillas dobles al final de la cadena. La cadena no fue cerrada.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Faltan comillas dobles al final de la cadena. La cadena no fue cerrada.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
     # Error comentario no cerrado
     def t_ERROR_LEXICO_8(self,t):
         r'\/°'
-        mensaje_error=(f"Error Léxico (8) en la línea {t.lineno}. Falta '°/' para cerrar el bloque de comentarios.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Falta '°/' para cerrar el bloque de comentarios.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
     # Error comentario no abierto
     def t_ERROR_LEXICO_9(self,t):
         r'°\/'
-        mensaje_error=(f"Error Léxico (9) en la línea {t.lineno}. Falta '/°' al comienzo del bloque de comentarios. El comentario no fue abierto.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Falta '/°' al comienzo del bloque de comentarios. El comentario no fue abierto.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
     # Error tamaño (número demasiado grande)
     # def t_ERROR_LEXICO_10(self,t):
     #     r'(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5]?[0-9]{1,4}){Digito}'
-    #     mensaje_error=(f"Error Léxico (10) en la línea {t.lineno}. El número supera el máximo valor permitido en Axol2D. Solo se permiten números entre 0 y 6553.")
+    #     mensaje_error=(f"Error Léxico (10) (Línea {t.lineno}). El número supera el máximo valor permitido en Axol2D. Solo se permiten números entre 0 y 6553.")
     #     self.errores.append([mensaje_error,t.lineno,t.lexpos])
     #     t.lexer.skip(1)
 
     # Error número decimal no válido
     def t_ERROR_LEXICO_11(self,t):
         r'[0-9]*("\."* [0-9]*)("\."* [0-9]*)'
-        mensaje_error=(f"Error Léxico (11) en la línea {t.lineno}. El número ingresado no es válido en el lenguaje Axol2D.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). El número ingresado no es válido en el lenguaje Axol2D.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
@@ -227,14 +227,14 @@ class Lexico():
     def t_ERROR_LEXICO_2(self,t):
         r'[a-zA-Z]([a-zA-Z0-9])*'
         if len(t.value) > 32:
-            mensaje_error=(f"Error Léxico (2) en la línea {t.lineno}. El identificador supera la longitud máxima de 32 símbolos.")
+            mensaje_error=(f"Error Léxico (Línea {t.lineno}). El identificador supera la longitud máxima de 32 símbolos.")
             self.errores.append([mensaje_error,t.lineno,t.lexpos])
             t.lexer.skip(1)
 
     # Error de identificador con carácter inválido
     def t_ERROR_LEXICO_4(self,t):
         r'[a-zA-Z][^a-zA-Z0-9_]'
-        mensaje_error=(f"Error Léxico (4) en la línea {t.lineno}. El identificador no es válido. Debe comenzar con una letra y puede estar seguido de dígitos o letras.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). El identificador no es válido. Debe comenzar con una letra y puede estar seguido de dígitos o letras.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
 
@@ -242,20 +242,20 @@ class Lexico():
 
     #def t_ERROR_LEXICO_5(t):
     #    r'[+\-*/%^!&|~<>]'
-    #    print(f"Error Léxico (5) en la línea {t.lineno}. El operador no es válido en Axol2D.")
+    #    print(f"Error Léxico (5) (Línea {t.lineno}). El operador no es válido en Axol2D.")
     #    t.lexer.skip(1)
 
     # Error carácter no cerrado
     def t_ERROR_LEXICO_6(self,t):
         r"\'([a-zA-Z0-9_\-\.])"
-        mensaje_error=(f"Error Léxico (6) en la línea {t.lineno}. Falta comilla simple ' a la derecha del carácter. El carácter no fue cerrado.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Falta comilla simple ' a la derecha del carácter. El carácter no fue cerrado.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(self,1)
 
     # Caracteres no válidos
     def t_error(self,t):
         r'[^a-zA-Z0-9_\-\.]'
-        mensaje_error=(f"Error Léxico (1) en la línea {t.lineno} la cadena: \"{t.value[0]}\". El identificador no es válido. Debe comenzar con una letra y puede estar seguido de dígitos o letras.")
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}) la cadena: \"{t.value[0]}\". El identificador no es válido. Debe comenzar con una letra y puede estar seguido de dígitos o letras.")
         print(mensaje_error)
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         t.lexer.skip(1)
