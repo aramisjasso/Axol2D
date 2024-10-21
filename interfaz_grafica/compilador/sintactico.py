@@ -1505,22 +1505,22 @@ class Sintactico():
     #falta coma
     #falta elemento después de la coma
     
-    # # <elementosFila> ::= <expresion> <restoElementosFila>
-    # def p_elementosFila(self,p):
-    #     '''elementosFila : expresion restoElementosFila
-    #                     | valorCadena restoElementosFila
-    #                     | booleano restoElementosFila'''
-    #     self.fila+=1
-    #     p[0] = [p[1]] + p[2]
+    # <elementosFila> ::= <expresion> <restoElementosFila>
+    def p_elementosFila(self,p):
+        '''elementosFila : expresion restoElementosFila
+                        | valorCadena restoElementosFila
+                        | booleano restoElementosFila'''
+        self.fila+=1
+        p[0] = [p[1]] + p[2]
 
-    # # <restoElementosFila> ::= , <elementosFila> | ε
-    # def p_restoElementosFila(self,p):
-    #     '''restoElementosFila : COMA elementosFila
-    #                         | empty'''
-    #     if len(p) == 2:  # Caso de ε
-    #         p[0] = []
-    #     else:  # Caso con coma
-    #         p[0] = p[2]
+    # <restoElementosFila> ::= , <elementosFila> | ε
+    def p_restoElementosFila(self,p):
+        '''restoElementosFila : COMA elementosFila
+                            | empty'''
+        if len(p) == 2:  # Caso de ε
+            p[0] = []
+        else:  # Caso con coma
+            p[0] = p[2]
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------- V A L O R E S -----------------------------------------------
@@ -1654,24 +1654,24 @@ class Sintactico():
     #fila sin elementos
     #fila sin corchete cierra
 
-    # <elementosFila> ::= <expresion> <restoElementosFila>
-    def p_elementosFila(self,p):
-        '''elementosFila : expresion restoElementosFila
-                         | valorCadena restoElementosFila
-                         | booleano restoElementosFila'''
-        self.fila+=1
-        p[0] = [p[1]] + p[2]
+    # # <elementosFila> ::= <expresion> <restoElementosFila>
+    # def p_elementosFila(self,p):
+    #     '''elementosFila : expresion restoElementosFila
+    #                      | valorCadena restoElementosFila
+    #                      | booleano restoElementosFila'''
+    #     self.fila+=1
+    #     p[0] = [p[1]] + p[2]
 
-    # <restoElementosFila> ::= , <elementosFila> | ε
-    def p_restoElementosFila(self,p):
-        '''restoElementosFila : COMA elementosFila
-                              | empty'''
-        if len(p) == 2 and p[1] == 'empty':  # Caso de ε
-            p[0] = []
-        #caso error elementos fila sin coma
+    # # <restoElementosFila> ::= , <elementosFila> | ε
+    # def p_restoElementosFila(self,p):
+    #     '''restoElementosFila : COMA elementosFila
+    #                           | empty'''
+    #     if len(p) == 2 and p[1] == 'empty':  # Caso de ε
+    #         p[0] = []
+    #     #caso error elementos fila sin coma
 
-        else:  # Caso con coma
-            p[0] = p[2]
+    #     else:  # Caso con coma
+    #         p[0] = p[2]
 
     # <definicionArreglo> ::= <identificador> = [ <elementosArreglo> ] 
     def p_definicionArreglo(self,p):

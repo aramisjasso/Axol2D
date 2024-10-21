@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
         #         return 0;
         #     }  
-        #     method int miMetodo3(int a , int c){
+        #     method int miMetodo3(int  , int c){
         #         a1 = 12;
         #         this.miMetodo3(a,12);
         #         return 0;

@@ -128,6 +128,7 @@ class LineNumberedText(tk.Frame):
         self._text.delete(1.0, tk.END)
         self._text.insert(tk.END, contenido)
         self._text.edit_reset()
+        self._update_line_numbers()
     
     #Borrar Texto
     def delete_text(self):

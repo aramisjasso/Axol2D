@@ -626,21 +626,22 @@ class Semantico():
                 #Separación de Parametros
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
-                self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
-                contenido = metodo[4]
-                if contenido == 'Sin Contenido':
-                    return
-                if len(contenido) == 4: 
-                    instrucciones=contenido[1]
-                    self.fnInstrucciones(instrucciones, id)
-                    parteReturn=contenido[2]
-                    line  = contenido[3][0]
-                    lexpos =contenido[3][1]
-                else: 
-                    parteReturn=contenido[1]
-                    line  = contenido[2][0]
-                    lexpos =contenido[2][1]
-                self.fnReturn(parteReturn,id,line=line,lexpos=lexpos)
+                if self.listaParametros !='Error':
+                    self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
+                    contenido = metodo[4]
+                    if contenido == 'Sin Contenido':
+                        return
+                    if len(contenido) == 4: 
+                        instrucciones=contenido[1]
+                        self.fnInstrucciones(instrucciones, id)
+                        parteReturn=contenido[2]
+                        line  = contenido[3][0]
+                        lexpos =contenido[3][1]
+                    else: 
+                        parteReturn=contenido[1]
+                        line  = contenido[2][0]
+                        lexpos =contenido[2][1]
+                    self.fnReturn(parteReturn,id,line=line,lexpos=lexpos)
 
                 
         #print(lista_metodos)
@@ -679,9 +680,18 @@ class Semantico():
             if parametros is not None:
                 if len(parametros[0])==2 :
                     self.listaParametros.append(parametros[0][1])
+                    print('Checar parametros',parametros[0][1] )
+                    if parametros[0][1][1] =='Sin Identificador':
+                        self.listaParametros ='Error'
+                        compara=False
                     parametros = parametros[1]
+                    
+
                 else:
                     self.listaParametros.append(parametros[1])
+                    print('Checar parametros',parametros[1] )
+                    if parametros[1][1] =='Sin Identificador':
+                        self.listaParametros ='Error'
                     compara = False
             else:
                     compara=False
@@ -944,6 +954,7 @@ class Semantico():
         lista_argumentos=[]
         for x in range(cantidad):
             lista_argumentos.append(argumentos[1])
+            print('Checar Argumentos',argumentos[1])
             if x<=cantidad-1:
                 argumentos=argumentos[2]
         return lista_argumentos
