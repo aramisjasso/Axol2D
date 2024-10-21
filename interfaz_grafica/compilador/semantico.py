@@ -628,6 +628,8 @@ class Semantico():
                 #Declaracion Métodos
                 self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
                 contenido = metodo[4]
+                if contenido == 'Sin Contenido':
+                    return
                 if len(contenido) == 4: 
                     instrucciones=contenido[1]
                     self.fnInstrucciones(instrucciones, id)
@@ -781,6 +783,9 @@ class Semantico():
 
             elif y[0]=='expresionAsignacion':
                 id=y[1][1]
+
+                if id == 'Sin Identificador':
+                    return
                 
                 temp = self.fnComprobarDeclaracion(id)
                 #print('id:',id)
@@ -867,13 +872,12 @@ class Semantico():
                     return
                 # print(self.ts[0][0])
                 # print(y[1])
+                self.banderaStart = True
                 if not (self.fnComprobarDeclaracion(y[1]) and self.fnEncontrarTipo(y[1]) == 'Nivel'):
                         nombreNivel = self.fnEncontrarMétodo()
                         self.errores.append([f'Error Semántico (Línea {line}. El identificador de llamada al método start() [{y[1]}] no coincide con el identificador del nivel [{nombreNivel}].',line, lexpos]) 
                 else:
                     # (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-
-                    
                     self.ts.append([',fila_pla','',('arreglo', 'platform'),'Null','Hola'])
                     self.fnValidartipos(',fila_pla',y[2][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -881,17 +885,12 @@ class Semantico():
                     self.ts.append([',fila_obs','',('arreglo', 'obstacles'),'Null','Hola'])
                     self.fnValidartipos(',fila_obs',y[3][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
-
-                    
-
-                    
                     self.ts.append([',Jugador','','player','Null','Hola'])
                     
                     atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                     for y2 in range(len(atributos)):
                         in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1],'Null', 'Linea declaración']
                         self.ts.append(in_simbolo)
-                    
                     
                     self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -904,7 +903,6 @@ class Semantico():
                     self.fnAsignar(y[5],',Fondo',True,line=line,lexpos=lexpos)
                     self.ts.pop()
 
-                    
                     self.ts.append([',elementos_fondo','',('arreglo', 'platform'),'Null','Hola'])
                     self.fnValidartipos(',elementos_fondo',y[6][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -913,9 +911,6 @@ class Semantico():
                     self.fnAsignar(y[7],',Posicion',True,axol=True,line=line,lexpos=lexpos)
                     self.ts.pop()
 
-                    
-                        
-                    
                     return
                 #print(y)
 #----------Asignación Metodo ()--------------------------------------------------------------
@@ -1226,6 +1221,8 @@ class Semantico():
         # Procesar instrucciones
         print(self.parteMetodoPrincipal[1])
         self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
+        # if self.banderaStart: 
+        #     self.errores.append([f'Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
 
 #----- Encontrar método Axol----------------------------------------------------------------------------------
     def fnEncontrarMétodo(self):

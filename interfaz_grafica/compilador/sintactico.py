@@ -240,9 +240,11 @@ class Sintactico():
         p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     
     #falta identificador
-    def p_llamadaStart_error1(self,p): 
-        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
+    # def p_llamadaStart_error1(self,p): 
+    #     '''llamadaStart : PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del nivel en la llamada al método [start]. ', 0, 1])
+    #     p[0] = ('llamadaStart', ('Sin Identificador'),p[4],p[6],p[8],p[10],p[12],p[14])
+
     #falta punto
     #falta start
     #falta parentesis abre
@@ -403,15 +405,56 @@ class Sintactico():
     def p_metodoDeclaracion(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8], (p.lineno(0),p.lexpos(0)))
-    #falta method (puede ser un identificador)
+
+    #falta method (puede ser un identificador) 
+    #genera demasiados problemas
+    # def p_metodoDeclaracion_error1(self,p):
+    #     '''metodoDeclaracion : tipoDato IDENTIFICADOR error parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [method] en la declaración del método. ', 0, 1])
+    #     p[0] = ('metodoDeclaracion', p[1],p[2], p[4], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta tipo dato del método
+    def p_metodoDeclaracion_error1(self,p):
+        '''metodoDeclaracion : METHOD IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato del método en la declaración del método. ', 0, 1])
+        p[0] = ('metodoDeclaracion', 'Sin Tipo',p[2], p[4], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta identificador del método
+    #genera demasiados problemas
+    # def p_metodoDeclaracion_error2(self,p):
+    #     '''metodoDeclaracion : METHOD tipoDato PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del método en la declaración del método. ', 0, 1])
+    #     p[0] = ('metodoDeclaracion', p[2], 'id', p[4], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta parentesis abre
-    #falta parametros
+    def p_metodoDeclaracion_error3(self,p):
+        '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la declaración del método. ', 0, 1])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[4], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta parentesis cierra 
+    def p_metodoDeclaracion_error4(self,p):
+        '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la declaración del método. ', 0, 1])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta llave abre
+    def p_metodoDeclaracion_error5(self,p):
+        '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA contenidoMetodo LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la declaración del método. ', 0, 1])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[7], (p.lineno(0),p.lexpos(0)))
+
     #falta contenido metodo
+    def p_metodoDeclaracion_error6(self,p):
+        '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta contenido del método en la declaración del método. Todos los métodos deben retornar un valor y tener al menos una instrucción. ', 0, 1])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], 'Sin Contenido', (p.lineno(0),p.lexpos(0)))
+    
     #falta llave cierra
+    def p_metodoDeclaracion_error7(self,p):
+        '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la declaración del método. ', 0, 1])
+        p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8], (p.lineno(0),p.lexpos(0)))
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
     def p_contenidoMetodo(self,p):
@@ -420,10 +463,33 @@ class Sintactico():
         if len(p) == 5:
             p[0] = ('contenidoMetodo', p[1], p[3],(p.lineno(3),p.lexpos(3)))
         else: 
-            p[0] = ('contenidoMetodo', p[2])
+            p[0] = ('contenidoMetodo', p[2], (p.lineno(3),p.lexpos(3)))
+
     #falta return 
+    def p_contenidoMetodo_error1(self,p):
+        '''contenidoMetodo : instrucciones error'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', 0, 1])
+        p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'), (p.lineno(2),p.lexpos(2)))
+
     #falta expresion de retorno
+    def p_contenidoMetodo_error2(self,p):
+        '''contenidoMetodo : instrucciones RETURN PUNTO_Y_COMA
+                           | RETURN PUNTO_Y_COMA '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta expresión de retorno en el método después de [return]. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'),(p.lineno(3),p.lexpos(3)))
+        else: 
+            p[0] = ('contenidoMetodo', ('expresion', 'error'), (p.lineno(3),p.lexpos(3)))
+
     #falta punto y coma
+    def p_contenidoMetodo_error3(self,p):
+        '''contenidoMetodo : instrucciones RETURN expresion
+                           | RETURN expresion '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta punto y coma [;] después expresión de retorno en el método. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'),(p.lineno(3),p.lexpos(3)))
+        else: 
+            p[0] = ('contenidoMetodo', ('expresion', 'error'), (p.lineno(3),p.lexpos(3)))
 
     #<parametros> ::= <tipoDato> identificador |
     #                 <tipoDato> identificador , <parametros> | ε
@@ -441,10 +507,33 @@ class Sintactico():
             p[0] = ('parametro',(p[1], p[2]) ), p[4]
         else:
             p[0] = None
+
     #falta tipo dato
+    def p_parametro_error1(self,p):
+        '''parametro : IDENTIFICADOR COMA parametro
+                     | IDENTIFICADOR '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato antes del identificador en los parámetros en la declaración del método. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('parametro',('Sin Tipo', p[1]) ), p[3]
+        elif len(p) == 5:
+             p[0] = ('parametro',('Sin Tipo', p[1]))
+
     #falta identificador
+    def p_parametro_error2(self,p):
+        '''parametro : tipoDato COMA parametro
+                     | tipoDato '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador después del tipo de dato en los parámetros en la declaración del método. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('parametro',(p[1], 'Sin Identificador') ), p[3]
+        elif len(p) == 5:
+             p[0] = ('parametro',(p[1], 'Sin Identificador'))
+
     #falta coma
-    #puede tronar sin tipo dato
+    def p_parametro_error3(self,p):
+        '''parametro : tipoDato IDENTIFICADOR parametro'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre los parámetros en la declaración del método. ', 0, 1])
+        if len(p) == 4:
+            p[0] = ('parametro',(p[1], p[2]) ), p[3]
 
     #---------------------------------------- I N S T R U C C I O N E S ---------------------------------------
     #<instruccionesNivel> ::= 
@@ -471,13 +560,12 @@ class Sintactico():
         p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     
     #punto y coma
-
-    # def p_instruccion_error(self,p):
-    #     '''instruccion : expresionAsignacion 
-    #                    | llamadaMetodo 
-    #                    | expresion '''
-    #     #falta punto y coma
-    #     p[0] = ('instruccion', p[1])
+    def p_instruccion_error(self,p):
+        '''instruccion : expresionAsignacion 
+                       | llamadaMetodo 
+                       | expresion '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ', 0, 1])
+        p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     #probar con expresionAsignacion error
 
     #----------------------------------------------------------------------------------------------------------
@@ -1225,7 +1313,7 @@ class Sintactico():
     # int a = - ;
     def p_expresionUnitaria_error(self, p):
         '''expresionUnitaria : operadorAdicion error'''
-        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [factor] después del operador unitario [+, -]. ',p.lineno(0),p.lexpos(0)])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Se esperaba un [factor] después del operador unitario [+, -]. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -1250,7 +1338,7 @@ class Sintactico():
     #int a = ((2 + 3) * 4;
     def p_expresionParentesis_error(self,p):
         '''expresionParentesis : PARENTESIS_ABRE expresion error'''
-        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Falta parentesis de cierre en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 #------------------------------------------------------------------------------------------------
@@ -1272,6 +1360,7 @@ class Sintactico():
     #----------------------------------------------------------------------------------------------------------
 
     #---------------------------- E X P R E S I O N   D E   A S I G N A C I O N -------------------------------
+    #checar
     def p_izqAsignacion(self,p):
         '''izqAsignacion : IDENTIFICADOR operadorAsignacion
                          | accesoLineal operadorAsignacion
@@ -1284,6 +1373,10 @@ class Sintactico():
             p[0] = ('izqAsignacion', p[1], p[2])
     
     #falta a qué asignarle el valor
+    def p_izqAsignacion_error(self,p):
+        '''izqAsignacion :  operadorAsignacion'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la asignación. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('izqAsignacion', 'Sin Identificador')
 
     #<expresionAsignacion> ::= <identificador> <operadorAsignacion> <expresion> |
     #                          <identificador> = (<llamadaMetodo>  | <definicionArreglo>)
@@ -1303,6 +1396,10 @@ class Sintactico():
             p[0] = ('expresionAsignacion', p[1])
 
     #falta valor en la asignación
+    def p_expresionAsignacion_error(self, p):
+        '''expresionAsignacion : izqAsignacion'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta valor después del operador de asignación [=] en la asignación. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('expresionAsignacion', p[1], ('expresion', 'error'))  
 
     #<expresionConstante> ::= constant <expresionAsignacion>
     # def p_expresionConstante(self,p):
@@ -1330,8 +1427,16 @@ class Sintactico():
         else:
             p[0] = ('llamadaMetodo', p[1], self.parametros , p[3]) 
             self.parametros =0
+
     #falta this (puede ser un identificador)
+    def p_llamadaMetodo(self,p):
+        '''llamadaMetodo : PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [this] en la llamada al método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[2], self.parametros ,p[4]) 
+        self.parametros = 0
+
     #falta punto
+
     #falta identificador
     #falta parentesis abre
     #falta método
@@ -1383,6 +1488,7 @@ class Sintactico():
             p[0] = ('argumentos')
     
     #falta primer valor cuando resto argumentos no es None
+    
     #falta parentesis cierra
 
     #<restoArgumentos> ::= , <argumentos> | ε
