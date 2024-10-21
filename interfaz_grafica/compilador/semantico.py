@@ -15,6 +15,7 @@ class Semantico():
         self.listaDeclaraciones = []
         self.listaParametros = []
         self.pila_semantica = []
+        self.banderaStart = False
 
     #Run
     def correr(self,resultadoSemantico,TS):
@@ -24,7 +25,8 @@ class Semantico():
         self.ts=TS
         self.fnSepararArbol()
         self.fnParteImport()
-        self.fnParteNivel()
+        if self.parteNivel[2] != 'Sin Contenido Nivel':
+            self.fnParteNivel()
         self.fnPrintTs()
         if len(self.errores)!=0:
             self.compilo=False
@@ -43,6 +45,7 @@ class Semantico():
                     print('Importaciones:',valor)
         
         if self.parteNivel != None:
+            #print(self.parteNivel[2])
             for indice, valor in enumerate(self.parteNivel[2]):
                 if indice !=0:
                     if valor[0]== 'bloqueDeclaracion':
@@ -125,7 +128,8 @@ class Semantico():
         self.fnBloqueDeclaracion()
         if not(self.parteMetodos is None):
             self.fnbloqueMetodos()
-        self.fnMetodoPrincipal()
+        if self.parteMetodoPrincipal[1] != 'Sin Método Axol': 
+            self.fnMetodoPrincipal()
 
 #---------Separación de bloque de Declaración ------------------------------------------------------
     def fnSeparacionDeclaracion(self):
@@ -295,6 +299,8 @@ class Semantico():
         else:
             #Error dos veces declarado
             self.compilo = False
+            if id == 'Sin Nivel':
+                return
             tipoEn =self.fnEncontrarTipo(id)
             self.errores.append([f'Error Semántico (Línea {line}). El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',line,lexpos])
         #if temp_errores ==len(self.errores):
@@ -622,6 +628,8 @@ class Semantico():
                 #Declaracion Métodos
                 self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
                 contenido = metodo[4]
+                if contenido == 'Sin Contenido':
+                    return
                 if len(contenido) == 4: 
                     instrucciones=contenido[1]
                     self.fnInstrucciones(instrucciones, id)
@@ -775,76 +783,79 @@ class Semantico():
 
             elif y[0]=='expresionAsignacion':
                 id=y[1][1]
-                
-                temp = self.fnComprobarDeclaracion(id)
-                #print('id:',id)
-                #print('Declaración antes', temp)
-                separado = id.split(',')
-                if ',' in id:
-                    probar = separado[1]
-                    try:
-                        probar= float(probar)  # Intenta convertir a número
-                    except (ValueError, TypeError):
-                        ''''''
-                if ',' in id and isinstance(probar, str) :
-                    id = separado[0]
-                    #declaración
-                    comprueba=self.fnComprobarDeclaracion(id)
-                    if comprueba =='NoId' or comprueba == False:
-                        self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha sido declarada.', line,lexpos])
-                    else:
-                        #Validar que sea un arreglo 
-                        tipo = self.fnEncontrarTipo(id)
-                        if len(tipo) != 2 or tipo[0]=='Metodo':
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha puede tener acceso lineal.',line, lexpos])
+                if id == 'Sin Identificador':
+                    return
+
+                if id =='error':
+                    temp = self.fnComprobarDeclaracion(id)
+                    #print('id:',id)
+                    #print('Declaración antes', temp)
+                    separado = id.split(',')
+                    if ',' in id:
+                        probar = separado[1]
+                        try:
+                            probar= float(probar)  # Intenta convertir a número
+                        except (ValueError, TypeError):
+                            ''''''
+                    if ',' in id and isinstance(probar, str) :
+                        id = separado[0]
+                        #declaración
+                        comprueba=self.fnComprobarDeclaracion(id)
+                        if comprueba =='NoId' or comprueba == False:
+                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha sido declarada.', line,lexpos])
                         else:
-                            id2 = separado[1]
-                            temp = self.fnComprobarDeclaracion(id2)
-                            
-                            if not temp or 'NoId'== temp:
-                            #print('Declaración', temp)
-                                temp_id=id2
-                                id2=f'{llamada},{id2}'
-                                if 'NoId'== self.fnComprobarDeclaracion(id2):
-                                    self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                            if 'int' != self.fnEncontrarTipo(id2):
-                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{id2}] no es de tipo int.',line, lexpos])
+                            #Validar que sea un arreglo 
+                            tipo = self.fnEncontrarTipo(id)
+                            if len(tipo) != 2 or tipo[0]=='Metodo':
+                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha puede tener acceso lineal.',line, lexpos])
                             else:
-                                if len(y)==3:
-                                    id +=',0'
-                                    valores= y[2]        
-                                    if y[2][0] == 'llamadaMetodo':
-                                        x2 = y[2]
-                                        print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
-                                        self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                        self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
-                                    else:
+                                id2 = separado[1]
+                                temp = self.fnComprobarDeclaracion(id2)
+                                
+                                if not temp or 'NoId'== temp:
+                                #print('Declaración', temp)
+                                    temp_id=id2
+                                    id2=f'{llamada},{id2}'
+                                    if 'NoId'== self.fnComprobarDeclaracion(id2):
+                                        self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                                if 'int' != self.fnEncontrarTipo(id2):
+                                    self.errores.append([f'Error Semántico (Línea {line}. La variable [{id2}] no es de tipo int.',line, lexpos])
+                                else:
+                                    if len(y)==3:
+                                        id +=',0'
+                                        valores= y[2]        
+                                        if y[2][0] == 'llamadaMetodo':
+                                            x2 = y[2]
+                                            print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                            self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                            self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                        else:
+                                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                    elif len(y)==2:
+                                        valores= y[1][2]
                                         self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                                elif len(y)==2:
-                                    valores= y[1][2]
+                    else:
+                        if not temp or 'NoId'== temp:
+                            #print('Declaración', temp)
+                            temp_id=id
+                            id=f'{llamada},{id}'
+                            if 'NoId'== self.fnComprobarDeclaracion(id):
+                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                        else:        
+                            if len(y)==3:
+                                valores= y[2]
+                                
+                                if y[2][0] == 'llamadaMetodo':
+                                    x2 = y[2]
+                                    print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                    self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                    self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                else:
                                     self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                else:
-                    if not temp or 'NoId'== temp:
-                        #print('Declaración', temp)
-                        temp_id=id
-                        id=f'{llamada},{id}'
-                        if 'NoId'== self.fnComprobarDeclaracion(id):
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                    else:        
-                        if len(y)==3:
-                            valores= y[2]
-                            
-                            if y[2][0] == 'llamadaMetodo':
-                                x2 = y[2]
-                                print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
-                                self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
-                            else:
+                            elif len(y)==2:
+                                valores= y[1][2]
                                 self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                        elif len(y)==2:
-                            valores= y[1][2]
-                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                            
+                                
                     
             elif y[0]=='llamadaMetodo':
                 id = y[1]
@@ -861,13 +872,12 @@ class Semantico():
                     return
                 # print(self.ts[0][0])
                 # print(y[1])
+                self.banderaStart = True
                 if not (self.fnComprobarDeclaracion(y[1]) and self.fnEncontrarTipo(y[1]) == 'Nivel'):
                         nombreNivel = self.fnEncontrarMétodo()
                         self.errores.append([f'Error Semántico (Línea {line}. El identificador de llamada al método start() [{y[1]}] no coincide con el identificador del nivel [{nombreNivel}].',line, lexpos]) 
                 else:
                     # (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-
-                    
                     self.ts.append([',fila_pla','',('arreglo', 'platform'),'Null','Hola'])
                     self.fnValidartipos(',fila_pla',y[2][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -875,17 +885,12 @@ class Semantico():
                     self.ts.append([',fila_obs','',('arreglo', 'obstacles'),'Null','Hola'])
                     self.fnValidartipos(',fila_obs',y[3][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
-
-                    
-
-                    
                     self.ts.append([',Jugador','','player','Null','Hola'])
                     
                     atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                     for y2 in range(len(atributos)):
                         in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1],'Null', 'Linea declaración']
                         self.ts.append(in_simbolo)
-                    
                     
                     self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -898,7 +903,6 @@ class Semantico():
                     self.fnAsignar(y[5],',Fondo',True,line=line,lexpos=lexpos)
                     self.ts.pop()
 
-                    
                     self.ts.append([',elementos_fondo','',('arreglo', 'platform'),'Null','Hola'])
                     self.fnValidartipos(',elementos_fondo',y[6][1][1],False,line=line,lexpos=lexpos)
                     self.ts.pop()
@@ -907,9 +911,6 @@ class Semantico():
                     self.fnAsignar(y[7],',Posicion',True,axol=True,line=line,lexpos=lexpos)
                     self.ts.pop()
 
-                    
-                        
-                    
                     return
                 #print(y)
 #----------Asignación Metodo ()--------------------------------------------------------------
@@ -1220,6 +1221,8 @@ class Semantico():
         # Procesar instrucciones
         print(self.parteMetodoPrincipal[1])
         self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
+        # if self.banderaStart: 
+        #     self.errores.append([f'Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
 
 #----- Encontrar método Axol----------------------------------------------------------------------------------
     def fnEncontrarMétodo(self):
