@@ -783,57 +783,57 @@ class Semantico():
 
             elif y[0]=='expresionAsignacion':
                 id=y[1][1]
-
                 if id == 'Sin Identificador':
                     return
-                
-                temp = self.fnComprobarDeclaracion(id)
-                #print('id:',id)
-                #print('Declaración antes', temp)
-                separado = id.split(',')
-                if ',' in id:
-                    probar = separado[1]
-                    try:
-                        probar= float(probar)  # Intenta convertir a número
-                    except (ValueError, TypeError):
-                        ''''''
-                if ',' in id and isinstance(probar, str) :
-                    id = separado[0]
-                    #declaración
-                    comprueba=self.fnComprobarDeclaracion(id)
-                    if comprueba =='NoId' or comprueba == False:
-                        self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha sido declarada.', line,lexpos])
-                    else:
-                        #Validar que sea un arreglo 
-                        tipo = self.fnEncontrarTipo(id)
-                        if len(tipo) != 2 or tipo[0]=='Metodo':
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha puede tener acceso lineal.',line, lexpos])
+
+                if id =='error':
+                    temp = self.fnComprobarDeclaracion(id)
+                    #print('id:',id)
+                    #print('Declaración antes', temp)
+                    separado = id.split(',')
+                    if ',' in id:
+                        probar = separado[1]
+                        try:
+                            probar= float(probar)  # Intenta convertir a número
+                        except (ValueError, TypeError):
+                            ''''''
+                    if ',' in id and isinstance(probar, str) :
+                        id = separado[0]
+                        #declaración
+                        comprueba=self.fnComprobarDeclaracion(id)
+                        if comprueba =='NoId' or comprueba == False:
+                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha sido declarada.', line,lexpos])
                         else:
-                            id2 = separado[1]
-                            temp = self.fnComprobarDeclaracion(id2)
-                            
-                            if not temp or 'NoId'== temp:
-                            #print('Declaración', temp)
-                                temp_id=id2
-                                id2=f'{llamada},{id2}'
-                                if 'NoId'== self.fnComprobarDeclaracion(id2):
-                                    self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                            if 'int' != self.fnEncontrarTipo(id2):
-                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{id2}] no es de tipo int.',line, lexpos])
+                            #Validar que sea un arreglo 
+                            tipo = self.fnEncontrarTipo(id)
+                            if len(tipo) != 2 or tipo[0]=='Metodo':
+                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha puede tener acceso lineal.',line, lexpos])
                             else:
-                                if len(y)==3:
-                                    id +=',0'
-                                    valores= y[2]        
-                                    if y[2][0] == 'llamadaMetodo':
-                                        x2 = y[2]
-                                        print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
-                                        self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                        self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
-                                    else:
+                                id2 = separado[1]
+                                temp = self.fnComprobarDeclaracion(id2)
+                                
+                                if not temp or 'NoId'== temp:
+                                #print('Declaración', temp)
+                                    temp_id=id2
+                                    id2=f'{llamada},{id2}'
+                                    if 'NoId'== self.fnComprobarDeclaracion(id2):
+                                        self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                                if 'int' != self.fnEncontrarTipo(id2):
+                                    self.errores.append([f'Error Semántico (Línea {line}. La variable [{id2}] no es de tipo int.',line, lexpos])
+                                else:
+                                    if len(y)==3:
+                                        id +=',0'
+                                        valores= y[2]        
+                                        if y[2][0] == 'llamadaMetodo':
+                                            x2 = y[2]
+                                            print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                            self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                            self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                        else:
+                                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                    elif len(y)==2:
+                                        valores= y[1][2]
                                         self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
-                                elif len(y)==2:
-                                    valores= y[1][2]
-                                    self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
                 else:
                     if not temp or 'NoId'== temp:
                         #print('Declaración', temp)
