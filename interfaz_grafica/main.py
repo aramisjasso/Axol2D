@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
             method int sumar (int a, int b) {
                 numeros [0][0] = 0;
-                .sumar(a,b);
+                this.sumar(a,b);
                 return 0;
             }
 
