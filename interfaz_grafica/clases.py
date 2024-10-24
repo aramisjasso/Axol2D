@@ -66,6 +66,8 @@ class LineNumberedText(tk.Frame):
         # Limpiar resaltado anterior
         self._text.tag_remove('resaltado', '1.0', tk.END)
         self._text.tag_remove('resaltado_simbolo', '1.0', tk.END)
+        self._text.tag_remove('resaltado_comentario', '1.0', tk.END)
+        self._text.tag_remove('resaltado_comentario_personalizado', '1.0', tk.END)
 
         # Palabras clave a resaltar
         palabras_clave = [
@@ -113,6 +115,15 @@ class LineNumberedText(tk.Frame):
             indice_inicio = f"1.0 + {inicio}c"
             indice_final = f"1.0 + {fin}c"
             self._text.tag_add('resaltado_comentario', indice_inicio, indice_final)
+
+        patron_comentario_personalizado = r'/°.*?°/'  # Expresión regular para comentarios con /°°/
+        for match in re.finditer(patron_comentario_personalizado, contenido, re.DOTALL):
+            inicio = match.start()
+            fin = match.end()
+            indice_inicio = f"1.0 + {inicio}c"
+            indice_final = f"1.0 + {fin}c"
+            self._text.tag_add('resaltado_comentario_personalizado', indice_inicio, indice_final)
+
         # Configurar el estilo del resaltado para palabras clave
         self._text.tag_configure('resaltado', foreground='blue')  # Color para palabras clave
 
@@ -121,6 +132,9 @@ class LineNumberedText(tk.Frame):
 
          # Configurar el estilo del resaltado para comentarios
         self._text.tag_configure('resaltado_comentario', foreground='gray')  # Color gris para comentarios
+
+        # Configurar el estilo del resaltado para comentarios con /°°/
+        self._text.tag_configure('resaltado_comentario_personalizado', foreground='gray')  # Color púrpura para comentarios personalizados
 
 
     #checar si el código de modifico y se guardo

@@ -250,7 +250,7 @@ class Lexico():
         r"\'([a-zA-Z0-9_\-\.])"
         mensaje_error=(f"Error Léxico (Línea {t.lineno}). Falta comilla simple ' a la derecha del carácter. El carácter no fue cerrado.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
-        t.lexer.skip(self,1)
+        t.lexer.skip(1)
 
     # Caracteres no válidos
     def t_error(self,t):

@@ -1,24 +1,20 @@
 import Background;
 import Players;
-import Background;
-import Players;
 
 level MiPrimerNivel{
 	boolean bol1 = true;
 	int x = 0;
     int y = 1;
-	string x = "Mensaje";
-	char char1 = "cadena";
-    int a1 = 1*x+1;
-    int a3 = w;
+    int a1 = 1*x+ 1;
     string b = "cadena";
-    // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+	char char1 = 'a';
+	int x23;
+    				// [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
     platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
     platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
     platform pl3 = pl2;
     platform pl4 = pl1;
     platform pl5 = pl4;
-	platform pl6 = bol1;
 
     platform plarreglo[3] = [pl1,pl2,pl3];
     obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
@@ -27,16 +23,11 @@ level MiPrimerNivel{
            
     background fondo = Castle;
     int fin [2] = [100,100];
-	string arreglo [4] = ["Prueba", "Jugador","Tipos"];
-	string arreglo2 [5] = ["Prueba", "Jugador","Tipos","Hola1", 1 ];
 	int numero1 [3][2] = [[1,2],[3,4],[5,6]];
-	int numero2 [3][2] = [[1,2],[3,4],[5,6,7]];
-    					//[inicio x, inicio y, vidas, personaje       ]
+
     player jugador = [   0    ,    0    ,   3  , knight   ];
     
-		method int miMetodo1( int x, int x){
-    			a1 = 12*b-a;
-			a1 = a;
+	method int miMetodo1( int x2, int x4){
 			pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
     			while (x<5){
     				obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
@@ -44,24 +35,12 @@ level MiPrimerNivel{
 			a1=12;
   			}
                 
-       			return b;
-			//return 0;
-		}
-
-		method int miMetodo2(int b1){
-			a1 = 12;
 			return 0;
-		}  
-		method int miMetodo3(int  a, int c){
-			a1 = 12;
-			a1 = 12* 1;
-			this.miMetodo3( b ,12);
-			return 0;
-		}               
+		}             
 		axol2D play () {
-			b = 'h';
-			b = this.miMetodo3( a ,2);
-			// (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-				MiPrimerNivel.start(plarreglo , b , jugador , fondo , obs,     fin  );
+			b = "hola";
+			x = this.miMetodo1(123,2);
+								// (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+				MiPrimerNivel.start( plarreglo , obs , jugador , fondo , plarreglo,     fin  );
 		}
 }

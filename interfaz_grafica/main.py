@@ -119,11 +119,13 @@ if __name__ == "__main__":
         '''
         level MiPrimerNivel {
             int numeros [5][1];  
+            int a1;
 
             method int sumar (int a, int b) {
                 numeros [0][0] = 0;
                 pl1 = [200, 200, 200, 200, 200, 200, 200];
-                this.sumar(a,b);
+                this.sumar("Hola",b);
+                a1 = this.sumar("Hola",b);
                 return 0;
             }
 

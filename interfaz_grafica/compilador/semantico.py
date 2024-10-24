@@ -42,7 +42,7 @@ class Semantico():
                     #print('Nivel:',valor)
                 if valor[0] == 'importaciones':
                     self.parteImportaciones = valor
-                    print('Importaciones:',valor)
+                    #print('Importaciones:',valor)
         
         if self.parteNivel != None:
             #print(self.parteNivel[2])
@@ -135,7 +135,7 @@ class Semantico():
     def fnSeparacionDeclaracion(self):
         compara = True
         while(compara):
-            print('Sé esta separando', self.parteDeclaracion)
+            #print('Sé esta separando', self.parteDeclaracion)
             if len(self.parteDeclaracion[1]) == 3: #Declaraciones simples
                 self.listaDeclaraciones.append((self.parteDeclaracion[1]))
             else:
@@ -151,7 +151,7 @@ class Semantico():
         self.fnSeparacionDeclaracion()
         #Muestra una declaración una por una
         for declaracion in self.listaDeclaraciones:
-            print('Se esta declarando', declaracion)
+            # print('Se esta declarando', declaracion)
             estructura = None
             tipo = None
             tamaño = None
@@ -356,7 +356,7 @@ class Semantico():
                                 #checar tamaño
                                 indice = self.fnIndice(valores[1][1])
                                 tamaño=int(self.ts[indice][3])
-                                print('String a todos',coma,id,tipo)
+                                # print('String a todos',coma,id,tipo)
                                 if tamaño!=2:
                                     self.errores.append([f'Error Semántico (Línea {line}). El último parametro al identificador [{id}] no corresponde al tamaño necesario',line,lexpos])
                             else:
@@ -372,6 +372,7 @@ class Semantico():
                     tamaño_arreglo=int(self.ts[indice][3])
                     if tamaño_arreglo!=tamaño:
                         self.errores.append([f'Error Semántico (Línea {line}). La fila no se puede asignar al identificador {id} los tamaños no coinciden el tamaño declaro es: {tamaño_arreglo}',line,lexpos])
+                        return 0
                     else:
                         if tipo_id[1]in['obstacles', 'platform']:
                             tamaño_errores = len(self.errores)
@@ -395,6 +396,9 @@ class Semantico():
                                 temp_id = self.ts[indice+x+1][0]
                                 temp_valores.append(self.ts[indice+x+1][3])
                                 temp_valor = valores[2][x]
+                                if temp_valor[0]!='expresion':
+                                    temp_valor=temp_valor[1]
+                                # print('Asignar el arreglo:', temp_valor,temp_id,inMetodo,var,line,lexpos)
                                 self.fnAsignar(temp_valor,temp_id,inMetodo,var,line=line,lexpos=lexpos)
                                 #self.ts[indice+x+1][3]=valores[2][x]
                             if tamaño_errores != len(self.errores) or inMetodo:
@@ -460,8 +464,8 @@ class Semantico():
                                  
         else:
             # tipo=self.fnRetornaValor(valores,tipo_id)
-            if renin:
-                print('Estoy evaluando return:',id,tipo_id,valores)
+            # if renin:
+                # print('Estoy evaluando return:',id,tipo_id,valores)
 
             if tipo_id in ['int', 'byte', 'boolean', 'char', 'string','obstacles', 'platform','background','character','player']:
                     #Valida que sea un arreglo el que se manda
@@ -529,7 +533,7 @@ class Semantico():
                 # String, Char, Llamada a Método, Booleano
                 if tipo != 'fila':
                     
-                    print('nO Estoy evaluando return:',id,tipo_id,valores,inMetodo)
+                    # print('nO Estoy evaluando return:',id,tipo_id,valores,inMetodo)
                     if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
                         if (valores >= 0 and valores <= 65535):
                             if inMetodo is False:
@@ -614,7 +618,7 @@ class Semantico():
     def fnbloqueMetodos(self):
         lista_metodos=self.fnSeparacionMetodos()
         for x in lista_metodos:
-                print('Declaración de método',x)
+                # print('Declaración de método',x)
                 metodo=x
                 id = metodo[2]
                 tipo= metodo[1]
@@ -622,7 +626,7 @@ class Semantico():
                 parametros = metodo[3]
                 line = metodo[5][0]
                 lexpos = metodo[5][1]
-                print('linea y columna de metodo', line,lexpos)
+                # print('linea y columna de metodo', line,lexpos)
                 #Separación de Parametros
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
@@ -680,7 +684,7 @@ class Semantico():
             if parametros is not None:
                 if len(parametros[0])==2 :
                     self.listaParametros.append(parametros[0][1])
-                    print('Checar parametros',parametros[0][1] )
+                    # print('Checar parametros',parametros[0][1] )
                     if parametros[0][1][1] =='Sin Identificador':
                         self.listaParametros ='Error'
                         compara=False
@@ -689,7 +693,7 @@ class Semantico():
 
                 else:
                     self.listaParametros.append(parametros[1])
-                    print('Checar parametros',parametros[1] )
+                    # print('Checar parametros',parametros[1] )
                     if parametros[1][1] =='Sin Identificador':
                         self.listaParametros ='Error'
                     compara = False
@@ -796,7 +800,7 @@ class Semantico():
                 if id == 'Sin Identificador':
                     return
 
-                if id =='error':
+                if id !='error':
                     temp = self.fnComprobarDeclaracion(id)
                     #print('id:',id)
                     #print('Declaración antes', temp)
@@ -1101,28 +1105,28 @@ class Semantico():
                             if b != 0:
                                 resultado = int(a / b)
                             else:
-                                self.errores.append(['Error Semántico (Línea {line}. No se puede dividir entre cero.', line, lexpos])
+                                self.errores.append([f'Error Semántico (Línea {line}). No se puede dividir entre cero.', line, lexpos])
                                 return 'Null' 
                         elif elemento == '%':
                             if b != 0:
                                 resultado = a % b
                             else:
-                                self.errores.append(['Error Semántico (Línea {line}. No se puede calcular el módulo de una división entre cero. ', line, lexpos])
+                                self.errores.append([f'Error Semántico (Línea {line}). No se puede calcular el módulo de una división entre cero. ', line, lexpos])
                                 return 'Null' 
                         pila_evaluacion.append(resultado) 
                     else: 
                         if (isinstance(a, int)) or (isinstance(b, int)): 
                             if (isinstance(a, int)):
                                 if not self.fnEncontrarTipo(b) in ['int', 'byte']:
-                                    self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
+                                    self.errores.append([f'Error Semántico (Línea {line}).  Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
                                     return 'Null' 
                             if (isinstance(b, int)):
                                 if not self.fnEncontrarTipo(a) in ['int', 'byte']:
-                                    self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
+                                    self.errores.append([f'Error Semántico (Línea {line}). Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
                                     return 'Null' 
                         else: 
                             if not self.fnEncontrarTipo(a) in ['int', 'byte'] or not self.fnEncontrarTipo(b) in ['int', 'byte'] :
-                                self.errores.append(['Error Semántico. Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ', 0, 1])
+                                self.errores.append([f'Error Semántico (Línea {line}).  Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
                                 return 'Null' 
 
             # Operadores de comparación
@@ -1230,7 +1234,7 @@ class Semantico():
 #------Método Axol--------------------------------------------------------------------------------------------
     def fnMetodoPrincipal(self):
         # Procesar instrucciones
-        print(self.parteMetodoPrincipal[1])
+        #print(self.parteMetodoPrincipal[1])
         self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
         # if self.banderaStart: 
         #     self.errores.append([f'Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
@@ -1269,10 +1273,10 @@ class Semantico():
                 tipo1 = self.fnEncontrarTipo(id1)
                 tipo1_antes = tipo1
                 tipo2 = self.fnEncontrarTipo(id2)
-                print('Tipos',id1,id2, tipo1,tipo2)
+                #print('Tipos',id1,id2, tipo1,tipo2)
                 # si es un método
                 if metodo == True:
                     tipo1 = ('metodo',tipo1)
-                print('Tipos',id1,id2, tipo1,tipo2)
+                #print('Tipos',id1,id2, tipo1,tipo2)
                 if tipo1 !=tipo2:
                     self.errores.append([f'Error Semántico (Línea {line}). [{id2}] No se puede asingar a [{id1}] de tipo [{tipo1_antes}]. ', line , lexpos])

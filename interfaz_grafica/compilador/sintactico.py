@@ -1140,10 +1140,7 @@ class Sintactico():
 #------------------------------------------------------------------------------------------
    #<expresionAritmetica> ::= <termino> <restoExpresionAritmetica>
     def p_expresion(self, p):
-        '''expresion : termino restoExpresionAritmetica
-                     | booleano restoExpresionAritmetica
-                     | valorCadena restoExpresionAritmetica
-                     | expresionUnitaria restoExpresionAritmetica'''
+        '''expresion : termino restoExpresionAritmetica'''
         if not p[1][0] in ['factor', 'termino'] and p[2] != None:
             self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de adición [+,-] no puede ir precedido de un valor [boolean, string o char]. ', 0, 1])
             p[0] = ('expresion', 'error')
@@ -1385,13 +1382,13 @@ class Sintactico():
                                | izqAsignacion VALOR_CHAR PUNTO_Y_COMA
                                | izqAsignacion VALOR_STRING PUNTO_Y_COMA
                                | izqAsignacion booleano PUNTO_Y_COMA
+                               | izqAsignacion fila PUNTO_Y_COMA
                                | definicionArreglo PUNTO_Y_COMA
                                | definicionMatriz PUNTO_Y_COMA'''
         # a = [1, 2, 3];
-        if len(p) == 4:
-            p[0] = ('expresionAsignacion', p[1], p[2])  
-        elif len(p) == 3: 
-            p[0] = ('expresionAsignacion', p[1], p[2])  
+        if len(p) == 4 or p.slice[2].type == 'llamadaMetodo':
+            p[0] = ('expresionAsignacion', p[1], p[2])
+          
         else:  
             p[0] = ('expresionAsignacion', p[1])
 
