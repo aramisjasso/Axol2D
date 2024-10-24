@@ -243,6 +243,7 @@ class Sintactico():
     # def p_llamadaStart_error1(self,p): 
     #     '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
     #     p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
+
     # #falta punto
     # #falta start
     #falta parentesis abre
@@ -1173,9 +1174,10 @@ class Sintactico():
     #int a =  * 5;
     def p_termino_error1(self,p):
         '''termino : error restoTermino'''
-        self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)])
-        p[0] = 'error'
-        self.error_Expresion = True
+        if p[2] != None: 
+            self.errores.append([f'Error Sintáctico, en linea: {p.lineno(0)}. Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)])
+            p[0] = 'error'
+            self.error_Expresion = True
 
     #<errorFactores> ::= <factor> <factor> <restoErrorFactores>
     def p_errorFactores_error(self, p):
@@ -1473,11 +1475,13 @@ class Sintactico():
         self.parametros = 0
 
     #falta punto y coma
-    def p_llamadaMetodo_error6(self,p):
-        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada a método. ',p.lineno(0),p.lexpos(0)])
-        p[0] = ('llamadaMetodo', p[3], self.parametros , ('argumentos')) 
+    def p_llamadaMetodo_error7(self,p):
+        '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('llamadaMetodo', p[3], self.parametros , p[5]) 
         self.parametros = 0
+
+    #faltan errores de llamada a método axol
 
     #<metodoAxol> ::= (read_key | read_bin | read_tec | save_bin | print |print_con | pop | push | position |
     #               show | positionX | positionY | add | set | random | getPosition | size | rotate)
@@ -1494,23 +1498,6 @@ class Sintactico():
                     | GETPOSITION'''
         p[0] = ('metodoAxol', p[1])
 
-    # def p_instrucciones(self,p):
-    #     '''instrucciones : instruccion
-    #                      | instruccion instrucciones'''
-    #     if len(p) == 2:
-    #         p[0] = [p[1]]  # Lista con una instrucción
-    #     else:
-    #         p[0] = [p[1]] + p[2]  # Concatenar las instrucciones
-
-    # #<instruccion> ::=  ( <expresionAsignacion> | (<llamadaMetodo>) ; | <estructuraControl>
-    # def p_instruccion(self,p):
-    #     '''instruccion : expresionAsignacion PUNTO_Y_COMA
-    #                    | llamadaMetodo PUNTO_Y_COMA
-    #                    | estructuraControl
-    #                    | expresion PUNTO_Y_COMA
-    #                    | llamadaStart'''
-    #     p[0] = ('instruccion', p[1])
-
     # <argumentos> ::= (expresion | objeto) <restoArgumentos> PARENTESIS_CIERRA
     def p_argumentos(self,p):
         '''argumentos : expresion restoArgumentos PARENTESIS_CIERRA
@@ -1526,24 +1513,53 @@ class Sintactico():
             p[0] = ('argumentos')
     
     #falta primer valor cuando resto argumentos no es None
-    
+    def p_argumentos_error1(self,p):
+        '''argumentos : restoArgumentos PARENTESIS_CIERRA'''
+        if p[1] != None: 
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el primer argumento en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('argumentos', p[1])
+            
     #falta parentesis cierra
+    def p_argumentos_error2(self,p):
+        '''argumentos : expresion restoArgumentos
+                      | objeto restoArgumentos
+                      | valorCadena restoArgumentos
+                      | booleano restoArgumentos 
+                      | direction restoArgumentos'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('argumentos', p[1],p[2])
+        self.parametros+=1
 
     #<restoArgumentos> ::= , <argumentos> | ε
     def p_restoArgumentos(self,p):
         '''restoArgumentos : COMA expresion restoArgumentos
-                        | COMA objeto restoArgumentos
-                        | COMA valorCadena restoArgumentos
-                        | COMA booleano restoArgumentos
-                        | COMA direction restoArgumentos
-                        | empty'''
+                           | COMA objeto restoArgumentos
+                           | COMA valorCadena restoArgumentos
+                           | COMA booleano restoArgumentos
+                           | COMA direction restoArgumentos
+                           | empty'''
         if len(p) == 4:
             p[0] = ('restoArgumentos', p[2],p[3])  # Caso con argumentos adicionales
             self.parametros+=1
         else:
             p[0]   # Caso ε (sin más argumentos)
+
     #falta coma
+    # def p_restoArgumentos_error1(self,p):
+    #     '''restoArgumentos : errorFactores restoArgumentos
+    #                        | objeto restoArgumentos
+    #                        | valorCadena restoArgumentos
+    #                        | booleano restoArgumentos
+    #                        | direction restoArgumentos'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre los argumentos de la llamada a método. ',p.lineno(0),p.lexpos(0)])
+    #     p[0]
+        
     #falta elemento después de la coma
+    def p_restoArgumentos_error2(self,p):
+        '''restoArgumentos : COMA restoArgumentos'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta argumento después de coma [,] en la llamada a método. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('restoArgumentos', ('expresion', 'error'), p[2]) 
+        self.parametros+=1
     
     # <elementosFila> ::= <expresion> <restoElementosFila>
     def p_elementosFila(self,p):
@@ -1602,7 +1618,7 @@ class Sintactico():
 
     def p_declaracionEstructuraDatos(self,p):
         '''declaracionEstructuraDatos : declaracionArreglo
-                                    | declaracionMatriz'''
+                                      | declaracionMatriz'''
         p[0] = ('declaracionEstructuraDatos', p[1])
 
     # <declaracionArreglo> ::= 
@@ -1618,8 +1634,33 @@ class Sintactico():
             self.filas=[]
 
     #falta punto y coma
+    def p_declaracionArreglo_error1(self,p):
+        '''declaracionArreglo : declaracionArregloSimple
+                              | declaracionArregloSimple IGUAL fila'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ',p.lineno(0),p.lexpos(0)])
+        if len(p) == 2:
+            # Caso de declaración de arreglo simple, sin asignación
+            p[0] = ('declaracionArreglo', p[1])
+        else:
+            # Caso de declaración de arreglo con asignación de una fila (elementos del arreglo)
+            p[0] = ('declaracionArreglo', p[1], p[3])
+            self.filas=[]
+
     #IGUAL 
+    def p_declaracionArreglo_error2(self,p):
+        '''declaracionArreglo : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO error '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
+        lista_errores = [('expresion', 'error') for i in range(int(p[4]))]
+        p[0] = ('declaracionArreglo', ('declaracionArregloSimple', p[1], p[2], p[4]), ('fila', p[4], lista_errores))
+        self.filas=[]
+
     # fila
+    def p_declaracionArreglo(self,p):
+        '''declaracionArreglo : declaracionArregloSimple IGUAL PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
+        lista_errores = [('expresion', 'error') for i in range(int(p[1][3]))]
+        p[0] = ('declaracionArreglo', p[1], ('fila', p[1][3], lista_errores))
+        self.filas=[]
 
     # <declaracionArreglo> ::=  
     def p_declaracionMatriz(self,p):
@@ -1633,19 +1674,55 @@ class Sintactico():
             p[0] = ('declaracionMatriz', p[1], p[4])
 
     #falta punto y coma
+    def p_declaracionMatriz_error1(self,p):
+        '''declaracionMatriz  : declaracionMatrizSimple 
+                              | declaracionMatrizSimple IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ',p.lineno(0),p.lexpos(0)])
+        if len(p) == 2:
+            # Caso de declaración de matriz sin inicialización
+            p[0] = ('declaracionMatriz', p[1])
+        else:
+            # Caso de declaración de matriz con asignación de filas (contenidos entre corchetes)
+            p[0] = ('declaracionMatriz', p[1], p[4])
+
     #IGUAL 
+    def p_declaracionMatriz_error2(self,p):
+        '''declaracionMatriz  : declaracionMatrizSimple CORCHETE_ABRE filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracionMatriz', p[1])
+
     # CORCHETE_ABRE 
+    def p_declaracionMatriz_error3(self,p):
+        '''declaracionMatriz  : declaracionMatrizSimple IGUAL filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracionMatriz', p[1], p[3])
+
     # filas
+    def p_declaracionMatriz_error3(self,p):
+        '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE CORCHETE_CIERRA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracionMatriz', p[1])
+
     #  CORCHETE_CIERRA
+    def p_declaracionMatriz_error3(self,p):
+        '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE filas PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta corchete de cierre en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracionMatriz', p[1], p[4])
 
     # <declaracionArregloSimple> ::= <tipoDato> [ numero ] identificador ;
     def p_declaracionArregloSimple(self,p):
         '''declaracionArregloSimple : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
         p[0] = ('declaracionArregloSimple', p[1],p[2],p[4])
-
     #si falta tipo dato se toma como acceso lineal
+
     #falta identificador
+    # def p_declaracionArregloSimple_error1(self,p):
+    #     '''declaracionArregloSimple : tipoDato CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del arreglo en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
+    #     p[0] = ('declaracionArregloSimple', p[1], 'Sin Identificador',p[3])
+
     #falta corchete abre
+
     #falta numero
     #falta corchete cierra
 
