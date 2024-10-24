@@ -51,7 +51,7 @@ class LineNumberedText(tk.Frame):
                          'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Insert','XF86AudioMute',
                          'XF86AudioLowerVolume', 'XF86AudioRaiseVolume', 'Win_L', '??']:
             self.checar = True  # Regresa true
-            #self._color_letra()
+            self._color_letra()
             return
         self.checar = False
 
@@ -62,35 +62,79 @@ class LineNumberedText(tk.Frame):
             return True
 
     #Cambia el color si se modifico
-    # def _color_letra(self):
-    #     # Limpiar resaltado anterior
-    #     self._text.tag_remove('resaltado', '1.0', tk.END)
+    def _color_letra(self):
+        # Limpiar resaltado anterior
+        self._text.tag_remove('resaltado', '1.0', tk.END)
+        self._text.tag_remove('resaltado_simbolo', '1.0', tk.END)
+        self._text.tag_remove('resaltado_comentario', '1.0', tk.END)
+        self._text.tag_remove('resaltado_comentario_personalizado', '1.0', tk.END)
 
-    #     # Palabras clave a resaltar
-    #     palabras_clave = ["Python", "Tkinter", "color"]
+        # Palabras clave a resaltar
+        palabras_clave = [
+            'Controllers', 'axol2D', 'background', 'boolean', 'break', 'byte', 'case', 
+            'char', 'class', 'constant', 'default', 'dimensions', 'do while', 'down', 
+            'else', 'enemies', 'false', 'for', 'from', 'getPosition', 'if', 'import', 
+            'int', 'left', 'level', 'method', 'music', 'new', 'null', 'obstacles', 
+            'platform', 'play', 'player', 'positionX', 'positionY', 'print', 'print_con', 
+            'random', 'read_bin', 'read_mg', 'read_mp3', 'read_tec', 'return', 'right', 
+            'save_bin', 'show', 'start', 'string', 'switch', 'this', 'true', 'up', 
+            'while'
+        ]
 
-    #     # Obtener el texto del widget
-    #     contenido = self._text.get("1.0", tk.END)
-        
-    #     # Iterar sobre cada palabra clave
-    #     for palabra in palabras_clave:
-    #         # Crear una expresión regular que busque la palabra exacta
-    #         # Asegurando que la palabra esté separada por un delimitador como espacio, inicio o fin de línea
-    #         patron = fr'\b{re.escape(palabra)}\b'
+        # Símbolos que siempre deben ser resaltados
+        simbolos = ['{', '|', '}', '!', '!=', '%', '&', '(', ')', '*', '*=', '+', '++', 
+                    '+=', ',', '-', '--', '-=', '.', '/', '/=', ':', ';', '<', '<=', '=', 
+                    '==', '>', '>=', '[', ']', '^']
 
-    #         # Buscar todas las ocurrencias de la palabra clave en el texto
-    #         for match in re.finditer(patron, contenido):
-    #             # Calcular las posiciones inicial y final de la coincidencia
-    #             inicio = match.start()
-    #             fin = match.end()
+        # Obtener el texto del widget
+        contenido = self._text.get("1.0", tk.END)
 
-    #             # Convertir las posiciones a índices compatibles con Tkinter
-    #             indice_inicio = f"1.0 + {inicio}c"
-    #             indice_final = f"1.0 + {fin}c"
+        # Resaltar palabras clave
+        for palabra in palabras_clave:
+            patron = fr'\b{re.escape(palabra)}\b'
+            for match in re.finditer(patron, contenido):
+                inicio = match.start()
+                fin = match.end()
+                indice_inicio = f"1.0 + {inicio}c"
+                indice_final = f"1.0 + {fin}c"
+                self._text.tag_add('resaltado', indice_inicio, indice_final)
 
-    #             # Aplicar la etiqueta "resaltado" al texto encontrado
-    #             self._text.tag_add('resaltado', indice_inicio, indice_final)    
-    
+        # Resaltar símbolos con otro color
+        for simbolo in simbolos:
+            patron_simbolo = re.escape(simbolo)
+            for match in re.finditer(patron_simbolo, contenido):
+                inicio = match.start()
+                fin = match.end()
+                indice_inicio = f"1.0 + {inicio}c"
+                indice_final = f"1.0 + {fin}c"
+                self._text.tag_add('resaltado_simbolo', indice_inicio, indice_final)
+        patron_comentario = r'//.*'  # Expresión regular para comentarios de línea
+        for match in re.finditer(patron_comentario, contenido):
+            inicio = match.start()
+            fin = match.end()
+            indice_inicio = f"1.0 + {inicio}c"
+            indice_final = f"1.0 + {fin}c"
+            self._text.tag_add('resaltado_comentario', indice_inicio, indice_final)
+
+        patron_comentario_personalizado = r'/°.*?°/'  # Expresión regular para comentarios con /°°/
+        for match in re.finditer(patron_comentario_personalizado, contenido, re.DOTALL):
+            inicio = match.start()
+            fin = match.end()
+            indice_inicio = f"1.0 + {inicio}c"
+            indice_final = f"1.0 + {fin}c"
+            self._text.tag_add('resaltado_comentario_personalizado', indice_inicio, indice_final)
+
+        # Configurar el estilo del resaltado para palabras clave
+        self._text.tag_configure('resaltado', foreground='blue')  # Color para palabras clave
+
+        # Configurar el estilo del resaltado para símbolos
+        self._text.tag_configure('resaltado_simbolo', foreground='#DC6601')  # Color para símbolos    
+
+         # Configurar el estilo del resaltado para comentarios
+        self._text.tag_configure('resaltado_comentario', foreground='gray')  # Color gris para comentarios
+
+        # Configurar el estilo del resaltado para comentarios con /°°/
+        self._text.tag_configure('resaltado_comentario_personalizado', foreground='gray')  # Color púrpura para comentarios personalizados
 
 
     #checar si el código de modifico y se guardo
@@ -134,6 +178,7 @@ class LineNumberedText(tk.Frame):
         self._text.insert(tk.END, contenido)
         self._text.edit_reset()
         self._update_line_numbers()
+        self._color_letra()
     
     #Borrar Texto
     def delete_text(self):

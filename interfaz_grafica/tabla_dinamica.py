@@ -29,7 +29,7 @@ class TablaDinamica:
         ventana_tabla.geometry(f"{width}x{height}+{x}+{y}")
         
         # Crear un widget Treeview para mostrar la tabla
-        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor", "Declaración"]
+        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor"]
         tree = ttk.Treeview(ventana_tabla, columns=columnas, show='headings')
         
         # Configurar encabezados de columna
@@ -104,13 +104,13 @@ class TablaDinamica:
         ventana_detalle.geometry(f"{width}x{height}+{x}+{y}")
         # Mostrar los detalles del elemento en la nueva ventana
         texto = ''
-        for idx, col in enumerate(["Lexema", "NO. ID", "Tipo de Datos", "Elementos", "Declaración"]):
+        for idx, col in enumerate(["Lexema", "NO. ID", "Tipo de Datos", "Elementos"]):
             texto += f"{col}: {self.datos[indice][idx]}\t"
         
         etiqueta = tk.Label(ventana_detalle, text=texto, font=self.font)  # Aplica la fuente a la etiqueta
         etiqueta.pack(padx=10, pady=5)
 
-        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor", "Declaración"]
+        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor"]
         tree = ttk.Treeview(ventana_detalle, columns=columnas, show='headings')
 
         # Configurar encabezados de columna y aplicar fuente

@@ -203,7 +203,7 @@ class InterfazCompilador:
         self.cmplr.compilar(self.text_area.get_text())
         if self.cmplr.compilo:
             
-            self.mostrar_resultado('Compilador de forma exitosa.')
+            self.mostrar_resultado('Compilado de forma exitosa.')
         else:
             self.mostrar_resultado(self.cmplr.errores_re())
         
