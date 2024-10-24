@@ -119,13 +119,22 @@ if __name__ == "__main__":
         '''
         level MiPrimerNivel {
             int numeros [5][1];  
-            int a1;
+            //int numero  = 3.3;
+            int 12h2 = 1;
+            //string cadena = "Hola';
+            string cadena = 'Hola";
+            string cadena = 'Hola';
+            char uno = "s';
+            char uno2 = 's" ;
+            char uno3 = 'f;
+            char uno4 = f';
+            char qwertyuiopasdfghjklzxcvbnmasdfghjertyuisdfghjkdfgh ;
 
             method int sumar (int a, int b) {
                 numeros [0][0] = 0;
-                pl1 = [200, 200, 200, 200, 200, 200, 200];
-                this.sumar("Hola",b);
-                a1 = this.sumar("Hola",b);
+                //pl1 = [200, 200, 200, 200, 200, 200, 200];
+                //this.sumar("Hola",b);
+                //a1 = this.sumar("Hola",b);
                 return 0;
             }
 
