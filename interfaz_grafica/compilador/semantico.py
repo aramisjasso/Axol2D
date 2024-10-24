@@ -225,19 +225,19 @@ class Semantico():
                     self.ts[indice][3]=var
                     y = 0
                     for x in range(int(var)):
-                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
+                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1], 'Null' ]
                         self.ts.insert(indice+y+1,in_simbolo)
                         y+=1
                         atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
                         for k in range(len(atributos)):
-                            in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int','Null', 'Linea declaración']
+                            in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
                             self.ts.insert(indice+y+1,in_simbolo)
                             y+=1
                         
                 else:
                     self.ts[indice][3]=var
                     for x in range(int(var)):
-                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1],'Null', 'Linea declaración']
+                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1], 'Null' ]
                         self.ts.insert(indice+x+1,in_simbolo)
             #Checa si es de un tipo matriz
             elif tipo[0]=='matriz':
@@ -245,7 +245,7 @@ class Semantico():
                 x1=0
                 for x in range(int(var[0])):
                     for y in range(int(var[1])):
-                        in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1],'Null', 'Linea declaración']
+                        in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1], 'Null' ]
                         self.ts.insert(indice+x1+1,in_simbolo)
                         x1+=1
             #Checa si es de un tipo metodo
@@ -274,7 +274,7 @@ class Semantico():
                             #añade a lista atributos
                             atributos.append(tipo_m)
                             # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
-                            simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m,'Null','Linea declaración']
+                            simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m, 'Null']
                             self.ts.insert(indice+x+1,simbolo)
                         y+=1
 
@@ -285,14 +285,14 @@ class Semantico():
             elif tipo in ['obstacles', 'platform']:
                 atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
                 for x in range(len(atributos)):
-                    in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int','Null', 'Linea declaración']
+                    in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
                     self.ts.insert(indice+x+1,in_simbolo)
                 #self.ts[indice][3]=tipo
             elif tipo == 'player':
                 #[inicio_x, inicio_y, vidas, personaje]
                 atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                 for x in range(len(atributos)):
-                    in_simbolo=[f'{id},{atributos[x][0]}',f'{simbolo[1]},{atributos[x][0]}',atributos[x][1],'Null', 'Linea declaración']
+                    in_simbolo=[f'{id},{atributos[x][0]}',f'{simbolo[1]},{atributos[x][0]}',atributos[x][1], 'Null' ]
                     self.ts.insert(indice+x+1,in_simbolo)
                 self.ts[indice][3]='Null'
                 #
@@ -903,7 +903,7 @@ class Semantico():
                     
                     atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                     for y2 in range(len(atributos)):
-                        in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1],'Null', 'Linea declaración']
+                        in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
                         self.ts.append(in_simbolo)
                     
                     self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)

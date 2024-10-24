@@ -92,5 +92,5 @@ class Compilador():
     def identificadores_lista(self):
         self.identificadores_ts=[]
         for token in self.identificadores:
-            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Null','Sin Declación'])
+            self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Null'])
         return self.identificadores_ts
