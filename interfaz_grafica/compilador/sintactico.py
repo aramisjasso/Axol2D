@@ -1479,16 +1479,8 @@ class Sintactico():
     #<metodoAxol> ::= (read_key | read_bin | read_tec | save_bin | print |print_con | pop | push | position |
     #               show | positionX | positionY | add | set | random | getPosition | size | rotate)
     def p_metodoAxol(self,p):
-        '''metodoAxol : READ_BIN
-                    | READ_TEC
-                    | SAVE_BIN
-                    | PRINT
-                    | PRINT_CON
-                    | SHOW
-                    | POSITIONX
-                    | POSITIONY
-                    | RANDOM
-                    | GETPOSITION'''
+        '''metodoAxol :  PRINT_CON
+                    '''
         p[0] = ('metodoAxol', p[1])
 
     # def p_instrucciones(self,p):
@@ -1511,10 +1503,8 @@ class Sintactico():
     # <argumentos> ::= (expresion | objeto) <restoArgumentos> PARENTESIS_CIERRA
     def p_argumentos(self,p):
         '''argumentos : expresion restoArgumentos PARENTESIS_CIERRA
-                      | objeto restoArgumentos PARENTESIS_CIERRA
                       | valorCadena restoArgumentos PARENTESIS_CIERRA
                       | booleano restoArgumentos PARENTESIS_CIERRA
-                      | direction restoArgumentos PARENTESIS_CIERRA
                       | PARENTESIS_CIERRA'''
         if len(p) == 4:  # Caso con expresión u objeto, restoArgumentos y paréntesis de cierre
             p[0] = ('argumentos', p[1],p[2])
@@ -1529,10 +1519,8 @@ class Sintactico():
     #<restoArgumentos> ::= , <argumentos> | ε
     def p_restoArgumentos(self,p):
         '''restoArgumentos : COMA expresion restoArgumentos
-                        | COMA objeto restoArgumentos
                         | COMA valorCadena restoArgumentos
                         | COMA booleano restoArgumentos
-                        | COMA direction restoArgumentos
                         | empty'''
         if len(p) == 4:
             p[0] = ('restoArgumentos', p[2],p[3])  # Caso con argumentos adicionales
@@ -1568,12 +1556,12 @@ class Sintactico():
         p[0] = ('booleano', p[1])
 
     #<direction> ::= up | down | left | right
-    def p_direction(self,p):
-        '''direction : UP
-                    | DOWN
-                    | LEFT
-                    | RIGHT'''
-        p[0] = ('direction', p[1])
+    # def p_direction(self,p):
+    #     '''direction : UP
+    #                 | DOWN
+    #                 | LEFT
+    #                 | RIGHT'''
+    #     p[0] = ('direction', p[1])
 
     #<valorCadena>
     def p_valorCadena(self,p):
@@ -1581,10 +1569,10 @@ class Sintactico():
                     | VALOR_STRING'''
         p[0] = ('valorCadena', p[1])
     
-    #<objeto> ::= new <clase>(<argumentos>)
-    def p_objeto(self,p):
-        '''objeto : NEW IDENTIFICADOR PARENTESIS_ABRE argumentos'''
-        p[0] = ('objeto', p[2], p[4])
+    # #<objeto> ::= new <clase>(<argumentos>)
+    # def p_objeto(self,p):
+    #     '''objeto : NEW IDENTIFICADOR PARENTESIS_ABRE argumentos'''
+    #     p[0] = ('objeto', p[2], p[4])
     #----------------------------------------------------------------------------------------------------------
 
     #------------------------------- E S T R U C T U R A   D E   D A T O S ------------------------------------

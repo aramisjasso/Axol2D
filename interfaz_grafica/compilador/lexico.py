@@ -26,10 +26,8 @@ class Lexico():
             'TRUE', 'FALSE', 'VALOR_CHAR', 'VALOR_STRING',
             # Palabras Reservadas
             'IF', 'ELSE', 'SWITCH', 'CASE', 'BREAK', 'DEFAULT', 'FOR', 'WHILE', 'DOWHILE', 'METHOD', 'RETURN',
-            'START', 'SHOW', 'PRINT', 'READ_TEC', 'READ_BIN', 'READ_MP3', 'READ_MG', 'SAVE_BIN', 'GETPOSITION', 'RANDOM',
-            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS', 'MUSIC',
-            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'BACKGROUND_LIBRERIA', 'UP', 'DOWN', 'LEFT', 'RIGHT',
-            'CONSTANT', 'THIS', 'NULL',
+            'START', 'PLAY', 'PRINT_CON', 'LEVEL', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS',
+            'AXOL2D', 'IMPORT', 'BACKGROUND_LIBRERIA','CONSTANT', 'THIS', 'NULL',
         ]
 
         #Palabras Reservadas
@@ -54,40 +52,18 @@ class Lexico():
             'method': 'METHOD',
             'return': 'RETURN',
             'start': 'START',
-            'show': 'SHOW',
-            'print': 'PRINT',
-            'read_tec': 'READ_TEC',
-            'read_bin': 'READ_BIN',
-            'read_mp3': 'READ_MP3',
-            'read_mg': 'READ_MG',
-            'save_bin': 'SAVE_BIN',
-            'getPosition': 'GETPOSITION',
-            'random': 'RANDOM',
             'play': 'PLAY',
             'print_con': 'PRINT_CON',
             'level': 'LEVEL',
-            'dimensions': 'DIMENSIONS',
             'background': 'BACKGROUND',
             'platform': 'PLATFORM',
             'obstacles': 'OBSTACLES',
             'player': 'PLAYER',
             'Players': 'PLAYERS',
-            'music': 'MUSIC',
             'axol2D': 'AXOL2D',
-            'positionY': 'POSITIONY',
-            'positionX': 'POSITIONX',
             'import': 'IMPORT',
-            'class': 'CLASS',
-            'from': 'FROM',
-            'new': 'NEW',
             'Background': 'BACKGROUND_LIBRERIA',
-            'up': 'UP',
-            'down': 'DOWN',
-            'left': 'LEFT',
-            'right': 'RIGHT',
-            'constant': 'CONSTANT',
             'this': 'THIS',
-            'null': 'NULL',
             'true' : 'TRUE', 
             'false' : 'FALSE'
         }
@@ -103,7 +79,7 @@ class Lexico():
     t_POR = r'\*'
     t_DIVISION = r'/'
     t_MODULO = r'%'
-    t_POTENCIA = r'\^'
+    #t_POTENCIA = r'\^'
 
     #Operadores de Asignacion
     t_IGUAL = r'='
@@ -328,11 +304,11 @@ class Lexico():
             if not tok:
                 break
             print(tok)
-tokens = [ 
+tokens = [
             #Operadores Aritmeticos
-            'MAS', 'MENOS', 'POR', 'DIVISION', 'MODULO', 'POTENCIA',
+            'MAS', 'MENOS', 'POR', 'DIVISION', 'MODULO', 
             #Operadores de Asignacion
-            'IGUAL', 'MAS_IGUAL', 'MENOS_IGUAL', 'POR_IGUAL', 'DIVISION_IGUAL',
+            'IGUAL',
             #Operadores de Comparacion
             'DOBLE_IGUAL', 'DIFERENTE', 'MAYOR_QUE', 'MENOR_QUE', 'MAYOR_IGUAL_QUE', 'MENOR_IGUAL_QUE',
             #Operadores Logicos
@@ -351,8 +327,6 @@ tokens = [
             'TRUE', 'FALSE', 'VALOR_CHAR', 'VALOR_STRING',
             # Palabras Reservadas
             'IF', 'ELSE', 'SWITCH', 'CASE', 'BREAK', 'DEFAULT', 'FOR', 'WHILE', 'DOWHILE', 'METHOD', 'RETURN',
-            'START', 'SHOW', 'PRINT', 'READ_TEC', 'READ_BIN', 'READ_MP3', 'READ_MG', 'SAVE_BIN', 'GETPOSITION', 'RANDOM',
-            'PLAY', 'PRINT_CON', 'LEVEL', 'DIMENSIONS', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS', 'MUSIC',
-            'AXOL2D', 'POSITIONY', 'POSITIONX', 'IMPORT', 'CLASS', 'FROM', 'NEW', 'BACKGROUND_LIBRERIA', 'UP', 'DOWN', 'LEFT', 'RIGHT',
-            'CONSTANT', 'THIS', 'NULL',
+            'START', 'PLAY', 'PRINT_CON', 'LEVEL', 'BACKGROUND', 'PLATFORM', 'OBSTACLES', 'PLAYER', 'PLAYERS',
+            'AXOL2D', 'IMPORT', 'BACKGROUND_LIBRERIA', 'THIS'
         ]
