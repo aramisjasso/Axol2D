@@ -1,6 +1,6 @@
 import re
 
-class Semantico():
+class Intermedio():
     def __init__(self):
         #Lista de errores
         self.errores = []
@@ -16,6 +16,8 @@ class Semantico():
         self.listaParametros = []
         self.pila_semantica = []
         self.banderaStart = False
+        self.pilaCodigo = []
+        self.idIntruccion = 0
 
     #Run
     def correr(self,resultadoSemantico,TS):
@@ -25,12 +27,14 @@ class Semantico():
         self.ts=TS
         self.fnSepararArbol()
         self.fnParteImport()
-        if self.parteNivel[2] != 'Sin Contenido Nivel':
-            self.fnParteNivel()
-        self.fnPrintTs()
-        if len(self.errores)!=0:
-            self.compilo=False
-        print('Fin Semántico')
+        # if self.parteNivel[2] != 'Sin Contenido Nivel':
+        #     self.fnParteNivel()
+        # self.fnPrintTs()
+        # if len(self.errores)!=0:
+        #     self.compilo=False
+        print('Inicio Código Intermedio')
+        self.fnPrintPilaIntermedia()
+        print('Fin Código Intermedio')
         #print(self.errores)
 
     #Separa las partes de las tuplas
@@ -65,256 +69,23 @@ class Semantico():
             listaImportaciones = self.parteImportaciones[1]
             for x,importa in enumerate (listaImportaciones):
                 if importa == 'Background':
-                    self.fnIsertarImportaciones(importa,listaImportaciones[x+1],listaImportaciones[x+2])
+                    self.pilaCodigo.append([self.idIntruccion,('import','','Background')])
+                    self.idIntruccion+=1
                 elif importa == 'Players':
-                    self.fnIsertarImportaciones(importa,listaImportaciones[x+1],listaImportaciones[x+2])
-
-    # Insertar importaciones
-    def fnIsertarImportaciones(self,tipo,line,lexpos):
-        if tipo == 'Background':
-            if not self.fnChecharImportaciones('background',tipo,line,lexpos):
-                fondos = [
-                ['Forest', 'id_import', 'background', 'Forest'  ],
-                ['Mountain', 'id_import', 'background', 'Mountain'  ],
-                ['Ocean', 'id_import', 'background', 'Ocean'  ],
-                ['Desert', 'id_import', 'background', 'Desert'  ],
-                ['City', 'id_import', 'background', 'City'  ],
-                ['Village', 'id_import', 'background', 'Village'  ],
-                ['Cave', 'id_import', 'background', 'Cave'  ],
-                ['Swamp', 'id_import', 'background', 'Swamp'  ],
-                ['River', 'id_import', 'background', 'River'  ],
-                ['Island', 'id_import', 'background', 'Island'  ],
-                ['Castle', 'id_import','background', 'Castle']]
-                self.fnIsertarArrayImportaciones(fondos)
-        else:
-            if not self.fnChecharImportaciones('character',tipo,line,lexpos):
-                jugadores = [
-                    ['wizard', 'id_import', 'character', 'wizard' ],
-                    ['archer', 'id_import', 'character', 'archer' ],
-                    ['rogue', 'id_import', 'character', 'rogue' ],
-                    ['paladin', 'id_import', 'character', 'paladin' ],
-                    ['barbarian', 'id_import', 'character', 'barbarian' ],
-                    ['assassin', 'id_import', 'character', 'assassin' ],
-                    ['druid', 'id_import', 'character', 'druid' ],
-                    ['samurai', 'id_import', 'character', 'samurai' ],
-                    ['ninja', 'id_import', 'character', 'ninja' ],
-                    ['priest', 'id_import', 'character', 'priest' ],
-                    ['knight', 'id_import','character', 'knight']
-                ]
-                self.fnIsertarArrayImportaciones(jugadores)
+                    self.pilaCodigo.append([self.idIntruccion,('import','','Players')])
+                    self.idIntruccion+=1
 
 
-    # Checa si ya se hizo la declaración de importaciones
-    def fnChecharImportaciones(self,tipo,lib,line,lexpos):
-        for x in self.ts:
-            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
-            if x[2] == tipo:
-                self.errores.append([f'Error Semántico (Línea {line}). La librería {lib} ya ha sido importada.',line,lexpos])
-                return True # La librería ya fue declarada
-
-    #Inserta todas las importaciones en orden alfabetico
-    def fnIsertarArrayImportaciones(self,elementos):
-        for x in elementos:
-            indice =  self.fnIndice(x[0])
-            if indice is None or isinstance(indice, list):
-                self.ts.append(x)
-            else:
-                self.ts[indice]=x
-        self.ts = sorted(self.ts, key=lambda x: x[0])
     #Parte de nivel
     def fnParteNivel(self):
         #Validación en TS del nombre de nivel
-        self.fnDeclararTipo(self.parteNivel[1],'Nivel')
-        self.fnBloqueDeclaracion()
+        #self.fnDeclararTipo(self.parteNivel[1],'Nivel')
+        #self.fnBloqueDeclaracion()
         if not(self.parteMetodos is None):
             self.fnbloqueMetodos()
         if self.parteMetodoPrincipal[1] != 'Sin Método Axol': 
             self.fnMetodoPrincipal()
 
-#---------Separación de bloque de Declaración ------------------------------------------------------
-    def fnSeparacionDeclaracion(self):
-        compara = True
-        while(compara):
-            #print('Sé esta separando', self.parteDeclaracion)
-            if len(self.parteDeclaracion[1]) == 3: #Declaraciones simples
-                self.listaDeclaraciones.append((self.parteDeclaracion[1]))
-            else:
-                self.listaDeclaraciones.append((self.parteDeclaracion[1][1],self.parteDeclaracion[1][2],self.parteDeclaracion[1][3]))
-
-            if self.parteDeclaracion[2] is None:
-                compara =False
-                break
-            self.parteDeclaracion = self.parteDeclaracion[2]
-
-#---------Bloque declaración -----------------------------------------------------------------------
-    def fnBloqueDeclaracion(self):
-        self.fnSeparacionDeclaracion()
-        #Muestra una declaración una por una
-        for declaracion in self.listaDeclaraciones:
-            # print('Se esta declarando', declaracion)
-            estructura = None
-            tipo = None
-            tamaño = None
-            id = None
-            valores=None
-            line = None
-            lexpos = None
-            # Declaración de Variables Simples
-            # Declaración sin Asignación
-            if declaracion[0] == 'declaracion':
-                id = declaracion[1][2]
-                tipo = declaracion[1][1]
-                line = declaracion[2][0]
-                lexpos = declaracion[2][1]
-                
-                self.fnDeclararTipo(id,tipo,None,line,lexpos)
-            # Declaración con Asignación
-            if declaracion[0][0] == 'declaracionTipo':
-                id=declaracion[0][2]
-                tipo=declaracion[0][1]
-                line = declaracion[2][0]
-                lexpos = declaracion[2][1]
-                # Declaracion
-                self.fnDeclararTipo(id,tipo,None,line,lexpos)
-                valores= declaracion[1]
-                self.fnAsignar(valores,id,line=line,lexpos=lexpos)
-            if declaracion[0][0] == 'declaracionEstructuraDatos':
-                estructura = declaracion[0][1][0]
-                tipo = declaracion[0][1][1][1]
-                tamaño = declaracion[0][1][1][3]
-                id= declaracion[0][1][1][2]
-                line= declaracion[2][0]
-                lexpos=declaracion[2][1]
-                #Declaracion
-                self.fnDeclararEstructuraDatos(estructura,tipo,id,tamaño,line,lexpos)
-                if len(declaracion[0][1])==3:
-                    #Asignacion
-                    valores=declaracion[0][1][2]
-                    self.fnAsignar(valores,id,line=line,lexpos=lexpos)
-        
-# ------------ Encuentra el tipo de ts -------------------------------------------------------------
-    def fnEncontrarTipo(self,id):
-        for simbolo in self.ts:
-            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
-            if simbolo[0]==id:
-                return simbolo[2]
-
-# ------------ Devuelve True si ya fue declarado --------------------------------------------------
-    # Devuelve un true si fue declaro el id 
-    def fnComprobarDeclaracion(self,id):
-        for simbolo in self.ts:
-            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
-            if simbolo[0]==id:
-                if simbolo[2] != 'Sin tipo':
-                    return True
-                else:
-                    return False
-        return 'NoId'
-
-#----------- Declaracion en TS  por tipo -----------------------------------------------------
-    def fnDeclararTipo(self,id,tipo,var=None,line=0,lexpos=0):
-        if not(self.fnComprobarDeclaracion(id)):
-            temp_errores = len(self.errores)
-            for indice,simbolo in enumerate(self.ts):
-                if simbolo[0]==id:
-                    self.ts[indice][2]=tipo
-                    break
-            #Checa si es de un tipo arreglo
-            if tipo[0]=='arreglo':
-                if tipo[1]in ['obstacles','platform']:
-                    self.ts[indice][3]=var
-                    y = 0
-                    for x in range(int(var)):
-                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1], 'Null' ]
-                        self.ts.insert(indice+y+1,in_simbolo)
-                        y+=1
-                        atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
-                        for k in range(len(atributos)):
-                            in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
-                            self.ts.insert(indice+y+1,in_simbolo)
-                            y+=1
-                        
-                else:
-                    self.ts[indice][3]=var
-                    for x in range(int(var)):
-                        in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1], 'Null' ]
-                        self.ts.insert(indice+x+1,in_simbolo)
-            #Checa si es de un tipo matriz
-            elif tipo[0]=='matriz':
-                self.ts[indice][3]=var
-                x1=0
-                for x in range(int(var[0])):
-                    for y in range(int(var[1])):
-                        in_simbolo=[f'{id},{x},{y}',f'{simbolo[1]},{x},{y}',tipo[1], 'Null' ]
-                        self.ts.insert(indice+x1+1,in_simbolo)
-                        x1+=1
-            #Checa si es de un tipo metodo
-            elif tipo[0] == 'metodo':
-                atributos = []
-                y=0 #inicia y=0 para cuando no hay
-                id_ts=self.ts[indice][1]
-                #Validar que en los parametros no haya variables repetidas
-                parametros=[]
-                for x,valor in enumerate(self.listaParametros):
-                    id_m = valor[1]
-                    parametros.append(id_m)
-                    
-                #Se guarda la cantidad de errores
-                temp_errores = len(self.errores)
-                if len(parametros) != len(set(parametros)):
-                    self.errores.append([f'Error Semántico (Línea {line}). Hay parametros repetidos en el método [{id}].',line,lexpos])
-                else:
-                    for x,valor in enumerate(self.listaParametros):
-                        id_m = valor[1]
-                        #validar que no exista como variable local
-                        if self.fnComprobarDeclaracion(id_m):
-                            self.errores.append([f'Error Semántico (Línea {line}). El identificador [{id_m}] ya habia sido declarado anteriormente como variable global.',line,lexpos])
-                        else:
-                            tipo_m = valor[0]
-                            #añade a lista atributos
-                            atributos.append(tipo_m)
-                            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
-                            simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m, 'Null']
-                            self.ts.insert(indice+x+1,simbolo)
-                        y+=1
-                    if temp_errores == len(self.errores):
-                        #print('creación de un método',self.ts[indice])
-                        self.ts[indice][3]=(y, atributos)
-                        #print('creación de un método',self.ts[indice])
-            elif tipo in ['obstacles', 'platform']:
-                atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
-                for x in range(len(atributos)):
-                    in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
-                    self.ts.insert(indice+x+1,in_simbolo)
-                #self.ts[indice][3]=tipo
-            elif tipo == 'player':
-                #[inicio_x, inicio_y, vidas, personaje]
-                atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
-                for x in range(len(atributos)):
-                    in_simbolo=[f'{id},{atributos[x][0]}',f'{simbolo[1]},{atributos[x][0]}',atributos[x][1], 'Null' ]
-                    self.ts.insert(indice+x+1,in_simbolo)
-                self.ts[indice][3]='Null'
-                #
-        else:
-            #Error dos veces declarado
-            self.compilo = False
-            if id == 'Sin Nivel':
-                return
-            tipoEn =self.fnEncontrarTipo(id)
-            self.errores.append([f'Error Semántico (Línea {line}). El identificador [{id}] ya ha sido declarado de tipo [{tipoEn}]. No puede declarar dos veces el mismo identificador. ',line,lexpos])
-        #if temp_errores ==len(self.errores):
-            #Lo declara en la TS
-            
-            
-
-#----------- Declaracion en TS por Estructura de Datos ----------------------------------
-    def fnDeclararEstructuraDatos(self,estructura,tipo,id,tamaño,line,lexpos):
-        if estructura=='declaracionArreglo':
-            tipo = ('arreglo',tipo)
-            self.fnDeclararTipo(id,tipo,tamaño,line,lexpos)
-        if estructura=='declaracionMatriz':
-            tipo=('matriz',tipo)
-            self.fnDeclararTipo(id,tipo,tamaño,line,lexpos)
 
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
     def fnAsignar(self,valores,id,inMetodo = False, var = None,renin=None,axol=None, line=0 , lexpos=0 ):
@@ -756,8 +527,7 @@ class Semantico():
                 #     print(y[1])
                 elif y[1][0] == 'forEach':
                     #Validar que y[1][2] no esté declarada
-
-                    if y[1][2]!='Sin Identificador' and self.fnComprobarDeclaracion(y[1][2]):
+                    if self.fnComprobarDeclaracion(y[1][2]):
                         self.errores.append([f'Error Semántico. La variable [{y[1][2]}] no puede ser utilizada como variable de control en la estructura [for each] porque ha sido declarada previamente. ', line, lexpos])
                         return
                     #Validar que y[1][3] sea una estructura de datos
@@ -765,11 +535,11 @@ class Semantico():
                         self.errores.append([f'Error Semántico. La estructura de datos [{y[1][3]}] no ha sido declarada. ', line, lexpos])
                         return
                     ed = self.fnEncontrarTipo(y[1][3])
-                    if y[1][3] != 'Sin Estructura' and not (isinstance(ed, tuple) and ed[0] in ['arreglo', 'matriz']):
+                    if not (isinstance(ed, tuple) and ed[0] in ['arreglo', 'matriz']):
                         self.errores.append([f'Error Semántico. La variable [{y[1][3]}] no es una estructura de datos, por lo tanto no es posible recorrerla en la estructura de contol [for each]. ', line, lexpos])
                         return
                     #Validar que y[1][1] y y[1][3] sean del mismo tipo
-                    if  y[1][3] != 'Sin Estructura' and y[1][1] != 'Sin Tipo'and not y[1][1] == ed[1]  :
+                    if not y[1][1] == ed[1]:
                         self.errores.append([f'Error Semántico. La variable de control de tipo [{y[1][1]}] no coincide con el tipo de dato de la estructura de control de tipo {ed[1]}. ', line, lexpos])
                         return
                     
@@ -903,7 +673,7 @@ class Semantico():
                     
                     atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                     for y2 in range(len(atributos)):
-                        in_simbolo=[f'{',Jugador'},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
+                        in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
                         self.ts.append(in_simbolo)
                     
                     self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)
@@ -1151,7 +921,7 @@ class Semantico():
                             resultado = a <= b
                         pila_evaluacion.append(resultado) 
                     else: 
-                        self.errores.append([f'Error Semántico (Línea {line}). Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
+                        self.errores.append(['Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
                         return 'Null' 
 
                     # else: 
@@ -1280,3 +1050,6 @@ class Semantico():
                 #print('Tipos',id1,id2, tipo1,tipo2)
                 if tipo1 !=tipo2:
                     self.errores.append([f'Error Semántico (Línea {line}). [{id2}] No se puede asingar a [{id1}] de tipo [{tipo1_antes}]. ', line , lexpos])
+    def fnPrintPilaIntermedia(self):
+        for x in self.pilaCodigo:
+            print(x)

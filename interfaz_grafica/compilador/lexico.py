@@ -168,11 +168,6 @@ class Lexico():
     def t_IDENTIFICADOR(self,t):
         r'[a-zA-ZñÑ]([a-zA-Z0-9ñÑ]{0,31})'
         # Verificar si es una palabra reservada
-        if len(t.value) > 32:
-            mensaje_error=(f"Error Léxico (Línea {t.lineno}). El identificador supera la longitud máxima de 32 símbolos.")
-            self.errores.append([mensaje_error,t.lineno,t.lexpos])
-            pass
-
         t.type = self.palabras_reservadas.get(t.value, 'IDENTIFICADOR')
 
         return t
