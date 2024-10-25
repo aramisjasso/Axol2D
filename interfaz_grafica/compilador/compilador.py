@@ -1,6 +1,7 @@
 import compilador.lexico as lexico
 import compilador.sintactico as sintactico
 import compilador.semantico as semantico
+import compilador.codigo_intermedio as codigo_int
 
 # Clase del compilador
 class Compilador():
@@ -17,11 +18,15 @@ class Compilador():
         self.varId = 0
         self.resultado=None
         self.sema = semantico.Semantico()
+        self.codigoint = codigo_int.Intermedio()
 
     def compilar(self,data):
         self.parte_Lexico(data)
         self.parte_Sintactica(data,self.lexi.lexer)
         self.parte_Semantica()
+        if self.compilo:
+            self.parte_Intermedia()
+        
 
     #Parte_del lexico
     def parte_Lexico(self,data):
@@ -68,7 +73,10 @@ class Compilador():
         self.identificadores_ts=self.sema.ts
         if(not self.sema.compilo):
             self.compilo = False
-        
+    
+    def parte_Intermedia(self):
+        self.codigoint.correr(self.resultado,self.identificadores_ts)
+
     #Errores
     def errores_re(self):
         mensajes=''
