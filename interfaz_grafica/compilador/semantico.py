@@ -318,6 +318,9 @@ class Semantico():
 
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
     def fnAsignar(self,valores,id,inMetodo = False, var = None,renin=None,axol=None, line=0 , lexpos=0 ):
+        if valores[1] == 'error':
+            print(valores[1])
+            return
         #Validar su declaración
         coma = False
         if axol == True and ',' in id:
@@ -891,6 +894,9 @@ class Semantico():
                         nombreNivel = self.fnEncontrarMétodo()
                         self.errores.append([f'Error Semántico (Línea {line}. El identificador de llamada al método start() [{y[1]}] no coincide con el identificador del nivel [{nombreNivel}].',line, lexpos]) 
                 else:
+                    #print(y[2][1])
+                    if y[2][1] == 'error':
+                        return
                     # (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                     self.ts.append([',fila_pla','',('arreglo', 'platform'),'Null','Hola'])
                     self.fnValidartipos(',fila_pla',y[2][1][1],False,line=line,lexpos=lexpos)

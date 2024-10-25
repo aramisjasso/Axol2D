@@ -119,22 +119,24 @@ if __name__ == "__main__":
         '''
         level MiPrimerNivel {
             int c = 6%5; 
-            int a [3];
+
+            int array [3] = ||||;
+
             //int numeros [1][5] = [[1, 2, 3, 4, 5];
 
             method int sumar (int a, int b) {
-                this [[[[[ 914u390jg i ijq oief9s o; 
-                while {
+                this.sumar(a, b); 
+                while (c < 0) {
                     b = b + b;
                     b = b + b;
                     a = a + 2;
                     a = a + 2;
                 }
-                return 0;
+                return a;
             }
 
             axol2D play () {
-                Mi.start[] ;
+                MiPrimerNivel.start(a, a, a, a, a, a)
             }
         }
         '''
