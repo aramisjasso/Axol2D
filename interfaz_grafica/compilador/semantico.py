@@ -1151,7 +1151,7 @@ class Semantico():
                             resultado = a <= b
                         pila_evaluacion.append(resultado) 
                     else: 
-                        self.errores.append(['Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
+                        self.errores.append([f'Error Semántico (Línea {line}). Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
                         return 'Null' 
 
                     # else: 
