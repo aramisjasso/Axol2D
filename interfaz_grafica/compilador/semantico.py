@@ -74,32 +74,32 @@ class Semantico():
         if tipo == 'Background':
             if not self.fnChecharImportaciones('background',tipo,line,lexpos):
                 fondos = [
-                ['Forest', 'id_import', 'background', 'Forest', 'Linea declación'],
-                ['Mountain', 'id_import', 'background', 'Mountain', 'Linea declación'],
-                ['Ocean', 'id_import', 'background', 'Ocean', 'Linea declación'],
-                ['Desert', 'id_import', 'background', 'Desert', 'Linea declación'],
-                ['City', 'id_import', 'background', 'City', 'Linea declación'],
-                ['Village', 'id_import', 'background', 'Village', 'Linea declación'],
-                ['Cave', 'id_import', 'background', 'Cave', 'Linea declación'],
-                ['Swamp', 'id_import', 'background', 'Swamp', 'Linea declación'],
-                ['River', 'id_import', 'background', 'River', 'Linea declación'],
-                ['Island', 'id_import', 'background', 'Island', 'Linea declación'],
-                ['Castle', 'id_import','background', 'Castle','Linea declación']]
+                ['Forest', 'id_import', 'background', 'Forest'  ],
+                ['Mountain', 'id_import', 'background', 'Mountain'  ],
+                ['Ocean', 'id_import', 'background', 'Ocean'  ],
+                ['Desert', 'id_import', 'background', 'Desert'  ],
+                ['City', 'id_import', 'background', 'City'  ],
+                ['Village', 'id_import', 'background', 'Village'  ],
+                ['Cave', 'id_import', 'background', 'Cave'  ],
+                ['Swamp', 'id_import', 'background', 'Swamp'  ],
+                ['River', 'id_import', 'background', 'River'  ],
+                ['Island', 'id_import', 'background', 'Island'  ],
+                ['Castle', 'id_import','background', 'Castle']]
                 self.fnIsertarArrayImportaciones(fondos)
         else:
             if not self.fnChecharImportaciones('character',tipo,line,lexpos):
                 jugadores = [
-                    ['wizard', 'id_import', 'character', 'wizard', 'Línea de declaración'],
-                    ['archer', 'id_import', 'character', 'archer', 'Línea de declaración'],
-                    ['rogue', 'id_import', 'character', 'rogue', 'Línea de declaración'],
-                    ['paladin', 'id_import', 'character', 'paladin', 'Línea de declaración'],
-                    ['barbarian', 'id_import', 'character', 'barbarian', 'Línea de declaración'],
-                    ['assassin', 'id_import', 'character', 'assassin', 'Línea de declaración'],
-                    ['druid', 'id_import', 'character', 'druid', 'Línea de declaración'],
-                    ['samurai', 'id_import', 'character', 'samurai', 'Línea de declaración'],
-                    ['ninja', 'id_import', 'character', 'ninja', 'Línea de declaración'],
-                    ['priest', 'id_import', 'character', 'priest', 'Línea de declaración'],
-                    ['knight', 'id_import','character', 'knight','Linea declación']
+                    ['wizard', 'id_import', 'character', 'wizard' ],
+                    ['archer', 'id_import', 'character', 'archer' ],
+                    ['rogue', 'id_import', 'character', 'rogue' ],
+                    ['paladin', 'id_import', 'character', 'paladin' ],
+                    ['barbarian', 'id_import', 'character', 'barbarian' ],
+                    ['assassin', 'id_import', 'character', 'assassin' ],
+                    ['druid', 'id_import', 'character', 'druid' ],
+                    ['samurai', 'id_import', 'character', 'samurai' ],
+                    ['ninja', 'id_import', 'character', 'ninja' ],
+                    ['priest', 'id_import', 'character', 'priest' ],
+                    ['knight', 'id_import','character', 'knight']
                 ]
                 self.fnIsertarArrayImportaciones(jugadores)
 
@@ -277,7 +277,6 @@ class Semantico():
                             simbolo = [f'{id},{id_m}',f'{id_ts},{id_m}',tipo_m, 'Null']
                             self.ts.insert(indice+x+1,simbolo)
                         y+=1
-
                     if temp_errores == len(self.errores):
                         #print('creación de un método',self.ts[indice])
                         self.ts[indice][3]=(y, atributos)
@@ -757,7 +756,8 @@ class Semantico():
                 #     print(y[1])
                 elif y[1][0] == 'forEach':
                     #Validar que y[1][2] no esté declarada
-                    if self.fnComprobarDeclaracion(y[1][2]):
+
+                    if y[1][2]!='Sin Identificador' and self.fnComprobarDeclaracion(y[1][2]):
                         self.errores.append([f'Error Semántico. La variable [{y[1][2]}] no puede ser utilizada como variable de control en la estructura [for each] porque ha sido declarada previamente. ', line, lexpos])
                         return
                     #Validar que y[1][3] sea una estructura de datos
@@ -765,11 +765,11 @@ class Semantico():
                         self.errores.append([f'Error Semántico. La estructura de datos [{y[1][3]}] no ha sido declarada. ', line, lexpos])
                         return
                     ed = self.fnEncontrarTipo(y[1][3])
-                    if not (isinstance(ed, tuple) and ed[0] in ['arreglo', 'matriz']):
+                    if y[1][3] != 'Sin Estructura' and not (isinstance(ed, tuple) and ed[0] in ['arreglo', 'matriz']):
                         self.errores.append([f'Error Semántico. La variable [{y[1][3]}] no es una estructura de datos, por lo tanto no es posible recorrerla en la estructura de contol [for each]. ', line, lexpos])
                         return
                     #Validar que y[1][1] y y[1][3] sean del mismo tipo
-                    if not y[1][1] == ed[1]:
+                    if  y[1][3] != 'Sin Estructura' and y[1][1] != 'Sin Tipo'and not y[1][1] == ed[1]  :
                         self.errores.append([f'Error Semántico. La variable de control de tipo [{y[1][1]}] no coincide con el tipo de dato de la estructura de control de tipo {ed[1]}. ', line, lexpos])
                         return
                     
@@ -903,7 +903,7 @@ class Semantico():
                     
                     atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
                     for y2 in range(len(atributos)):
-                        in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
+                        in_simbolo=[f'{',Jugador'},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
                         self.ts.append(in_simbolo)
                     
                     self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)
