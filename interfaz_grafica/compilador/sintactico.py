@@ -1879,9 +1879,8 @@ class Sintactico():
 
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
-
         while True:
-            tok = self.parser.token()             # Get the next token
+            tok = self.parser.token()            # Get the next token
             if not tok or tok.type == 'PUNTO_Y_COMA': break
         self.parser.errok()
 
