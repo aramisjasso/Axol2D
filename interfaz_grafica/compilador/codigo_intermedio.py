@@ -27,8 +27,8 @@ class Intermedio():
         self.ts=TS
         self.fnSepararArbol()
         self.fnParteImport()
-        # if self.parteNivel[2] != 'Sin Contenido Nivel':
-        #     self.fnParteNivel()
+        if self.parteNivel[2] != 'Sin Contenido Nivel':
+            self.fnParteNivel()
         # self.fnPrintTs()
         # if len(self.errores)!=0:
         #     self.compilo=False
@@ -294,87 +294,13 @@ class Intermedio():
                     
                     self.postorden(valores)
                     #print(self.pila_semantica)
+                    self.pilaCodigo.append([self.idIntruccion,('=',id,self.pila_semantica)])
+                    self.idIntruccion+=1
                     valores = self.evaluar_pila(self.pila_semantica,var,line=line,lexpos=lexpos)
+                    
                     #print(valores)
                     # self.ts[indice][3] = self.pila_semantica
                     self.pila_semantica = []
-
-                # Asignación de un Valor Diferente a Expresión
-                # String, Char, Llamada a Método, Booleano
-                if tipo != 'fila':
-                    
-                    # print('nO Estoy evaluando return:',id,tipo_id,valores,inMetodo)
-                    if not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'int':
-                        if (valores >= 0 and valores <= 65535):
-                            if inMetodo is False:
-                                self.ts[indice][3] = valores
-                        elif valores < 0:
-                            self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
-                            if inMetodo is False:
-                                self.ts[indice][3] = 0
-                        else: 
-                            self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [int] es de 65535. ',line,lexpos])
-                    elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
-                        if valores >= 0 and valores <= 255:
-                            if inMetodo is False:
-                                self.ts[indice][3] = valores
-                        elif valores < 0:
-                            self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
-                            if inMetodo is False:
-                                self.ts[indice][3] = 0
-                        else: 
-                            self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [byte] es de 255. ',line,lexpos])
-                    elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
-                        if inMetodo is False:
-                            self.ts[indice][3] = valores
-                    elif isinstance(valores, str) and tipo_id == 'string' and valores != 'Null' and not re.fullmatch("'[a-zA-ZñÑ0-9]'", valores):
-                        if inMetodo is False:
-                            self.ts[indice][3] = valores
-                    elif valores in ['true', 'false'] and tipo_id == 'boolean':
-                        if valores:
-                            self.ts[indice][3] = 'true'
-                        else: 
-                            self.ts[indice][3] = 'false'
-                    elif isinstance(valores, tuple) and valores[0] == 'booleano' and tipo_id == 'boolean':
-                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id)
-                        if inMetodo is False:
-                            self.ts[indice][3] = valores[1]
-                    elif valores=='asignadoblo' and tipo_id in ['platform','obstacles']:
-                        id_buscar = valortemp[1][1]
-                        indice_buscar = self.fnIndice(id_buscar)
-                        for x in range(8):
-                            #print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
-                            self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
-                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
-
-                    elif tipo_id =='background' and valores in ['Forest', 'Mountain', 'Ocean', 'Desert', 'City', 'Village', 'Cave','Swamp', 'River', 'Island','Castle']:
-                        self.ts[indice][3] = valores
-                    elif tipo_id =='character' and valores in ['wizard', 'archer', 'rogue', 'paladin', 'barbarian','assassin', 'druid', 'samurai', 'ninja', 'priest', 'knight']:
-                        self.ts[indice][3] = valores
-                        # buscar id que se asigana
-                        
-                    elif valores=='player' and tipo_id =='player':
-                        id_buscar = valortemp[1][1]
-                        indice_buscar = self.fnIndice(id_buscar)
-                        for x in range(4):
-                            #print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
-                            self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
-                    # elif isinstance(valores, list) and self.ts[indice][2] in ['int', 'byte']:
-                    #     #Error de inicialización
-                    #     self.ts[indice][3] = valores
-                    else:
-                        #print('valores:',valores,'valores:',valores[0],'tipo',tipo_id)
-                        if valores != 'Null':
-                            if not isinstance(valores, tuple):
-                                #print(valores)
-                                if isinstance(valores, bool) and valores: 
-                                    valores = 'true'
-                                elif isinstance(valores, bool) and not valores:  
-                                    valores = 'false'
-                                self.errores.append([f'Error Semántico (Línea {line}). El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores}].',line,lexpos])  
-                            elif valores[1] != 'error': 
-                                self.errores.append([f'Error Semántico (Línea {line}). El tipo de dato [{tipo_id}] no coincide con el tipo de dato del valor asignado [{valores[1]}].',line,lexpos])  
-                    #Si es de un tipo especial pero no array:
 
             
 #---------Funcion que Retorna Valor----------------------------
@@ -401,7 +327,7 @@ class Intermedio():
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
                 if self.listaParametros !='Error':
-                    self.fnDeclararTipo(id,tipo,self.listaParametros,line=line,lexpos=lexpos)
+                    
                     contenido = metodo[4]
                     if contenido == 'Sin Contenido':
                         return
@@ -661,40 +587,8 @@ class Intermedio():
                         nombreNivel = self.fnEncontrarMétodo()
                         self.errores.append([f'Error Semántico (Línea {line}. El identificador de llamada al método start() [{y[1]}] no coincide con el identificador del nivel [{nombreNivel}].',line, lexpos]) 
                 else:
-                    # (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-                    self.ts.append([',fila_pla','',('arreglo', 'platform'),'Null','Hola'])
-                    self.fnValidartipos(',fila_pla',y[2][1][1],False,line=line,lexpos=lexpos)
-                    self.ts.pop()
                     
-                    self.ts.append([',fila_obs','',('arreglo', 'obstacles'),'Null','Hola'])
-                    self.fnValidartipos(',fila_obs',y[3][1][1],False,line=line,lexpos=lexpos)
-                    self.ts.pop()
-                    self.ts.append([',Jugador','','player','Null','Hola'])
-                    
-                    atributos=[['0','int'], ['1','int'], ['2','int'], ['3','character']]
-                    for y2 in range(len(atributos)):
-                        in_simbolo=[f'{id},{atributos[y2][0]}',f'{',Jugador'},{atributos[y2][0]}',atributos[y2][1], 'Null' ]
-                        self.ts.append(in_simbolo)
-                    
-                    self.fnAsignar(y[4],',Jugador',True,line=line,lexpos=lexpos)
-                    self.ts.pop()
-                    self.ts.pop()
-                    self.ts.pop()
-                    self.ts.pop()
-                    self.ts.pop()
-                    
-                    self.ts.append([',Fondo','','background','Null','Hola'])
-                    self.fnAsignar(y[5],',Fondo',True,line=line,lexpos=lexpos)
-                    self.ts.pop()
-
-                    self.ts.append([',elementos_fondo','',('arreglo', 'platform'),'Null','Hola'])
-                    self.fnValidartipos(',elementos_fondo',y[6][1][1],False,line=line,lexpos=lexpos)
-                    self.ts.pop()
-
-                    self.ts.append([',Posicion','',('arreglo', 'int'),'2','Hola'])
-                    self.fnAsignar(y[7],',Posicion',True,axol=True,line=line,lexpos=lexpos)
-                    self.ts.pop()
-
+                    self.pilaCodigo.append([self.idIntruccion,('call','start',(y[2][1][1],y[3][1][1],y[4][1][1],y[5][1][1],y[6][1][1],y[7][1][1]))])
                     return
                 #print(y)
 #----------Asignación Metodo ()--------------------------------------------------------------
@@ -1006,6 +900,8 @@ class Intermedio():
         # Procesar instrucciones
         #print(self.parteMetodoPrincipal[1])
         self.fnInstrucciones(self.parteMetodoPrincipal[1], 'axol')
+        
+        
         # if self.banderaStart: 
         #     self.errores.append([f'Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
 
@@ -1053,3 +949,21 @@ class Intermedio():
     def fnPrintPilaIntermedia(self):
         for x in self.pilaCodigo:
             print(x)
+
+        # Devuelve un true si fue declaro el id 
+    def fnComprobarDeclaracion(self,id):
+        for simbolo in self.ts:
+            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
+            if simbolo[0]==id:
+                if simbolo[2] != 'Sin tipo':
+                    return True
+                else:
+                    return False
+        return 'NoId'
+
+# ------------ Encuentra el tipo de ts -------------------------------------------------------------
+    def fnEncontrarTipo(self,id):
+        for simbolo in self.ts:
+            # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
+            if simbolo[0]==id:
+                return simbolo[2]
