@@ -1829,11 +1829,14 @@ class Sintactico():
     #falta punto y coma
     def p_declaracionMatriz_error1(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple 
-                              | declaracionMatrizSimple IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA '''
+                              | declaracionMatrizSimple IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA
+                               |  declaracionMatrizSimple IGUAL fila '''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 2:
             # Caso de declaración de matriz sin inicialización
             p[0] = ('declaracionMatriz', p[1])
+        elif len(p) == 4:
+            p[0] = ('declaracionMatriz', p[1], p[3])
         else:
             # Caso de declaración de matriz con asignación de filas (contenidos entre corchetes)
             p[0] = ('declaracionMatriz', p[1], p[4])
@@ -1846,13 +1849,18 @@ class Sintactico():
 
     # CORCHETE_ABRE 
     def p_declaracionMatriz_error3(self,p):
-        '''declaracionMatriz  : declaracionMatrizSimple IGUAL filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+        '''declaracionMatriz  : declaracionMatrizSimple IGUAL filas CORCHETE_CIERRA PUNTO_Y_COMA
+                                | declaracionMatrizSimple IGUAL PUNTO_Y_COMA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
-        p[0] = ('declaracionMatriz', p[1], p[3])
+        if len(p) == 4:
+            p[0] = ('declaracionMatriz', p[1])
+        else:
+            p[0] = ('declaracionMatriz', p[1], p[3])
 
     # filas
     def p_declaracionMatriz_error4(self,p):
-        '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE CORCHETE_CIERRA PUNTO_Y_COMA'''
+        '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE CORCHETE_CIERRA PUNTO_Y_COMA
+                                | declaracionMatrizSimple IGUAL CORCHETE_ABRE PUNTO_Y_COMA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracionMatriz', p[1])
 
