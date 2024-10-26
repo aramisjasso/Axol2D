@@ -974,7 +974,7 @@ class Semantico():
         # print('Return Metodo: ',id,regreso)
         #self.fnAsignar(regreso,id,True,id)
         # print('Retorno', regreso,id)
-        self.fnAsignar(regreso,id,inMetodo = True, renin=True,line=line,lexpos=lexpos)#Porque el id nunca se puede llamar for
+        self.fnAsignar(regreso,id,inMetodo = True,var= id, renin=True,line=line,lexpos=lexpos)#Porque el id nunca se puede llamar for
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):
