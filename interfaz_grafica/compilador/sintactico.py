@@ -257,25 +257,110 @@ class Sintactico():
         p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     
     #falta identificador
-    def p_llamadaStart_error_prueba(self,p): 
-        '''llamadaStart : IDENTIFICADOR PUNTO START PUNTO_Y_COMA'''
-        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+    def p_llamadaStart_error1(self,p): 
+        #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
+        '''llamadaStart : PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del nivel en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', 'Sin Identificador',p[4],p[6],p[8],p[10],p[12],p[14])
 
     # #falta punto
-    # #falta start
+    def p_llamadaStart_error2(self,p): 
+        #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
+        '''llamadaStart : IDENTIFICADOR START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto [.] en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1],p[4],p[6],p[8],p[10],p[12],p[14])
+
+    # falta start
+    def p_llamadaStart_error3(self,p): 
+        #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
+        '''llamadaStart : IDENTIFICADOR PUNTO PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA
+                        | IDENTIFICADOR PUNTO PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [start] en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta parentesis abre
+    def p_llamadaStart_error4(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+    
     #falta matriz de obstaculos
+    def p_llamadaStart_error5(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de plataformas en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+    
     #falta coma entre parámetros del metodo start
+    def p_llamadaStart_error6(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+    
     #falta matriz de obstaculos
+    def p_llamadaStart_error7(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de obstáculos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta coma entre parámetros del metodo start
+    def p_llamadaStart_error8(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+    
     #falta especificar jugador
+    def p_llamadaStart_error9(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el jugador en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta coma entre parámetros del metodo start
+    def p_llamadaStart_error10(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta fondo
+    def p_llamadaStart_error11(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de [background] en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta coma entre parámetros del metodo start
+    def p_llamadaStart_error12(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #faltan elementos de fondo
+    def p_llamadaStart_error13(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de elementos de fondo en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta coma entre parámetros del metodo start
+    def p_llamadaStart_error14(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta ubicacion de final del juego
+    def p_llamadaStart_error15(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar la ubicación final del juego en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
     #falta parentesis cierra
+    def p_llamadaStart_error16(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
+
+    #falta punto y coma
+    def p_llamadaStart_error17(self,p): 
+        '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] en la llamada al método [start]. ', 0, 1])
+        p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #----------------------------------------------------------------------------------------------------------
 
@@ -483,9 +568,9 @@ class Sintactico():
 
     #falta return 
     def p_contenidoMetodo_error1(self,p):
-        '''contenidoMetodo : instrucciones error'''
+        '''contenidoMetodo : instrucciones'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', 0, 1])
-        p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'), (p.lineno(2),p.lexpos(2)))
+        p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'), (p.lineno(-1),p.lexpos(-1)))
 
     #falta expresion de retorno
     def p_contenidoMetodo_error2(self,p):
@@ -495,7 +580,7 @@ class Sintactico():
         if len(p) == 4:
             p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'),(p.lineno(3),p.lexpos(3)))
         else: 
-            p[0] = ('contenidoMetodo', ('expresion', 'error'), (p.lineno(3),p.lexpos(3)))
+            p[0] = ('contenidoMetodo', ('expresion', 'error'), (p.lineno(1),p.lexpos(1)))
 
     #falta punto y coma
     def p_contenidoMetodo_error3(self,p):
@@ -1228,6 +1313,7 @@ class Sintactico():
         '''expresion : errorFactores error'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta [operador] en la expresión. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('expresion', 'error')
+        self.error_Expresion = True
 
     #int a =  1 2 2 3 + 5;
     def p_expresion_error1(self, p):
@@ -1313,7 +1399,7 @@ class Sintactico():
     #int a =  1 2 2 3 * 5;
     def p_termino_error2(self,p):
         '''termino : errorFactores restoTermino'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta [operador] en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta [operador] en la expresión. ',p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Expresion = True
 
@@ -1715,7 +1801,7 @@ class Sintactico():
 
     #IGUAL 
     def p_declaracionArreglo_error2(self,p):
-        '''declaracionArreglo : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO error '''
+        '''declaracionArreglo : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO PUNTO_Y_COMA '''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
         lista_errores = [('expresion', 'error') for i in range(int(p[4]))]
         p[0] = ('declaracionArreglo', ('declaracionArregloSimple', p[1], p[2], p[4]), ('fila', p[4], lista_errores))
@@ -1953,9 +2039,8 @@ class Sintactico():
 
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
-
         while True:
-            tok = self.parser.token()             # Get the next token
+            tok = self.parser.token()            # Get the next token
             if not tok or tok.type == 'PUNTO_Y_COMA': break
         self.parser.errok()
 
