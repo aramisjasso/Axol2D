@@ -20,6 +20,7 @@ class Sintactico():
         self.parser = None
         self.error_Expresion = False
         self.error_Condicion = False
+        self.error_Aritmetica_Condicion = False
     
     def build(self):
         self.parser = yacc.yacc(module=self,method='LALR', debug=True)
@@ -698,8 +699,7 @@ class Sintactico():
         else: 
             p[0] = ('ifElse', p[2], p[4], p[8])
     
-    #falta if en if con else
-    #error 0 if
+    #parentesis abre
     def p_ifElse_error1(self,p):
         '''ifElse : IF condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
@@ -712,8 +712,7 @@ class Sintactico():
                   | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de apertura en la condición. ', 0, 1])
-        p[0] = 'error'
-        self.error_Condicion = True
+        p[0] = ('ifElse', 'condicion', 'error')
 
     def p_ifElse_error2(self, p):
         '''ifElse : IF condicion LLAVE_CIERRA
@@ -1203,6 +1202,8 @@ class Sintactico():
             p[0] = p[1]
         else:
             p[0] = ('condicion', p[1], p[2])
+        if self.error_Aritmetica_Condicion:
+            self.errores.append([f'Error Semántico (Línea {p.lineno(0)}). Una expresión aritmética no puede ser utilizada como una condición. ',p.lineno(0),p.lexpos(0)])
 
     #<restoExpresionLogica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionLogica(self, p):
@@ -1210,10 +1211,12 @@ class Sintactico():
                                 | empty'''
         if len(p) == 2:
             p[0] = None 
-        elif p[1] is None:
-            p[0] = ('restoExpresionLogica', p[2], p[3])
-        else:
-            p[0] = ('restoExpresionLogica', p[1], p[2], p[3])
+        else: 
+            self.error_Aritmetica_Condicion = False
+            if p[1] is None:
+                p[0] = ('restoExpresionLogica', p[2], p[3])
+            else:
+                p[0] = ('restoExpresionLogica', p[1], p[2], p[3])
 
     #falta operador lógico
     def p_restoExpresionLogica_error1(self, p):
@@ -1241,12 +1244,14 @@ class Sintactico():
                                 | booleano restoExpresionComparacion'''
         if p[2] is None:
             p[0] = p[1]
-        elif p[1][0] == 'booleano': 
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
-            p[0] = 'error'
-            self.error_Condicion = True
-        else:
-            p[0] = ('expresionComparacion', p[1], p[2])
+        else: 
+            self.error_Aritmetica_Condicion = False
+            if p[1][0] == 'booleano': 
+                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
+                p[0] = 'error'
+                self.error_Condicion = True
+            else:
+                p[0] = ('expresionComparacion', p[1], p[2])
 
     #<restoExpresionAritmetica> ::= <operadorAdicion> <termino> <restoExpresionAritmetica> | ε
     def p_restoExpresionComparacion(self, p):
@@ -1281,7 +1286,7 @@ class Sintactico():
 
     # #int a = ((2 + 3) * 4;
     def p_expresionRelacionalParentesis_error(self,p):
-        '''expresionRelacionalParentesis : PARENTESIS_ABRE condicion error'''
+        '''expresionRelacionalParentesis : PARENTESIS_ABRE condicion '''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la condición. ', 0, 1])
         p[0] = 'error'
         self.error_Condicion = True
@@ -1319,6 +1324,8 @@ class Sintactico():
             else:
                 p[0] = ('expresion', p[1], p[2])
         self.error_Expresion = False
+        self.error_Aritmetica_Condicion = True
+
 
     #int a = 4 5 5 5 * 3;
     def p_expresion_error(self, p):
