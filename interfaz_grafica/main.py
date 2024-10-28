@@ -138,6 +138,7 @@ if __name__ == "__main__":
             platform plarreglo[3] = [pl1, pl2, pl3];
             obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ) ;
             obstacles obs2 = [110  ,   20 ,   20   10     ,  0  ,  0   ,   0  ].
+            int z;
             obstacles obs [2] = [obs1,obs2];
                 
             background fondo = Castle;
