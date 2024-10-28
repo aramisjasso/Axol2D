@@ -21,6 +21,7 @@ class Sintactico():
         self.error_Expresion = False
         self.error_Condicion = False
         self.error_Aritmetica_Condicion = False
+        self.pila_errores=''
     
     def build(self):
         self.parser = yacc.yacc(module=self,method='LALR', debug=True)
@@ -68,6 +69,7 @@ class Sintactico():
                        | libreriaAxol PUNTO_Y_COMA
                        | libreriaAxol 
                        | IMPORT'''
+        self.fnAhiNo('la impotación',p.lineno(0),p.lexpos(0))
         if len(p)==4:
             if not (p[2] == 'Background' or p[2] == 'Players') :
                 self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) ""{p[1]} {p[2]} {p[3]}"". En la importación: solo se puede importar una librería AXOL. \n \t Solución: {p[1]} "[Background | Players]" ;',p.lineno(0),p.lexpos(0)])
@@ -131,7 +133,7 @@ class Sintactico():
     def p_nivel_error1(self,p):
         '''nivel : IDENTIFICADOR LLAVE_ABRE contenidoNivel LLAVE_CIERRA
                  | IDENTIFICADOR IDENTIFICADOR LLAVE_ABRE contenidoNivel LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [level] en la estructura del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [level] en la estructura del nivel. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 6:
             p[0] = ('nivel', p[2], p[4])
         else: 
@@ -140,25 +142,25 @@ class Sintactico():
     #falta identificador
     def p_nivel_error2(self,p):
         '''nivel : LEVEL LLAVE_ABRE contenidoNivel LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el identificador del nivel en la estructura del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el identificador del nivel en la estructura del nivel. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('nivel', 'Sin Nivel', p[3])
 
     #falta llave abre
     def p_nivel_error3(self,p):
         '''nivel : LEVEL IDENTIFICADOR contenidoNivel LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura del nivel. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('nivel', p[2], p[3])
 
     #falta contenido nivel (no debería marcar error y deberíamos validar eso)
     def p_nivel_error4(self,p):
         '''nivel : LEVEL IDENTIFICADOR LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el contenido del nivel en la estructura del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el contenido del nivel en la estructura del nivel. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('nivel', p[2], 'Sin Contenido Nivel')
 
     #falta llave cierra
     def p_nivel_error5(self,p):
         '''nivel : LEVEL IDENTIFICADOR LLAVE_ABRE contenidoNivel'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(-1)}). Falta llave de cierre en la estructura del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(-1)}). Falta llave de cierre en la estructura del nivel. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('nivel', p[2], p[4])
 
     #<contenidoNivel> ::= <atributos> <metodos> <metodoPrincipal>
@@ -175,7 +177,7 @@ class Sintactico():
     def p_contenidoNivel_error1(self,p):
         '''contenidoNivel : bloqueDeclaracion bloqueMetodos 
                           | bloqueDeclaracion'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el método Axol2D play() en el contenido del nivel. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el método Axol2D play() en el contenido del nivel. ', p.lineno(0),p.lexpos(0)])
         if len(p)==3:
             p[0] = ('contenidoNivel', p[1], p[2], ('metodoPrincipal', 'Sin Método Axol'))
         else:
@@ -190,7 +192,8 @@ class Sintactico():
     def p_metodoPrincipal_error1(self,p):
         '''metodoPrincipal : PLAY PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                             | PLAY PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [Axol2D] en el método Axol2D. ', 0, 1])
+        self.fnAhiNo('la declaración del método principal',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [Axol2D] en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         if len(p)==5:
             p[0] = ('metodoPrincipal', p[3])   
         else:
@@ -201,7 +204,8 @@ class Sintactico():
     def p_metodoPrincipal_error2(self,p):
         '''metodoPrincipal : AXOL2D PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                             | AXOL2D PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [play] en el método Axol2D. ', 0, 1])
+        self.fnAhiNo('la declaración del método principal',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [play] en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         if len(p)==5:
             p[0] = ('metodoPrincipal', p[3])   
         else:
@@ -211,7 +215,8 @@ class Sintactico():
     def p_metodoPrincipal_error3(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                             | AXOL2D PLAY PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en el método Axol2D. ', 0, 1])
+        self.fnAhiNo('la declaración del método principal',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         if len(p)==6:
             p[0] = ('metodoPrincipal', p[4])   
         else:
@@ -221,20 +226,22 @@ class Sintactico():
     def p_metodoPrincipal_error4(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE LLAVE_ABRE instrucciones LLAVE_CIERRA
                             | AXOL2D PLAY PARENTESIS_ABRE PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en el método Axol2D. ', 0, 1])
+        self.fnAhiNo('la declaración del método principal',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoPrincipal', p[5])
 
     #faltan parentesis
     def p_metodoPrincipal_error5(self,p):
         '''metodoPrincipal : AXOL2D PLAY LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan paréntesis después de [play] en el método Axol2D. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan paréntesis después de [play] en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoPrincipal', p[4])
 
     #falta llave abre
     def p_metodoPrincipal_error6(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA instrucciones LLAVE_CIERRA
                             | AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan llave de apertura en el método Axol2D. ', 0, 1])
+        self.fnAhiNo('la declaración del método principal',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan llave de apertura en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         if len(p)==8:
             p[0] = ('metodoPrincipal', p[6])   
         else:
@@ -243,32 +250,35 @@ class Sintactico():
     #falta llamada a start
     def p_metodoPrincipal_error7(self,p):
         '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan llamada al método [start] en el método Axol2D. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan llamada al método [start] en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoPrincipal', [('instruccion', ('expresion', 'factor', '0'))])
 
     #falta llave cierra
     # def p_metodoPrincipal_error6(self,p):
     #     '''metodoPrincipal : AXOL2D PLAY PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones'''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(-1)}). Faltan llave de cierre en el método Axol2D. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(-1)}). Faltan llave de cierre en el método Axol2D. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('metodoPrincipal', p[6])
 
     def p_llamadaStart(self,p): 
         #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
         p[0] = ('llamadaStart', p[1],p[5],p[7],p[9],p[11],p[13],p[15])
     
     #falta identificador
     def p_llamadaStart_error1(self,p): 
         #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
         '''llamadaStart : PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del nivel en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del nivel en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', 'Sin Identificador',p[4],p[6],p[8],p[10],p[12],p[14])
 
     # #falta punto
     def p_llamadaStart_error2(self,p): 
         #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
         '''llamadaStart : IDENTIFICADOR START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto [.] en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto [.] en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1],p[4],p[6],p[8],p[10],p[12],p[14])
 
     # falta start
@@ -276,91 +286,105 @@ class Sintactico():
         #(pl      ,   obs    ,jugador, fondo ,  elementos_fondo,  [100,100]     )
         '''llamadaStart : IDENTIFICADOR PUNTO PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA PUNTO_Y_COMA
                         | IDENTIFICADOR PUNTO PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [start] en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [start] en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta parentesis abre
     def p_llamadaStart_error4(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
     
     #falta matriz de obstaculos
     def p_llamadaStart_error5(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de plataformas en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de plataformas en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
     
     #falta coma entre parámetros del metodo start
     def p_llamadaStart_error6(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
     
     #falta matriz de obstaculos
     def p_llamadaStart_error7(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de obstáculos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador de la matriz de obstáculos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta coma entre parámetros del metodo start
     def p_llamadaStart_error8(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
     
     #falta especificar jugador
     def p_llamadaStart_error9(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el jugador en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el jugador en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta coma entre parámetros del metodo start
     def p_llamadaStart_error10(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta fondo
     def p_llamadaStart_error11(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de [background] en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de [background] en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta coma entre parámetros del metodo start
     def p_llamadaStart_error12(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #faltan elementos de fondo
     def p_llamadaStart_error13(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de elementos de fondo en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar identificador de elementos de fondo en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta coma entre parámetros del metodo start
     def p_llamadaStart_error14(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta ubicacion de final del juego
     def p_llamadaStart_error15(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar la ubicación final del juego en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar la ubicación final del juego en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta parentesis cierra
     def p_llamadaStart_error16(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada al método [start]. ', 0, 1])
+        self.fnAhiNo('la llamada al método start',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #falta punto y coma
     def p_llamadaStart_error17(self,p): 
         '''llamadaStart : IDENTIFICADOR PUNTO START PARENTESIS_ABRE expresion COMA expresion COMA expresion COMA expresion COMA expresion COMA expresion PARENTESIS_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] en la llamada al método [start]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] en la llamada al método [start]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaStart', p[1], ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'), ('expresion', 'error'))
 
     #----------------------------------------------------------------------------------------------------------
@@ -393,6 +417,7 @@ class Sintactico():
         '''declaracion : declaracionTipo PUNTO_Y_COMA
                        | declaracionTipo valorDeclaracion PUNTO_Y_COMA
                        | declaracionEstructuraDatos '''
+        self.fnAhiNo('la declaracion',p.lineno(0),p.lexpos(0))
         # Declaracion Simple
         if len(p) == 3:
             p[0] = ('declaracion', p[1],(p.lineno(0),p.lexpos(0)))
@@ -408,6 +433,7 @@ class Sintactico():
     #declaracionTipo = ; 
     def p_declaracion_error1(self,p):
         '''declaracion : declaracionTipo IGUAL PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaracion',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el valor de la asignación en la declaración. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracion', p[1], (p.lineno(0),p.lexpos(0)))
 
@@ -415,6 +441,7 @@ class Sintactico():
     def p_declaracion_error2(self,p):
         '''declaracion : declaracionTipo valorDeclaracion PARENTESIS_CIERRA PUNTO_Y_COMA
                        | declaracionTipo valorDeclaracion PARENTESIS_CIERRA expresion PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaracion',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de apertura en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracion', p[1], ('expresion', 'error'), (p.lineno(0),p.lexpos(0)))
         self.error_Expresion = True
@@ -461,7 +488,7 @@ class Sintactico():
 
     # def p_valorDeclaracion_error(self,p):
     #     '''valorDeclaracion : IGUAL error restoTermino'''
-    #     self.errores.append([ff'Error Sintáctico (Línea {p.lineno(0)}). Se esperaba un [operando] antes del operador en la expresión aritmética. ', 0, 1])
+    #     self.errores.append([ff'Error Sintáctico (Línea {p.lineno(0)}). Se esperaba un [operando] antes del operador en la expresión aritmética. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('expresion', 'error')
     #     self.error_Expresion = True
 
@@ -508,27 +535,27 @@ class Sintactico():
     #genera demasiados problemas
     # def p_metodoDeclaracion_error1(self,p):
     #     '''metodoDeclaracion : tipoDato IDENTIFICADOR error parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [method] en la declaración del método. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [method] en la declaración del método. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('metodoDeclaracion', p[1],p[2], p[4], p[7], (p.lineno(0),p.lexpos(0)))
 
     #falta tipo dato del método
     def p_metodoDeclaracion_error1(self,p):
         '''metodoDeclaracion : METHOD IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato del método en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato del método en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoDeclaracion', 'Sin Tipo',p[2], p[4], p[7], (p.lineno(0),p.lexpos(0)))
 
     #falta identificador del método
     #genera demasiados problemas
     # def p_metodoDeclaracion_error2(self,p):
     #     '''metodoDeclaracion : METHOD tipoDato PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del método en la declaración del método. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del método en la declaración del método. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('metodoDeclaracion', p[2], 'id', p[4], p[7], (p.lineno(0),p.lexpos(0)))
 
     #falta parentesis abre
     def p_metodoDeclaracion_error3(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
                              # | METHOD tipoDato errorFactores PUNTO_Y_COMA contenidoMetodo LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9: 
             p[0] = ('metodoDeclaracion', p[2],p[3], p[4], p[7], (p.lineno(0),p.lexpos(0)))
 
@@ -536,31 +563,32 @@ class Sintactico():
     #falta parentesis cierra 
     def p_metodoDeclaracion_error4(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[7], (p.lineno(0),p.lexpos(0)))
 
     #falta llave abre
     def p_metodoDeclaracion_error5(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA contenidoMetodo LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[7], (p.lineno(0),p.lexpos(0)))
 
     #falta contenido metodo
     def p_metodoDeclaracion_error6(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta contenido del método en la declaración del método. Todos los métodos deben retornar un valor y tener al menos una instrucción. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta contenido del método en la declaración del método. Todos los métodos deben retornar un valor y tener al menos una instrucción. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], 'Sin Contenido', (p.lineno(0),p.lexpos(0)))
     
     #falta llave cierra
     def p_metodoDeclaracion_error7(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8], (p.lineno(0),p.lexpos(0)))
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
     def p_contenidoMetodo(self,p):
         '''contenidoMetodo : instrucciones RETURN expresion PUNTO_Y_COMA
                            | RETURN expresion PUNTO_Y_COMA '''
+        self.fnAhiNo('el contenido del método',p.lineno(0),p.lexpos(0))
         if len(p) == 5:
             p[0] = ('contenidoMetodo', p[1], p[3],(p.lineno(3),p.lexpos(3)))
         else: 
@@ -569,14 +597,15 @@ class Sintactico():
     #falta return 
     def p_contenidoMetodo_error1(self,p):
         '''contenidoMetodo : instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'), (p.lineno(-1),p.lexpos(-1)))
 
     #falta expresion de retorno
     def p_contenidoMetodo_error2(self,p):
         '''contenidoMetodo : instrucciones RETURN PUNTO_Y_COMA
                            | RETURN PUNTO_Y_COMA '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta expresión de retorno en el método después de [return]. ', 0, 1])
+        self.fnAhiNo('el contenido del método',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta expresión de retorno en el método después de [return]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'),(p.lineno(3),p.lexpos(3)))
         else: 
@@ -586,7 +615,7 @@ class Sintactico():
     def p_contenidoMetodo_error3(self,p):
         '''contenidoMetodo : instrucciones RETURN expresion
                            | RETURN expresion '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta punto y coma [;] después expresión de retorno en el método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(2)}). Falta punto y coma [;] después expresión de retorno en el método. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'),(p.lineno(3),p.lexpos(3)))
         else: 
@@ -613,7 +642,7 @@ class Sintactico():
     def p_parametro_error1(self,p):
         '''parametro : IDENTIFICADOR COMA parametro
                      | IDENTIFICADOR '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato antes del identificador en los parámetros en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato antes del identificador en los parámetros en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('parametro',('Sin Tipo', p[1]) ), p[3]
         elif len(p) == 5:
@@ -623,7 +652,7 @@ class Sintactico():
     def p_parametro_error2(self,p):
         '''parametro : tipoDato COMA parametro
                      | tipoDato '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador después del tipo de dato en los parámetros en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador después del tipo de dato en los parámetros en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('parametro',(p[1], 'Sin Identificador') ), p[3]
         elif len(p) == 5:
@@ -632,7 +661,7 @@ class Sintactico():
     #falta coma
     def p_parametro_error3(self,p):
         '''parametro : tipoDato IDENTIFICADOR parametro'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre los parámetros en la declaración del método. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre los parámetros en la declaración del método. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('parametro',(p[1], p[2]) ), p[3]
 
@@ -658,6 +687,7 @@ class Sintactico():
                        | estructuraControl
                        | expresion PUNTO_Y_COMA
                        | llamadaStart'''
+        self.fnAhiNo('una instrucción',p.lineno(0),p.lexpos(0))
         p[0] = ('instruccion', (p[1]), (p.lineno(1), p.lexpos(1)))
     
     #punto y coma
@@ -665,7 +695,7 @@ class Sintactico():
     #     '''instruccion : expresionAsignacion 
     #                    | llamadaMetodo 
     #                    | expresion '''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('instruccion', p[1], (p.lineno(1), p.lexpos(1)))
     #probar con expresionAsignacion error
 
@@ -711,7 +741,7 @@ class Sintactico():
                   | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PARENTESIS_CIERRA condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de apertura en la condición. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de apertura en la condición. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('ifElse', 'condicion', 'error')
 
     def p_ifElse_error2(self, p):
@@ -720,7 +750,7 @@ class Sintactico():
                   | IF condicion LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 3:
             p[0] = ('ifElse', p[2])
         elif len(p) == 4:
@@ -738,7 +768,8 @@ class Sintactico():
         '''ifElse : IF condicion PUNTO_Y_COMA LLAVE_CIERRA
                   | IF condicion PUNTO_Y_COMA LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PUNTO_Y_COMA instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', 0, 1])
+        self.fnAhiNo('un if',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 5 or len(p) == 8: 
             p[0] = ('ifElse', p[2])
         else: 
@@ -750,7 +781,7 @@ class Sintactico():
                   | IF condicion LLAVE_ABRE ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura [if]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura [if]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('ifElse', p[2])
         elif len(p) == 5:
@@ -766,7 +797,7 @@ class Sintactico():
         '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la subestructura [else]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la subestructura [else]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 7:
             p[0] = ('ifElse', p[2])
         elif len(p) == 8:
@@ -778,7 +809,7 @@ class Sintactico():
         '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [else] en la estructura [if]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [else] en la estructura [if]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 7:
             p[0] = ('ifElse', p[2])
         elif len(p) == 8:
@@ -790,7 +821,7 @@ class Sintactico():
         '''ifElse : IF condicion LLAVE_ABRE LLAVE_CIERRA ELSE LLAVE_ABRE 
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE
                   | IF condicion LLAVE_ABRE instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la subestructura [else]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la subestructura [else]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 7:
             p[0] = ('ifElse', p[2])
         elif len(p) == 8:
@@ -806,37 +837,37 @@ class Sintactico():
     def p_switch_error1(self,p):
         '''switch : PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA
                   | IDENTIFICADOR PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [switch] en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [switch] en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[2], p[5])
 
     def p_switch_error2(self,p):
         '''switch : SWITCH IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[2], p[5])  
 
     def p_switch_error3(self,p):
         '''switch : SWITCH PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE casos LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta variable de control en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta variable de control en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[5])  
     
     def p_switch_error4(self,p):
         '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR LLAVE_ABRE casos LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[3], p[5])  
 
     def p_switch_error5(self,p):
         '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA casos LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[3], p[5])
     
     def p_switch_error6(self,p):
         '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los distintos casos en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los distintos casos en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[3])
 
     def p_switch_error7(self,p):
         '''switch : SWITCH PARENTESIS_ABRE IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE casos'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('switch', p[3], p[5])
 
     #<casos> ::= <caso> <restoCasos>
@@ -851,6 +882,7 @@ class Sintactico():
     def p_caso(self,p):
         '''caso : CASE NUMERO DOS_PUNTOS instrucciones BREAK PUNTO_Y_COMA
                 | CASE NUMERO DOS_PUNTOS BREAK PUNTO_Y_COMA'''
+        self.fnAhiNo('un caso',p.lineno(0),p.lexpos(0))
         if (len(p) == 7):
             p[0] = ('caso', p[2], p[4])
         else: 
@@ -861,7 +893,8 @@ class Sintactico():
                 | NUMERO DOS_PUNTOS BREAK PUNTO_Y_COMA
                 | NUMERO PUNTO_Y_COMA instrucciones BREAK PUNTO_Y_COMA
                 | NUMERO PUNTO_Y_COMA BREAK PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [case] en la estructura [switch]. ', 0, 1])
+        self.fnAhiNo('un caso',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [case] en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         if (len(p) == 6):
             p[0] = ('caso', p[1], p[3])
         else: 
@@ -872,7 +905,8 @@ class Sintactico():
                 | CASE NUMERO BREAK PUNTO_Y_COMA
                 | CASE NUMERO PUNTO_Y_COMA instrucciones BREAK PUNTO_Y_COMA
                 | CASE NUMERO PUNTO_Y_COMA BREAK PUNTO_Y_COMA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del número de caso en la estructura [switch]. ', 0, 1])
+        self.fnAhiNo('un caso',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del número de caso en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         if (len(p) == 7):
             p[0] = ('caso', p[2], p[4])
         elif (len(p) == 6) and p[3]==';':
@@ -885,7 +919,8 @@ class Sintactico():
     def p_caso_error3(self,p):
         '''caso : CASE NUMERO DOS_PUNTOS instrucciones
                 | CASE NUMERO DOS_PUNTOS instrucciones PUNTO_Y_COMA'''
-        self.errores.append([f"Advertencia (Línea {p.lineno(0)}). Ha olvidado la instrucción 'break;' al final del caso en la estructura [switch]. ", 0, 1])
+        self.fnAhiNo('un caso',p.lineno(0),p.lexpos(0))
+        self.errores.append([f"Advertencia (Línea {p.lineno(0)}). Ha olvidado la instrucción 'break;' al final del caso en la estructura [switch]. ", p.lineno(0),p.lexpos(0)])
         p[0] = ('caso', p[2],p[4])
 
     #<restoCasos> ::= <casos> | default : <instrucciones> }
@@ -899,18 +934,19 @@ class Sintactico():
 
     def p_restoCasos_error1(self,p):
         '''restoCasos : DOS_PUNTOS instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [default] en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la palabra reservada [default] en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('default', p[2])
     
     def p_restoCasos_error2(self,p):
         '''restoCasos : DEFAULT DOS_PUNTOS '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). El caso [default] en la estructura [switch] no puede estar vacío. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('default', p[2])
 
     def p_restoCasos_error3(self,p):
         '''restoCasos : DEFAULT instrucciones
                       | DEFAULT PUNTO_Y_COMA instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
+        self.fnAhiNo('un caso',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('default', p[2])
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
@@ -936,7 +972,7 @@ class Sintactico():
                    | PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | IDENTIFICADOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                    | IDENTIFICADOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [for] en la estructura de control [for each]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [for] en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[2], p[3], p[5])
         elif len(p) == 10 and p[1] == 'PARENTESIS_ABRE':
@@ -951,7 +987,8 @@ class Sintactico():
                    | FOR tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | FOR PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[2], p[3], p[5])
         elif len(p) == 10:
@@ -967,7 +1004,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato de la variable de control en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta tipo de dato de la variable de control en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', 'Sin Tipo', p[3], p[5])
         elif len(p) ==10 :
@@ -983,7 +1021,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE tipoDato DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato PUNTO_Y_COMA  LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta variable de control en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta variable de control en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[3], 'Sin Identificador', p[5])
         elif len(p) == 10:
@@ -998,7 +1037,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan dos puntos [:] después de la variable de control en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan dos puntos [:] después de la variable de control en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[3], p[4], p[5])
         elif len(p) == 10:
@@ -1013,7 +1053,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta estructura de datos en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta estructura de datos en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9 and p[7]=='{':
             p[0] = ('forEach', p[3], p[4], 'Sin Estructura')
         elif len(p) == 10:
@@ -1028,7 +1069,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR LLAVE_ABRE LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[3], p[4], p[6])
         else:
@@ -1039,7 +1081,8 @@ class Sintactico():
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA PUNTO_Y_COMA instrucciones LLAVE_CIERRA
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA PUNTO_Y_COMA LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura de control [for each]. ', 0, 1])
+        self.fnAhiNo('un forEach',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[3], p[4], p[6])
         elif len(p) == 10 and p[8] != ';':
@@ -1053,7 +1096,7 @@ class Sintactico():
     def p_forEach_error9(self,p):
         '''forEach : FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE instrucciones 
                    | FOR PARENTESIS_ABRE tipoDato IDENTIFICADOR DOS_PUNTOS IDENTIFICADOR PARENTESIS_CIERRA LLAVE_ABRE '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura de control [for each]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la estructura de control [for each]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 9:
             p[0] = ('forEach', p[3], p[4], p[6])
         else:
@@ -1074,7 +1117,7 @@ class Sintactico():
                  | condicion LLAVE_ABRE LLAVE_CIERRA
                  | IDENTIFICADOR condicion LLAVE_ABRE instrucciones LLAVE_CIERRA
                  | IDENTIFICADOR condicion LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [if, while, dowhile] en la estructura de control. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [if, while, dowhile] en la estructura de control. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('while', p[1])
         elif len(p) == 5: 
@@ -1086,7 +1129,8 @@ class Sintactico():
         '''while : WHILE condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                  | WHILE condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                  | WHILE PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la condición en la estructura de control [while]. ', 0, 1])
+        self.fnAhiNo('un while',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la condición en la estructura de control [while]. ', p.lineno(0),p.lexpos(0)])
 
         if len(p) == 5: 
             p[0] = ('while', ('condicion', 'error'), p[3])
@@ -1099,7 +1143,8 @@ class Sintactico():
         '''while : WHILE condicion instrucciones LLAVE_CIERRA
                  | WHILE condicion LLAVE_CIERRA
                  | WHILE condicion PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la condición en la estructura de control [while]. ', 0, 1])
+        self.fnAhiNo('un while',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la condición en la estructura de control [while]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('while', p[2])
         elif len(p) == 6: 
@@ -1110,7 +1155,7 @@ class Sintactico():
     def p_while_error3(self,p):
         '''while : WHILE condicion LLAVE_ABRE instrucciones 
                  | WHILE condicion LLAVE_ABRE '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la condición en la estructura de control [while]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la condición en la estructura de control [while]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('while', p[2])
         else: 
@@ -1120,7 +1165,8 @@ class Sintactico():
         '''while : WHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                  | WHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                  | WHILE PARENTESIS_ABRE PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta condición en la estructura de control [while]. ', 0, 1])
+        self.fnAhiNo('un while',p.lineno(0),p.lexpos(0))
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta condición en la estructura de control [while]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 6:
             p[0] = ('while', 'Sin Condición')
         else: 
@@ -1139,7 +1185,7 @@ class Sintactico():
     def p_doWhile_error1(self,p):
         '''doWhile : DOWHILE condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                    | DOWHILE condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la condición en la estructura de control [dowhile]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la condición en la estructura de control [dowhile]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 6:
             p[0] = ('doWhile', p[2])
         else: 
@@ -1148,7 +1194,7 @@ class Sintactico():
     def p_doWhile_error2(self,p):
         '''doWhile : DOWHILE condicion instrucciones LLAVE_CIERRA
                  | DOWHILE condicion LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la condición en la estructura de control [dowhile]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la condición en la estructura de control [dowhile]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('doWhile', p[2])
         else: 
@@ -1157,7 +1203,7 @@ class Sintactico():
     def p_doWhile_error3(self,p):
         '''doWhile : DOWHILE condicion LLAVE_ABRE instrucciones
                  | DOWHILE condicion LLAVE_ABRE '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la condición en la estructura de control [dowhile]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la condición en la estructura de control [dowhile]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('doWhile', p[2])
         else: 
@@ -1166,7 +1212,7 @@ class Sintactico():
     def p_doWhile_error4(self,p):
         '''doWhile : DOWHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
                    | DOWHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta condición en la estructura de control [dowhile]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta condición en la estructura de control [dowhile]. ', p.lineno(0),p.lexpos(0)])
         if len(p) == 6:
             p[0] = ('doWhile', 'Sin Condición')
         else: 
@@ -1186,7 +1232,7 @@ class Sintactico():
     
     # def p_condicion(self, p):
     #     '''condicion : PARENTESIS_ABRE expresionLogica error'''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la expresión lógica/relacional. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la expresión lógica/relacional. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = 'error'
     #     self.error_Condicion = True
 
@@ -1247,7 +1293,7 @@ class Sintactico():
         else: 
             self.error_Aritmetica_Condicion = False
             if p[1][0] == 'booleano': 
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
+                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', p.lineno(0),p.lexpos(0)])
                 p[0] = 'error'
                 self.error_Condicion = True
             else:
@@ -1262,7 +1308,7 @@ class Sintactico():
         if len(p) == 2:
             p[0] = None 
         elif p[3][0] == 'booleano': 
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Las operaciones relacionales no pueden realizarse con valores de tipo [boolean]. ', p.lineno(0),p.lexpos(0)])
             p[0] = 'error'
             self.error_Condicion = True
         else: 
@@ -1287,7 +1333,7 @@ class Sintactico():
     # #int a = ((2 + 3) * 4;
     def p_expresionRelacionalParentesis_error(self,p):
         '''expresionRelacionalParentesis : PARENTESIS_ABRE condicion '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la condición. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de cierre en la condición. ', p.lineno(0),p.lexpos(0)])
         p[0] = 'error'
         self.error_Condicion = True
 
@@ -1313,7 +1359,7 @@ class Sintactico():
         '''expresion : termino restoExpresionAritmetica
                      | expresionUnitaria '''
         if not p[1][0] in ['factor', 'termino'] and p[2] != None:
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de adición [+,-] no puede ir precedido de un valor [boolean, string o char]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de adición [+,-] no puede ir precedido de un valor [boolean, string o char]. ', p.lineno(0),p.lexpos(0)])
             p[0] = ('expresion', 'error')
         else: 
             if p[2] is None:
@@ -1369,7 +1415,7 @@ class Sintactico():
         if len(p) == 2:
             p[0] = None  # ε
         elif not p[3][0] in ['factor', 'termino']:
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de adición [+,-] no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de adición [+,-] no puede ir seguido de un valor [boolean, string o char]. ', p.lineno(0),p.lexpos(0)])
             p[0] = 'error'
             self.error_Expresion = True
         else: 
@@ -1409,7 +1455,7 @@ class Sintactico():
         if p[2] is None:
             p[0] = p[1]
         elif p[1][0] != 'factor':
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de multiplicación [*,/,%] no puede ir precedido de un valor [boolean, string o char]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de multiplicación [*,/,%] no puede ir precedido de un valor [boolean, string o char]. ', p.lineno(0),p.lexpos(0)])
             p[0] = 'error'
             self.error_Expresion = True
         else:
@@ -1430,7 +1476,7 @@ class Sintactico():
         if len(p) == 2:
                 p[0] = None  # ε
         elif p[3][0] != 'factor':
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de multiplicación [*,/,%] no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador de multiplicación [*,/,%] no puede ir seguido de un valor [boolean, string o char]. ', p.lineno(0),p.lexpos(0)])
             p[0] = 'error'
             self.error_Expresion = True
         else: 
@@ -1474,7 +1520,7 @@ class Sintactico():
                              | operadorAdicion booleano
                              | operadorAdicion valorCadena'''
         if p[2][0] != 'factor':
-            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador unitario no puede ir seguido de un valor [boolean, string o char]. ', 0, 1])
+            self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Un operador unitario no puede ir seguido de un valor [boolean, string o char]. ', p.lineno(0),p.lexpos(0)])
             p[0] = 'error'
             self.error_Expresion = True
         else: 
@@ -1560,6 +1606,7 @@ class Sintactico():
                                | izqAsignacion fila PUNTO_Y_COMA
                                | definicionArreglo PUNTO_Y_COMA
                                | definicionMatriz PUNTO_Y_COMA'''
+        self.fnAhiNo('una asignación',p.lineno(0),p.lexpos(0))
         # a = [1, 2, 3];
         if len(p) == 4 or p.slice[2].type == 'llamadaMetodo':
             p[0] = ('expresionAsignacion', p[1], p[2])
@@ -1571,6 +1618,7 @@ class Sintactico():
     def p_expresionAsignacion_error(self, p):
         '''expresionAsignacion : izqAsignacion
                                 | izqAsignacion PUNTO_Y_COMA'''
+        self.fnAhiNo('una asignación',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta valor después del operador de asignación [=] en la asignación. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('expresionAsignacion', p[1], ('expresion', 'error'))  
 
@@ -1594,6 +1642,7 @@ class Sintactico():
     def p_llamadaMetodo(self,p):
         '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA
                          | metodoAxol PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         if len(p) == 7:
             p[0] = ('llamadaMetodo', p[3], self.parametros ,p[5]) 
             self.parametros =0
@@ -1604,6 +1653,7 @@ class Sintactico():
     #falta this (puede ser un identificador)
     def p_llamadaMetodo_error1(self,p):
         '''llamadaMetodo : PUNTO IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta palabra reservada [this] en la llamada al método. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaMetodo', p[2], self.parametros ,p[4]) 
         self.parametros = 0
@@ -1612,6 +1662,7 @@ class Sintactico():
     def p_llamadaMetodo_error2(self,p):
         '''llamadaMetodo : THIS IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA
         | THIS PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto [.] después de [this] en la llamada al método. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 3:
             p[0] = ('llamadaMetodo', 'Sin Identificador', self.parametros, ('argumentos')) 
@@ -1623,6 +1674,7 @@ class Sintactico():
     #error thiside
     def p_llamadaMetodo_error3(self,p):
         '''llamadaMetodo : IDENTIFICADOR PARENTESIS_ABRE argumentos PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). La llamada a métodos propios requiere el formato [this.nombreMetodo]. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaMetodo', p[1], self.parametros ,p[3]) 
         self.parametros = 0
@@ -1631,6 +1683,7 @@ class Sintactico():
     def p_llamadaMetodo_error4(self,p):
         '''llamadaMetodo : THIS PUNTO PARENTESIS_ABRE argumentos PUNTO_Y_COMA
                         | THIS PUNTO PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta identificador del método en la llamada al método. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('llamadaMetodo', 'Sin Identificador', self.parametros, ('argumentos')) 
@@ -1643,6 +1696,7 @@ class Sintactico():
     def p_llamadaMetodo_error5(self,p):
         '''llamadaMetodo : THIS PUNTO IDENTIFICADOR argumentos PUNTO_Y_COMA
                         | THIS PUNTO IDENTIFICADOR PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la llamada al método. ',p.lineno(0),p.lexpos(0)])
         if len (p) == 5:
             p[0] = ('llamadaMetodo',  p[3], 0 , ('argumentos',[])) 
@@ -1656,6 +1710,7 @@ class Sintactico():
     #faltan argumentos
     def p_llamadaMetodo_error6(self,p):
         '''llamadaMetodo : THIS PUNTO IDENTIFICADOR PARENTESIS_ABRE PUNTO_Y_COMA'''
+        self.fnAhiNo('la llamada a método',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de cierre en la llamada a método. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('llamadaMetodo', p[3], self.parametros , ('argumentos')) 
         self.parametros = 0
@@ -1814,6 +1869,7 @@ class Sintactico():
     def p_declaracionArreglo(self,p):
         '''declaracionArreglo : declaracionArregloSimple PUNTO_Y_COMA
                               | declaracionArregloSimple IGUAL fila PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         if len(p) == 3:
             # Caso de declaración de arreglo simple, sin asignación
             p[0] = ('declaracionArreglo', p[1])
@@ -1838,6 +1894,7 @@ class Sintactico():
     #IGUAL 
     def p_declaracionArreglo_error2(self,p):
         '''declaracionArreglo : tipoDato IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO PUNTO_Y_COMA '''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
         lista_errores = [('expresion', 'error') for i in range(int(p[4]))]
         p[0] = ('declaracionArreglo', ('declaracionArregloSimple', p[1], p[2], p[4]), ('fila', p[4], lista_errores))
@@ -1846,6 +1903,7 @@ class Sintactico():
     # fila
     def p_declaracionArreglo_error3(self,p):
         '''declaracionArreglo : declaracionArregloSimple IGUAL PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración del arreglo. ',p.lineno(0),p.lexpos(0)])
         lista_errores = [('expresion', 'error') for i in range(int(p[1][3]))]
         p[0] = ('declaracionArreglo', p[1], ('fila', p[1][3], lista_errores))
@@ -1855,6 +1913,7 @@ class Sintactico():
     def p_declaracionMatriz(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple PUNTO_Y_COMA
                               | declaracionMatrizSimple IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         if len(p) == 3:
             # Caso de declaración de matriz sin inicialización
             p[0] = ('declaracionMatriz', p[1])
@@ -1880,6 +1939,7 @@ class Sintactico():
     #IGUAL 
     def p_declaracionMatriz_error2(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple CORCHETE_ABRE filas CORCHETE_CIERRA PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta operador de asignación [=] en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracionMatriz', p[1])
 
@@ -1887,6 +1947,7 @@ class Sintactico():
     def p_declaracionMatriz_error3(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple IGUAL filas CORCHETE_CIERRA PUNTO_Y_COMA
                                 | declaracionMatrizSimple IGUAL PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 4:
             p[0] = ('declaracionMatriz', p[1])
@@ -1897,12 +1958,14 @@ class Sintactico():
     def p_declaracionMatriz_error4(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE CORCHETE_CIERRA PUNTO_Y_COMA
                               | declaracionMatrizSimple IGUAL CORCHETE_ABRE PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracionMatriz', p[1])
 
     #  CORCHETE_CIERRA
     def p_declaracionMatriz_error5(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE filas PUNTO_Y_COMA'''
+        self.fnAhiNo('la declaración',p.lineno(0),p.lexpos(0))
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta corchete de cierre en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracionMatriz', p[1], p[4])
 
@@ -1968,7 +2031,7 @@ class Sintactico():
     #fila sin corchete abre
     # def p_fila_error1(self,p):
     #     '''fila : elementosFila CORCHETE_CIERRA'''
-    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de apertura en la definición de elementos de la estructura de datos. ', 0, 1])
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de apertura en la definición de elementos de la estructura de datos. ', p.lineno(0),p.lexpos(0)])
     #     p[0] = ('fila',self.fila, p[1])
     #     self.filas.append(self.fila)
     #     self.fila=0
@@ -1976,7 +2039,7 @@ class Sintactico():
     #fila sin elementos
     def p_fila_error2(self,p):
         '''fila : CORCHETE_ABRE CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan elementos en la definición de elementos de la estructura de datos. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan elementos en la definición de elementos de la estructura de datos. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('fila',self.fila, None)
         self.filas.append(self.fila)
         self.fila=0
@@ -1984,7 +2047,7 @@ class Sintactico():
     #fila sin corchete cierra}
     def p_fila_error3(self,p):
         '''fila : CORCHETE_ABRE elementosFila'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de cierre en la definición de elementos de la estructura de datos. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de cierre en la definición de elementos de la estructura de datos. ', p.lineno(0),p.lexpos(0)])
         p[0] = ('fila',self.fila, p[1])
         self.filas.append(self.fila)
         self.fila=0
@@ -2055,44 +2118,44 @@ class Sintactico():
     #falta identificador
     def p_accesoMatriz_error1(self,p):
         '''accesoMatriz : CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan identificador de la matriz en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan identificador de la matriz en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
     # #falta corchete abre
     def p_accesoMatriz_error2(self,p):
         '''accesoMatriz : IDENTIFICADOR NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA
                         | IDENTIFICADOR LLAVE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA
                         | IDENTIFICADOR PARENTESIS_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta primer corchete de apertura en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
         
     # #falta numero
     def p_accesoMatriz_error3(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE CORCHETE_CIERRA CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de fila en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de fila en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
 
     # #falta corchete cierra
     def p_accesoMatriz_error4(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_ABRE NUMERO CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el primer corchete de cierre en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el primer corchete de cierre en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
 
     # #falta corchete abre
     def p_accesoMatriz_error5(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA NUMERO CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de apertura en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de apertura en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
 
     # #falta numero
     def p_accesoMatriz_error6(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE CORCHETE_CIERRA'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de columna en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el número de columna en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
 
     # #falta corchete cierra
     def p_accesoMatriz_error7(self,p):
         '''accesoMatriz : IDENTIFICADOR CORCHETE_ABRE NUMERO CORCHETE_CIERRA CORCHETE_ABRE NUMERO'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de cierre en el acceso al elemento de la matriz. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el segundo corchete de cierre en el acceso al elemento de la matriz. ', p.lineno(0),p.lexpos(0)])
         p[0]=('error')
     #----------------------------------------------------------------------------------------------------------
 
@@ -2105,13 +2168,18 @@ class Sintactico():
 
     #---------------------------------------------- E R R O R -------------------------------------------------
     def p_error(self,p):
+        self.pila_errores += p.value
         while True:
-            tok = self.parser.token()            # Get the next token
+            tok = self.parser.token()
+            self.pila_errores += tok.value           # Get the next token
             if not tok or tok.type == 'PUNTO_Y_COMA': break
         self.parser.errok()
 
         return tok
-
+    def fnAhiNo(self,mensaje, line, lexpos):
+        if self.pila_errores!='':
+            self.errores.append([f'Error Sintáctico (Línea {line}). [{ self.pila_errores}] No se puede ponere en {mensaje}. ',line, lexpos])
+            self.pila_errores=''
         # print('prueba sintanctica',p.value)
         # if p:
         #     p = p
