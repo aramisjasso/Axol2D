@@ -117,27 +117,52 @@ if __name__ == "__main__":
         #    }
         # }'''
         '''
-        level MiPrimerNivel {
-            int c = 6%5; 
+        import Background;
+        //importa Players;
 
-            int array [3] = ||||;
+        level MiPrimerNivel{
+            boolean bol1 = true;
+            int x = 0;
+            int y = 1
+            int a1 = 1*x+1.2;
+            string b = "cadena';
+            char char1 = 1';
+            int x23;
+                            // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+            platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
+            platform pl2 = [110  ,   20a ,   20  , 10     ,  0  ,  0   ,   0  ];
+            platform pl3 = pl2;
+            platform pl4 = pl1;
+            platform pl5 = pl4;
 
-            //int numeros [1][5] = [[1, 2, 3, 4, 5];
+            platform plarreglo[3] = [pl1, pl2, pl3];
+            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ) ;
+            obstacles obs2 = [110  ,   20 ,   20   10     ,  0  ,  0   ,   0  ].
+            obstacles obs [2] = [obs1,obs2];
+                
+            background fondo = Castle;
+            int fin [2] = [100,100];
+            int numero1 [3][2] = [[1,2],[3,4],[5,6]];
 
-            method int sumar (int a, int b) {
-                this.sumar(a, b); 
-                while (c < 0) {
-                    b = b + b;
-                    b = b + b;
-                    a = a + 2;
-                    a = a + 2;
+            player jugador == [   0    ,    0    ,   3  , knights   ];
+            
+            method int miMetodo1( int x2, int x4){
+                    pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
+                     a1=12;
+                        while (x<5){
+                            obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                            obss[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                       
+                    
+                        
+                    4return 0;
+                }             
+                axol2D play () {
+                    b = "hola";
+                    x = this.miMetodo1(123,2) ;
+                                        // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+                        MiPrimerNivel start( plarreglo , obs , jugador , fondo , plarreglo,     fin  );
                 }
-                return a;
-            }
-
-            axol2D play () {
-                MiPrimerNivel.start(a, a, a, a, a, a)
-            }
         }
         '''
     ]

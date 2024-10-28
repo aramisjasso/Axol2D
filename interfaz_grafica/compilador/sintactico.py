@@ -379,6 +379,14 @@ class Sintactico():
         else:
             p[0] = None
 
+    #error
+    # def p_restoDeclaracion_error1(self,p):
+    #     '''restoDeclaracion : PUNTO_Y_COMA restoDeclaracion'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Error en la declaración. ',p.lineno(0),p.lexpos(0)])
+    #     p[0] = None
+
+    #instrucción en bloque de declaración
+
     #<declaracion> ::= ( <declaracionTipo> ( <valorDeclaracion> | ε ) ; ) | <declaracionEstructuraDatos>
     def p_declaracion(self,p):
         '''declaracion : declaracionTipo PUNTO_Y_COMA
@@ -396,56 +404,44 @@ class Sintactico():
             p[0] = ('declaracion', p[1],'',(p.lineno(0),p.lexpos(0)))#vacio para el manejo más adelante
         #Manejo de errores de declaración
 
-    def p_declaracion1(self,p):
-        '''declaracion : declaracionTipo 
-                        | declaracionTipo valorDeclaracion
-                        | valorDeclaracion PUNTO_Y_COMA
-                        | valorDeclaracion '''
-        if  p.slice[1].type=='declaracionTipo':
-            if len(p)==2:
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1][1]} {p[1][2]}". Falta punto y coma en la declaración [;].\n\t Solución: {p[1][1]} {p[1][2]} ";"',p.lineno(0),p.lexpos(0)])
-            else:
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1][1]} {p[1][2]} = valor". Falta punto y coma en la declaración [;].\n\t Solución: {p[1][1]} {p[1][2]} = valor ";"',p.lineno(0),p.lexpos(0)])
-        else: 
-            if len(p)==2:
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la declaración del tipo y el punto y coma en la declaración [;].\n\t Solución: "[Tipo] [id] "= valor ";"',p.lineno(0),p.lexpos(0)])
-            else:
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta la declaración del tipo en la declaración.\n\t Solución: "[Tipo] [id] "= valor ;"',p.lineno(0),p.lexpos(0)])
-        p[0]=('error')
-        # Declaracion con Asignacion
+    #declaracionTipo = ; 
+    def p_declaracion_error1(self,p):
+        '''declaracion : declaracionTipo IGUAL PUNTO_Y_COMA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el valor de la asignación en la declaración. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracion', p[1], (p.lineno(0),p.lexpos(0)))
 
     #Validar que no se evalue y el valor sea 'Null'
-    def p_declaracion_error(self,p):
+    def p_declaracion_error2(self,p):
         '''declaracion : declaracionTipo valorDeclaracion PARENTESIS_CIERRA PUNTO_Y_COMA
                        | declaracionTipo valorDeclaracion PARENTESIS_CIERRA expresion PUNTO_Y_COMA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta parentesis de apertura en la expresión aritmética. ',p.lineno(0),p.lexpos(0)])
-        p[0] = ('declaracion', p[1], ('expresion', 'error'))
+        p[0] = ('declaracion', p[1], ('expresion', 'error'), (p.lineno(0),p.lexpos(0)))
         self.error_Expresion = True
 
-    def p_declaracionTipo_Error(self,p):
-        '''declaracion : tipoDato  PUNTO_Y_COMA
-                       | IDENTIFICADOR PUNTO_Y_COMA
-                       | tipoDato  valorDeclaracion PUNTO_Y_COMA
-                       | IDENTIFICADOR valorDeclaracion PUNTO_Y_COMA
-                       | tipoDato  valorDeclaracion
-                       | IDENTIFICADOR valorDeclaracion'''
-        if p.slice[1].type=='tipoDato':
-            if len(p)==3:
-                if p.slice[2].type=='valorDeclaracion':
-                    #tipoDato  valorDeclaracion
-                    self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor". Falta identificador y punto y coma en la declaración [;].\n\t Solución: {p[1]} "[id]" = valor ";"',p.lineno(0),p.lexpos(0)])
-            else:
-                #tipoDato  valorDeclaracion PUNTO_Y_COMA
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor;". Falta identificador en declaración. \n\t Solución: {p[1]} "[id]" = valor ;',p.lineno(0),p.lexpos(0)])
-        else:
-            if len(p)==3:
-                if p.slice[2].type=='valorDeclaracion':
-                    #IDENTIFICADOR valorDeclaracion
-                    self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor". Falta el tipo de dato y punto y coma en la declaración [;].\n\t Solución: "[Tipo]" {p[1]}  = valor ";"',p.lineno(0),p.lexpos(0)])
-            else:
-                self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor;". Falta el tipo de dato.\n\t Solución: "[Tipo]" {p[1]}  = valor ;',p.lineno(0),p.lexpos(0)])
+    # def p_declaracionTipo_Error(self,p):
+    #     '''declaracion : tipoDato  PUNTO_Y_COMA
+    #                    | IDENTIFICADOR PUNTO_Y_COMA
+    #                    | tipoDato  valorDeclaracion PUNTO_Y_COMA
+    #                    | IDENTIFICADOR valorDeclaracion PUNTO_Y_COMA
+    #                    | tipoDato  valorDeclaracion
+    #                    | IDENTIFICADOR valorDeclaracion'''
+    #     if p.slice[1].type=='tipoDato':
+    #         if len(p)==3:
+    #             if p.slice[2].type=='valorDeclaracion':
+    #                 #tipoDato  valorDeclaracion
+    #                 self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor". Falta identificador y punto y coma en la declaración [;].\n\t Solución: {p[1]} "[id]" = valor ";"',p.lineno(0),p.lexpos(0)])
+    #         else:
+    #             #tipoDato  valorDeclaracion PUNTO_Y_COMA
+    #             self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor;". Falta identificador en declaración. \n\t Solución: {p[1]} "[id]" = valor ;',p.lineno(0),p.lexpos(0)])
+    #     else:
+    #         if len(p)==3:
+    #             if p.slice[2].type=='valorDeclaracion':
+    #                 #IDENTIFICADOR valorDeclaracion
+    #                 self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor". Falta el tipo de dato y punto y coma en la declaración [;].\n\t Solución: "[Tipo]" {p[1]}  = valor ";"',p.lineno(0),p.lexpos(0)])
+    #         else:
+    #             self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) "{p[1]} = valor;". Falta el tipo de dato.\n\t Solución: "[Tipo]" {p[1]}  = valor ;',p.lineno(0),p.lexpos(0)])
 
-        p[0] = ('error')
+    #     p[0] = ('error')
 
     #<declaracionTipo> ::= <tipoDato> idenfiticador
     def p_declaracionTipo(self,p):
@@ -530,8 +526,11 @@ class Sintactico():
     #falta parentesis abre
     def p_metodoDeclaracion_error3(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo LLAVE_CIERRA'''
+                             # | METHOD tipoDato errorFactores PUNTO_Y_COMA contenidoMetodo LLAVE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta paréntesis de apertura en la declaración del método. ', 0, 1])
-        p[0] = ('metodoDeclaracion', p[2],p[3], p[4], p[7], (p.lineno(0),p.lexpos(0)))
+        if len(p) == 9: 
+            p[0] = ('metodoDeclaracion', p[2],p[3], p[4], p[7], (p.lineno(0),p.lexpos(0)))
+
 
     #falta parentesis cierra 
     def p_metodoDeclaracion_error4(self,p):
@@ -701,7 +700,6 @@ class Sintactico():
     
     #falta if en if con else
     #error 0 if
-
     def p_ifElse_error1(self,p):
         '''ifElse : IF condicion PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
@@ -722,8 +720,7 @@ class Sintactico():
                   | IF condicion instrucciones LLAVE_CIERRA
                   | IF condicion LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
                   | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
-                  | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA
-                  | IF condicion  error '''
+                  | IF condicion instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', 0, 1])
         if len(p) == 3:
             p[0] = ('ifElse', p[2])
@@ -737,6 +734,16 @@ class Sintactico():
             p[0] = ('ifElse', p[2], p[3])
         else: 
             p[0] = ('ifElse', p[2], p[3], p[7])
+
+    def p_ifElse_error2_5(self, p):
+        '''ifElse : IF condicion PUNTO_Y_COMA LLAVE_CIERRA
+                  | IF condicion PUNTO_Y_COMA LLAVE_CIERRA ELSE LLAVE_ABRE LLAVE_CIERRA
+                  | IF condicion PUNTO_Y_COMA instrucciones LLAVE_CIERRA ELSE LLAVE_ABRE instrucciones LLAVE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la estructura [if]. ', 0, 1])
+        if len(p) == 5 or len(p) == 8: 
+            p[0] = ('ifElse', p[2])
+        else: 
+            p[0] = ('ifElse', p[2], p[4], p[8])
 
     def p_ifElse_error3(self, p):
         '''ifElse : IF condicion LLAVE_ABRE 
@@ -898,12 +905,13 @@ class Sintactico():
     
     def p_restoCasos_error2(self,p):
         '''restoCasos : DEFAULT DOS_PUNTOS '''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
         p[0] = ('default', p[2])
 
     def p_restoCasos_error3(self,p):
-        '''restoCasos : DEFAULT instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). El caso [default] en la estructura [switch] no puede estar vacío. ', 0, 1])
+        '''restoCasos : DEFAULT instrucciones
+                      | DEFAULT PUNTO_Y_COMA instrucciones'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan los dos puntos [:] después del [default] en la estructura [switch]. ', 0, 1])
         p[0] = ('default', p[2])
 
     #<for> ::= for ( int identificador ; <condicion> ;  <expresionAsignacion> ) { <instrucciones> }
@@ -1086,14 +1094,17 @@ class Sintactico():
         elif len(p) == 6:
             p[0] = ('while', p[2])
         else: 
-            p[0] = ('while', p[2], p[4])
+            p[0] = ('while', p[2], p[5])
 
     def p_while_error2(self,p):
         '''while : WHILE condicion instrucciones LLAVE_CIERRA
-                 | WHILE condicion LLAVE_CIERRA'''
+                 | WHILE condicion LLAVE_CIERRA
+                 | WHILE condicion PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de apertura en la condición en la estructura de control [while]. ', 0, 1])
         if len(p) == 4:
             p[0] = ('while', p[2])
+        elif len(p) == 6: 
+            p[0] = ('while', p[2], p[4])  
         else: 
             p[0] = ('while', p[2], p[3])
 
@@ -1108,7 +1119,8 @@ class Sintactico():
     
     def p_while_error4(self,p):
         '''while : WHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE instrucciones LLAVE_CIERRA
-                 | WHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA'''
+                 | WHILE PARENTESIS_ABRE PARENTESIS_CIERRA LLAVE_ABRE LLAVE_CIERRA
+                 | WHILE PARENTESIS_ABRE PUNTO_Y_COMA instrucciones LLAVE_CIERRA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta condición en la estructura de control [while]. ', 0, 1])
         if len(p) == 6:
             p[0] = ('while', 'Sin Condición')
@@ -1372,9 +1384,9 @@ class Sintactico():
     # int a = 4 + ;
     # int a = 4 * 3 + (12 - 8) + ;
     def p_restoExpresionAritmetica_error2(self, p):
-        '''restoExpresionAritmetica : restoExpresionAritmetica operadorAdicion error
-                                    | restoExpresionAritmetica MENOS_MENOS error
-                                    | restoExpresionAritmetica MAS_MAS error'''
+        '''restoExpresionAritmetica : restoExpresionAritmetica operadorAdicion 
+                                    | restoExpresionAritmetica MENOS_MENOS 
+                                    | restoExpresionAritmetica MAS_MAS'''
         if len(self.errores) != 0:
             if self.errores[-1] == [f'Error Sintáctico (Línea {p.lineno(0)}). Se esperaba un [operando] antes del operador de multiplicación [*, /, %]. ',p.lineno(0),p.lexpos(0)]:
                 self.errores.pop()
@@ -1722,6 +1734,15 @@ class Sintactico():
         self.fila+=1
         p[0] = [p[1]] + p[2]
 
+    def p_elementosFila_error(self,p):
+        '''elementosFila : expresion expresion restoElementosFila
+                        | valorCadena valorCadena restoElementosFila
+                        | booleano booleano restoElementosFila'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta coma [,] entre elementos en la estructura de datos. ',p.lineno(0),p.lexpos(0)])
+        self.fila+=1
+        #aquí debería mandar error en lugar de una producción creada
+        p[0] = [p[1]] + p[3]
+
     # <restoElementosFila> ::= , <elementosFila> | ε
     def p_restoElementosFila(self,p):
         '''restoElementosFila : COMA elementosFila
@@ -1730,6 +1751,14 @@ class Sintactico():
             p[0] = []
         else:  # Caso con coma
             p[0] = p[2]
+
+    def p_restoElementosFila_error(self,p):
+        '''restoElementosFila : COMA COMA elementosFila'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta elemento después de coma [,] en la definición de los elementos de la estructura de datos. ',p.lineno(0),p.lexpos(0)])
+        if len(p) == 2:  # Caso de ε
+            p[0] = []
+        else:  # Caso con coma
+            p[0] = p[3]
     #----------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------- V A L O R E S -----------------------------------------------
@@ -1789,7 +1818,7 @@ class Sintactico():
     #falta punto y coma
     def p_declaracionArreglo_error1(self,p):
         '''declaracionArreglo : declaracionArregloSimple
-                              | declaracionArregloSimple IGUAL fila'''
+                              | declaracionArregloSimple IGUAL fila '''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 2:
             # Caso de declaración de arreglo simple, sin asignación
@@ -1830,7 +1859,7 @@ class Sintactico():
     def p_declaracionMatriz_error1(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple 
                               | declaracionMatrizSimple IGUAL CORCHETE_ABRE filas CORCHETE_CIERRA
-                               |  declaracionMatrizSimple IGUAL fila '''
+                              |  declaracionMatrizSimple IGUAL fila '''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta punto y coma [;] al final de la instrucción. ',p.lineno(0),p.lexpos(0)])
         if len(p) == 2:
             # Caso de declaración de matriz sin inicialización
@@ -1860,7 +1889,7 @@ class Sintactico():
     # filas
     def p_declaracionMatriz_error4(self,p):
         '''declaracionMatriz  : declaracionMatrizSimple IGUAL CORCHETE_ABRE CORCHETE_CIERRA PUNTO_Y_COMA
-                                | declaracionMatrizSimple IGUAL CORCHETE_ABRE PUNTO_Y_COMA'''
+                              | declaracionMatrizSimple IGUAL CORCHETE_ABRE PUNTO_Y_COMA'''
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar los elementos del arreglo en la declaración de la matriz. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracionMatriz', p[1])
 
@@ -1920,6 +1949,7 @@ class Sintactico():
             self.matriz+=1
         else:
             p[0] = []
+
         #fila resto filas sin coma en medio
 
     def p_fila(self,p):
@@ -1929,8 +1959,29 @@ class Sintactico():
         self.fila=0
     
     #fila sin corchete abre
+    # def p_fila_error1(self,p):
+    #     '''fila : elementosFila CORCHETE_CIERRA'''
+    #     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de apertura en la definición de elementos de la estructura de datos. ', 0, 1])
+    #     p[0] = ('fila',self.fila, p[1])
+    #     self.filas.append(self.fila)
+    #     self.fila=0
+
     #fila sin elementos
-    #fila sin corchete cierra
+    def p_fila_error2(self,p):
+        '''fila : CORCHETE_ABRE CORCHETE_CIERRA'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan elementos en la definición de elementos de la estructura de datos. ', 0, 1])
+        p[0] = ('fila',self.fila, None)
+        self.filas.append(self.fila)
+        self.fila=0
+
+    #fila sin corchete cierra}
+    def p_fila_error3(self,p):
+        '''fila : CORCHETE_ABRE elementosFila'''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Faltan corchete de cierre en la definición de elementos de la estructura de datos. ', 0, 1])
+        p[0] = ('fila',self.fila, p[1])
+        self.filas.append(self.fila)
+        self.fila=0
+
 
     # # <elementosFila> ::= <expresion> <restoElementosFila>
     # def p_elementosFila(self,p):

@@ -1077,8 +1077,11 @@ class Semantico():
             elif isinstance(validaDeclaracion, bool) and validaDeclaracion:
                 valor = self.fnRetornaValor(elemento)
                 if valor == 'Null' and nameMetod is None:
-                    self.errores.append([f'Advertencia (Línea {line}). La variable [{elemento}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
-                    pila_evaluacion.append(12) #Quitar esto cuando empecemos a trabajar con la memoria. 
+                    if self.fnEncontrarTipo(elemento) in ['int', 'byte']:
+                        self.errores.append([f'Advertencia (Línea {line}). La variable [{elemento}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
+                        pila_evaluacion.append(12) #Quitar esto cuando empecemos a trabajar con la memoria. 
+                    else: 
+                        return 'Null'
                 else:
                     pila_evaluacion.append(valor)  
             elif isinstance(validaDeclaracion, bool) and not validaDeclaracion:

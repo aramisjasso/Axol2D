@@ -282,11 +282,10 @@ class Lexico():
 
 
     # Caracteres no válidos
-    def t_error(self,t):
-        r'[^a-zA-Z0-9_\-\.]'
-        mensaje_error=(f"Error Léxico (Línea {t.lineno}) la cadena: \"{t.value[0]}\". El identificador no es válido. Debe comenzar con una letra y puede estar seguido de dígitos o letras.")
-        print(mensaje_error)
-        self.errores.append([mensaje_error,t.lineno,t.lexpos])
+    def t_error(self, t):
+        mensaje_error = (f"Error Léxico (Línea {t.lineno}) \"{t.value[0]}\". El carácter [{t.value[0]}] no pertenece al alfabeto del lenguaje.")
+        #print(mensaje_error)
+        self.errores.append([mensaje_error, t.lineno, t.lexpos])
         t.lexer.skip(1)
 
     def build(self, **kwargs):
