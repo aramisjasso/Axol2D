@@ -437,6 +437,16 @@ class Sintactico():
         self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el valor de la asignación en la declaración. ',p.lineno(0),p.lexpos(0)])
         p[0] = ('declaracion', p[1], (p.lineno(0),p.lexpos(0)))
 
+    def p_declaracion_error1_1(self,p):
+        '''declaracion : declaracionTipo IGUAL '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta especificar el valor de la asignación en la declaración y el punto y coma. ',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracion', p[1], (p.lineno(0),p.lexpos(0)))
+
+    def p_declaracion_error1_2(self,p):
+        '''declaracion : declaracionTipo  '''
+        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta el punto y coma en la declaración.',p.lineno(0),p.lexpos(0)])
+        p[0] = ('declaracion', p[1], (p.lineno(0),p.lexpos(0)))
+
     #Validar que no se evalue y el valor sea 'Null'
     def p_declaracion_error2(self,p):
         '''declaracion : declaracionTipo valorDeclaracion PARENTESIS_CIERRA PUNTO_Y_COMA
@@ -581,7 +591,7 @@ class Sintactico():
     #falta llave cierra
     def p_metodoDeclaracion_error7(self,p):
         '''metodoDeclaracion : METHOD tipoDato IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA LLAVE_ABRE contenidoMetodo'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta llave de cierre en la declaración del método. ', p.lineno(0),p.lexpos(0)])
+        self.errores.append([f'Error Sintáctico (Línea {p.linespan(8)[1]}). Falta llave de cierre en la declaración del método. ', p.linespan(8)[1],p.lexpos(0)])
         p[0] = ('metodoDeclaracion', p[2],p[3], p[5], p[8], (p.lineno(0),p.lexpos(0)))
 
     #<contenidoMetodo> ::= <instrucciones> return <expresion> ;
@@ -597,7 +607,7 @@ class Sintactico():
     #falta return 
     def p_contenidoMetodo_error1(self,p):
         '''contenidoMetodo : instrucciones'''
-        self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', p.lineno(0),p.lexpos(0)])
+        self.errores.append([f'Error Sintáctico (Línea {p.linespan(0)[1]}). Falta return en el contenido del método. Todos los métodos deben retornar un valor. ', p.linespan(0)[1],p.lexpos(0)])
         p[0] = ('contenidoMetodo', p[1], ('expresion', 'error'), (p.lineno(-1),p.lexpos(-1)))
 
     #falta expresion de retorno
@@ -2171,7 +2181,7 @@ class Sintactico():
         self.pila_errores += p.value
         while True:
             tok = self.parser.token()
-            self.pila_errores += tok.value           # Get the next token
+            self.pila_errores += ' '+tok.value           # Get the next token
             if not tok or tok.type == 'PUNTO_Y_COMA': break
         self.parser.errok()
 

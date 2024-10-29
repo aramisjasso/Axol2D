@@ -83,7 +83,7 @@ class Compilador():
         self.errores_lista = self.errores_lexicos
         self.errores_lista +=self.errores_sintacticos
         self.errores_lista +=self.sema.errores
-        self.errores_lista= sorted(self.errores_lista, key=lambda x:x[2])
+        self.errores_lista= sorted(self.errores_lista, key=lambda x:x[1])
         for error in self.errores_lista:
             mensajes+=(f"{error[0]}" +'\n')
         return mensajes

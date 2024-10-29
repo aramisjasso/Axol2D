@@ -203,16 +203,17 @@ class Lexico():
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         pass
         # Error cadena no cerrada
-    def t_ERROR_LEXICO_7(self,t):
-        r'\"([a-zA-Z0-9_\-\.])*'
-        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Faltan comillas dobles al final de la cadena. La cadena no fue cerrada.")
-        self.errores.append([mensaje_error,t.lineno,t.lexpos])
-        pass
 
     # Error cadena no cerrada
     def t_ERROR_LEXICO_7_1(self,t):
         r'\"([a-zA-Z0-9_\-\.])*\''
         mensaje_error=(f"Error Léxico (Línea {t.lineno}). Faltan comillas dobles al final de la cadena. La cadena fue cerrada con comilla simple.")
+        self.errores.append([mensaje_error,t.lineno,t.lexpos])
+        pass
+
+    def t_ERROR_LEXICO_7(self,t):
+        r'\"([a-zA-Z0-9_\-\.])*'
+        mensaje_error=(f"Error Léxico (Línea {t.lineno}). Faltan comillas dobles al final de la cadena. La cadena no fue cerrada.")
         self.errores.append([mensaje_error,t.lineno,t.lexpos])
         pass
 
