@@ -82,7 +82,7 @@ class Intermedio():
         #self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         #self.fnBloqueDeclaracion()
         if not(self.parteMetodos is None):
-            self.fnbloqueMetodos()
+            '''self.fnbloqueMetodos()'''
         if self.parteMetodoPrincipal[1] != 'Sin Método Axol': 
             self.fnMetodoPrincipal()
 
@@ -712,7 +712,7 @@ class Intermedio():
 #---------------------------Evaluación de la Pila Semántica-------------------------------------
 
     def evaluar_pila(self, semantica,nameMetod =None,line=0,lexpos=0):
-
+        
         pila_evaluacion = []
         idConValor = True
         
