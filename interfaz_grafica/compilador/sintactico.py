@@ -24,7 +24,8 @@ class Sintactico():
         self.pila_errores=''
     
     def build(self):
-        self.parser = yacc.yacc(module=self,method='LALR', debug=True)
+        self.parser = yacc.yacc(module=self,method='LALR')
+        # self.parser = yacc.yacc(module=self,method='LALR', debug=True)
         #parser = yacc.yacc(debug=True, write_tables=True, outputdir='.')
 
     #------------------------------------------ P R O G R A M A ---------------------------------------------------

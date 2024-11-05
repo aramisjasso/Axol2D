@@ -57,8 +57,8 @@ class Compilador():
         self.sin.build()
         lexer.lineno = 1 #Reincia el número de linea
         try:
-            #self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
-            self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True,tracking=True)
+            self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
+            # self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True,tracking=True)
             if self.resultado:
                 print("Análisis sintáctico exitoso:", self.resultado, '\n')
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")

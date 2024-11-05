@@ -294,8 +294,7 @@ class Intermedio():
                     
                     self.postorden(valores)
                     #print(self.pila_semantica)
-                    self.pilaCodigo.append([self.idIntruccion,('=',id,self.pila_semantica)])
-                    self.idIntruccion+=1
+                    
                     valores = self.evaluar_pila(self.pila_semantica,var,line=line,lexpos=lexpos)
                     
                     #print(valores)
@@ -420,21 +419,56 @@ class Intermedio():
                 if  y[1][0] == 'ifElse': 
                     condicion =  y[1][1]
                     #print(condicion)
-                    if x[1][1][1] != 'error':
-                      self.postorden(condicion)
-                       #print(self.pila_semantica)
-                      self.evaluar_pila(self.pila_semantica, llamada,line=line,lexpos=lexpos)
-                    #condicionEvaluada = self.evaluar_pila(self.pila_semantica)
-                      self.pila_semantica = []
-
+                    #   self.postorden(condicion)
+                    #    #print(self.pila_semantica)
+                    #   self.evaluar_pila(self.pila_semantica, llamada,line=line,lexpos=lexpos)
+                    # #condicionEvaluada = self.evaluar_pila(self.pila_semantica)
+                    #   self.pila_semantica = []
 
                     #if con instrucciones sin else (o else sin instrucciones)
                     if len( y[1]) == 3: 
-                        self.fnInstrucciones( y[1][2], llamada)
+                        condicion = y[1][1]
+                        self.postorden(condicion)
+                        inicio_while=self.idIntruccion
+                        condEval = self.evaluar_pila(self.pila_semantica,llamada,line=line,lexpos=lexpos)
+                        print('condicipónEval',condEval)
+                        self.pilaCodigo.append([self.idIntruccion,['IFF',f'({self.idIntruccion -1})','GOTO']])
+                        #INICIO DE CODIGO
+                        
+                        inicio_iff = self.idIntruccion
+                        self.idIntruccion+=1
+                        
+                        #print(condEval)
+                        self.pila_semantica = []
+
+                    #Evaluar instrucciones
+                        self.fnInstrucciones(y[1][2], llamada)
+                        self.pilaCodigo[inicio_iff][1][2]=f'({self.idIntruccion})'
+                    
                     #Condición, instrucciones del if y else
                     elif len( y[1]) == 4: 
-                        self.fnInstrucciones( y[1][2], llamada)
+                        condicion = y[1][1]
+                        self.postorden(condicion)
+                        inicio_while=self.idIntruccion
+                        condEval = self.evaluar_pila(self.pila_semantica,llamada,line=line,lexpos=lexpos)
+                        
+                        self.pilaCodigo.append([self.idIntruccion,['IFF',f'({self.idIntruccion -1})','GOTO']])
+                        #INICIO DE CODIGO
+                        
+                        inicio_iff = self.idIntruccion
+                        self.idIntruccion+=1
+                        
+                        #print(condEval)
+                        self.pila_semantica = []
+
+                    #Evaluar instrucciones
+                        self.fnInstrucciones(y[1][2], llamada)
+                        self.pilaCodigo.append([self.idIntruccion,['GO TO','','GOTO']])
+                        fin_if=self.idIntruccion
+                        self.idIntruccion+=1
+                        self.pilaCodigo[inicio_iff][1][2]=f'({self.idIntruccion})'
                         self.fnInstrucciones( y[1][3], llamada)
+                        self.pilaCodigo[fin_if][1][2]=f'({self.idIntruccion})'
                     
                 elif y[1][0] == 'switch':
                     #Validar que y[1][1] esté declarada
@@ -475,12 +509,25 @@ class Intermedio():
                 elif y[1][0] == 'while':
                     condicion = y[1][1]
                     self.postorden(condicion)
+                    inicio_while=self.idIntruccion
                     condEval = self.evaluar_pila(self.pila_semantica,llamada,line=line,lexpos=lexpos)
+                    print('condicipónEval',condEval)
+                    self.pilaCodigo.append([self.idIntruccion,['IFF',f'({self.idIntruccion -1})','GOTO']])
+                    #INICIO DE CODIGO
+                    
+                    inicio_iff = self.idIntruccion
+                    self.idIntruccion+=1
+                    
                     #print(condEval)
                     self.pila_semantica = []
+
                     #Evaluar instrucciones
                     if len(y[1]) == 3:
-                         self.fnInstrucciones(y[1][2], llamada)
+                        self.fnInstrucciones(y[1][2], llamada)
+                        self.pilaCodigo.append((self.idIntruccion,('GO TO','',f'({inicio_while})')))
+                        self.idIntruccion+=1
+                        self.pilaCodigo[inicio_iff][1][2]=f'({self.idIntruccion})'
+                    #Fuera de while
                 elif y[1][0] == 'doWhile':
                     condicion = y[1][1]
                     self.postorden(condicion)
@@ -492,6 +539,7 @@ class Intermedio():
                         self.fnInstrucciones(y[1][2], llamada)
 
             elif y[0]=='expresionAsignacion':
+                print('Es una fila',y)
                 id=y[1][1]
                 if id == 'Sin Identificador':
                     return
@@ -512,12 +560,12 @@ class Intermedio():
                         #declaración
                         comprueba=self.fnComprobarDeclaracion(id)
                         if comprueba =='NoId' or comprueba == False:
-                            self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha sido declarada.', line,lexpos])
+                            ''''''
                         else:
                             #Validar que sea un arreglo 
                             tipo = self.fnEncontrarTipo(id)
                             if len(tipo) != 2 or tipo[0]=='Metodo':
-                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{id}] no ha puede tener acceso lineal.',line, lexpos])
+                                ''''''
                             else:
                                 id2 = separado[1]
                                 temp = self.fnComprobarDeclaracion(id2)
@@ -527,12 +575,12 @@ class Intermedio():
                                     temp_id=id2
                                     id2=f'{llamada},{id2}'
                                     if 'NoId'== self.fnComprobarDeclaracion(id2):
-                                        self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                                        ''''''
                                 if 'int' != self.fnEncontrarTipo(id2):
-                                    self.errores.append([f'Error Semántico (Línea {line}. La variable [{id2}] no es de tipo int.',line, lexpos])
+                                    ''''''
                                 else:
                                     if len(y)==3:
-                                        id +=',0'
+                                        id +=f',{id2}'
                                         valores= y[2]        
                                         if y[2][0] == 'llamadaMetodo':
                                             x2 = y[2]
@@ -540,10 +588,43 @@ class Intermedio():
                                             self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
                                             self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
                                         else:
-                                            self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                            if valores[0] == 'expresion' and valores[1] != 'error':
+                                                self.postorden(valores)
+                                                valor_x=self.evaluar_pila(self.pila_semantica)
+                                                if len(self.pila_semantica)!=1:    
+                                                    self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                                                    self.idIntruccion+=1
+                                                    self.pila_semantica = []
+                                                else:
+                                                    self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
+                                                    self.idIntruccion+=1
+                                                    self.pila_semantica = []
+                                            elif valores[0] == 'fila':
+                                                tamaño = valores[1]
+                                                fila = valores[2]
+                                                print('fila123',fila[0])
+                                                for x1 in range (tamaño):
+                                                    self.postorden(fila[x1])
+                                                    self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id},{x1}')))
+                                                    self.idIntruccion+=1
+                                                    self.pila_semantica = []
+                                                
+                                            else:
+                                                self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
+                                                self.idIntruccion+=1
                                     elif len(y)==2:
                                         valores= y[1][2]
-                                        self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                        if valores[0] == 'expresion' and valores[1] != 'error':
+                                            self.postorden(valores)
+                                            valor_x=self.evaluar_pila(self.pila_semantica)
+                                        if len(self.pila_semantica)!=1:    
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                        else:
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
                     else:
                         if not temp or 'NoId'== temp:
                             #print('Declaración', temp)
@@ -559,12 +640,49 @@ class Intermedio():
                                     x2 = y[2]
                                     print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
                                     self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                    self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                    self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                                    self.idIntruccion+=1
                                 else:
-                                    self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                    if valores[0] == 'expresion' and valores[1] != 'error':
+                                        self.postorden(valores)
+                                        valor_x=self.evaluar_pila(self.pila_semantica)
+                                        if len(self.pila_semantica)!=1:    
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                        else:
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                    elif valores[0] == 'fila':
+                                        tamaño = valores[1]
+                                        fila = valores[2]
+                                        print('fila123',fila[0])
+                                        for x1 in range (tamaño):
+                                            self.postorden(fila[x1])
+                                            self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id},{x1}')))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                                
+                                    else:
+                                        self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
+                                        self.idIntruccion+=1
                             elif len(y)==2:
                                 valores= y[1][2]
-                                self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                if valores[0] == 'expresion':
+                                        self.postorden(valores)
+                                        valor_x=self.evaluar_pila(self.pila_semantica)
+                                        if len(self.pila_semantica)!=1:    
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                        else:
+                                            self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
+                                            self.idIntruccion+=1
+                                            self.pila_semantica = []
+                                else:
+                                    self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
+                                    self.idIntruccion+=1
                                 
                     
             elif y[0]=='llamadaMetodo':
@@ -577,43 +695,34 @@ class Intermedio():
                 else:
                     self.fnLlamadaMetodo(y[1],y[2],y[3],llamada,line=line,lexpos=lexpos)
             elif y[0] == 'llamadaStart':
-                if llamada != 'axol':
-                    self.errores.append([f'Error Semántico (Línea {line}. El método start() solo puede ser llamado desde el método principal axol2D play().',line, lexpos])
-                    return
-                # print(self.ts[0][0])
-                # print(y[1])
-                self.banderaStart = True
-                if not (self.fnComprobarDeclaracion(y[1]) and self.fnEncontrarTipo(y[1]) == 'Nivel'):
-                        nombreNivel = self.fnEncontrarMétodo()
-                        self.errores.append([f'Error Semántico (Línea {line}. El identificador de llamada al método start() [{y[1]}] no coincide con el identificador del nivel [{nombreNivel}].',line, lexpos]) 
-                else:
-                    
-                    self.pilaCodigo.append([self.idIntruccion,('call','start',(y[2][1][1],y[3][1][1],y[4][1][1],y[5][1][1],y[6][1][1],y[7][1][1]))])
-                    return
+                for x1 in range (6):
+                    self.pilaCodigo.append((self.idIntruccion,('parm','',y[x1+2][1][1])))
+                    self.idIntruccion+=1
+                self.pilaCodigo.append([self.idIntruccion,('call','','start')])
+                return
                 #print(y)
 #----------Asignación Metodo ()--------------------------------------------------------------
     def fnLlamadaMetodo(self,id,cantidad,argumentos,id_desdellamado ,line = 0 , lexpos=0):
         print('Es una llamada de Metodo', id, cantidad, argumentos)
         #Validación si es un método
-        tipo=self.fnEncontrarTipo(id)
-        if not (isinstance(tipo, tuple) and tipo[0] in ['metodo']):
-            self.errores.append([f'Error Semántico (Línea {line}). La variable llamada no es un método [{id}].', line, lexpos])
-            return
-        #Validar cantidad de argumentos
-        indice=self.fnIndice(id)
-        cantidad_metodo = int(self.ts[indice][3][0])
-        # print('Catidad método: ',cantidad_metodo)
-        if cantidad!=cantidad_metodo:
-            self.errores.append([f'Error Semántico (Línea {line}). La cantidad de argumentos proporcionados, no corresponde con la cantidad de argumentos declarados.', line, lexpos])
-            return
         #Validar tipo de argumento
         lista_argumentos=self.fnListaArgumentos(argumentos,cantidad)
-        for x in range(cantidad_metodo):
-            temp_id=self.ts[indice+x+1][0]
-            #print('indice: ',temp_id)
-            #print('valor: ', lista_argumentos[x])
-            self.fnAsignar(lista_argumentos[x],temp_id,True,id_desdellamado,line=line,lexpos=lexpos)
-
+        for x in range(cantidad):
+            print('valor: ', lista_argumentos[x])
+            valores = lista_argumentos[x]
+            print('valores',valores)
+            if valores[0] == 'expresion': 
+                self.postorden(valores)
+                self.pilaCodigo.append((self.idIntruccion,('parm','',self.pila_semantica)))
+                self.idIntruccion+=1
+                self.pila_semantica = []
+            else:
+                self.pilaCodigo.append((self.idIntruccion,('parm','',valores)))
+                self.idIntruccion+=1
+                #self.fnAsignar(lista_argumentos[x],temp_id,True,id_desdellamado,line=line,lexpos=lexpos)
+        self.pilaCodigo.append((self.idIntruccion,('call', '',id)))
+        self.idIntruccion+=1
+        
         # print('Tipo',tipo[1])
         #lista_argumentos = fnSeparacionArgumentos(argumentos)
 
@@ -729,11 +838,11 @@ class Intermedio():
                     elemento=temp_elemento
             validaDeclaracion =self.fnComprobarDeclaracion(elemento)
             if self.validaNumero(elemento):
-                pila_evaluacion.append(int(elemento))
+                pila_evaluacion.append((elemento))
             #---Validación de Identificadores---
 
             elif isinstance(validaDeclaracion, bool) and validaDeclaracion:
-                valor = self.fnRetornaValor(elemento)
+                valor = (elemento)
                 if valor == 'Null' and nameMetod is None:
                     self.errores.append([f'Advertencia (Línea {line}). La variable [{elemento}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
                     pila_evaluacion.append(12) #Quitar esto cuando empecemos a trabajar con la memoria. 
@@ -744,9 +853,9 @@ class Intermedio():
                 return 'Null'       
 
             elif elemento == 'true':
-                pila_evaluacion.append(True)
+                pila_evaluacion.append('true')
             elif elemento == 'false':
-                pila_evaluacion.append(False)
+                pila_evaluacion.append('false')
             elif self.validaCadena(elemento):
                 pila_evaluacion.append(str(elemento))
             
@@ -758,41 +867,12 @@ class Intermedio():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    if (isinstance(a, int)) and (isinstance(b, int)):
-                        if elemento == '+':
-                            resultado = a + b
-                        elif elemento == '-':
-                            resultado = a - b
-                        elif elemento == '*':
-                            resultado = a * b
-                        elif elemento == '/':
-                            if b != 0:
-                                resultado = int(a / b)
-                            else:
-                                self.errores.append([f'Error Semántico (Línea {line}). No se puede dividir entre cero.', line, lexpos])
-                                return 'Null' 
-                        elif elemento == '%':
-                            if b != 0:
-                                resultado = a % b
-                            else:
-                                self.errores.append([f'Error Semántico (Línea {line}). No se puede calcular el módulo de una división entre cero. ', line, lexpos])
-                                return 'Null' 
-                        pila_evaluacion.append(resultado) 
-                    else: 
-                        if (isinstance(a, int)) or (isinstance(b, int)): 
-                            if (isinstance(a, int)):
-                                if not self.fnEncontrarTipo(b) in ['int', 'byte']:
-                                    self.errores.append([f'Error Semántico (Línea {line}).  Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
-                                    return 'Null' 
-                            if (isinstance(b, int)):
-                                if not self.fnEncontrarTipo(a) in ['int', 'byte']:
-                                    self.errores.append([f'Error Semántico (Línea {line}). Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
-                                    return 'Null' 
-                        else: 
-                            if not self.fnEncontrarTipo(a) in ['int', 'byte'] or not self.fnEncontrarTipo(b) in ['int', 'byte'] :
-                                self.errores.append([f'Error Semántico (Línea {line}).  Las operaciones aritméticas solo pueden ser realizadas entre tipos numéricos (int, byte). ',line, lexpos])
-                                return 'Null' 
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,b,a)))
+                    self.idIntruccion+=1
+                     
+                    pila_evaluacion.append(f'({self.idIntruccion-1})')
 
+                    
             # Operadores de comparación
             elif elemento in ['==', '!=', '>', '<', '>=', '<=']:
                 if len(pila_evaluacion) >= 2:
@@ -800,23 +880,11 @@ class Intermedio():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    if not (isinstance(a, bool) or (isinstance(b, bool))) and (((isinstance(a, int)) and (isinstance(b, int))) or (isinstance(a, str) and (isinstance(b, str)))):
-                        if elemento == '==':
-                            resultado = a == b
-                        elif elemento == '!=':
-                            resultado = a != b
-                        elif elemento == '>':
-                            resultado = a > b
-                        elif elemento == '<':
-                            resultado = a < b
-                        elif elemento == '>=':
-                            resultado = a >= b
-                        elif elemento == '<=':
-                            resultado = a <= b
-                        pila_evaluacion.append(resultado) 
-                    else: 
-                        self.errores.append(['Error Semántico (Línea {line}. Las operaciones relacionales solo pueden ser realizadas entre operandos del mismo tipo. La condición no fue evaluada. ', line, lexpos])
-                        return 'Null' 
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,b,a)))
+                    self.idIntruccion+=1
+                     
+                    pila_evaluacion.append(f'({self.idIntruccion-1})')
+                     
 
                     # else: 
                     #     if (isinstance(a, int)) or (isinstance(b, int)): 
@@ -856,24 +924,10 @@ class Intermedio():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    if isinstance(a, bool) and isinstance(b, bool):
-                        if elemento == '&':
-                            resultado = a and b
-                        elif elemento == '|':
-                            resultado = a or b
-                        pila_evaluacion.append(resultado)
-                    if (isinstance(a, bool)) or (isinstance(b, bool)): 
-                        if (isinstance(a, bool)):
-                            if self.fnEncontrarTipo(b) == 'boolean':
-                                return 'Null' 
-                        if (isinstance(b, bool)):
-                            if self.fnEncontrarTipo(a) != 'boolean':
-                                return 'Null'
-                    if self.fnEncontrarTipo(a) == 'boolean' and self.fnEncontrarTipo(b) == 'boolean':
-                        return 'Null' 
-                    else: 
-                        self.errores.append(['Error Semántico. Las operaciones lógicas solo pueden ser realizadas entre tipos booleanos (boolean). ', 0, 1])
-                        return 'Null' 
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,b,a)))
+                    self.idIntruccion+=1
+                     
+                    pila_evaluacion.append(f'({self.idIntruccion-1})')
                     
             # Operador NOT
             elif elemento == '!':
@@ -881,6 +935,10 @@ class Intermedio():
                     #Validar que son booleanos
                     a = pila_evaluacion.pop()
 
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,'',a)))
+                    self.idIntruccion+=1
+                     
+                    pila_evaluacion.append(f'({self.idIntruccion-1})')
                     if a == bool:
                         resultado = not a
                         pila_evaluacion.append(resultado)  

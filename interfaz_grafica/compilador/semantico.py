@@ -726,7 +726,8 @@ class Semantico():
                 if  y[1][0] == 'ifElse': 
                     condicion =  y[1][1]
                     #print(condicion)
-                    if x[1][1][1] != 'error':
+                    print('iffff', y)
+                    if x[1][1] != 'error':
                       self.postorden(condicion)
                        #print(self.pila_semantica)
                       self.evaluar_pila(self.pila_semantica, llamada,line=line,lexpos=lexpos)

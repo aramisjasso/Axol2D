@@ -110,12 +110,48 @@ if __name__ == "__main__":
             }          
             
            axol2D play () {
+                a1=2;
                 b = "a";
+                fin[0]=1+a1*1;
+                fin[0]=a1;
+                this.miMetodo3(a1,a1);
+                        while ((x<5) & x>1){
+                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    while (x<5){
+                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                }
+                }
+                if (x>5){
+                    a1=122;
+                    if (x>5){
+                    a1=122;
+                    a1=0;
+                }
+                    a1=0;
+                }else {
+                    a1=0;
+                }
+                
+                switch (a1){
+                    case 1:
+                        a1=0;
+                    break;
+
+                    case 2:
+                        a1=0;
+                    break;
+                    default:
+                        a1=0;
+                }
+
                 a1 = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
            }
         }'''
+
         # '''
         # import Background;
         # //importa Players;
