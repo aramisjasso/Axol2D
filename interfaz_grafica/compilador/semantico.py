@@ -755,6 +755,23 @@ class Semantico():
                     #Advertir si y[1][1] no ha sido inicializada
                     if self.fnRetornaValor(y[1][1]) == 'Null':
                         self.errores.append([f'Advertencia. La variable [{y[1][1]}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
+                    hay_casos=True
+                    lista_casos=[]
+                    casos=y[1][2]
+                    while(hay_casos):
+                        lista_casos.append(casos[1])
+                        
+                        if  casos[0] in ['default']:
+                           hay_casos = False
+                        else:
+                            casos=casos[2]
+                                     
+                    for caso in lista_casos:
+                        if not isinstance(caso[0],tuple) :
+
+                            self.fnInstrucciones(caso[2],llamada)
+                        else:
+                            self.fnInstrucciones(caso,llamada)
                     #print(y[1])
                 # elif y[1][0] == 'for':
                 #     print(y[1])
@@ -859,6 +876,20 @@ class Semantico():
                             id=f'{llamada},{id}'
                             if 'NoId'== self.fnComprobarDeclaracion(id):
                                 self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
+                            else:        
+                                if len(y)==3:
+                                    valores= y[2]
+                                    
+                                    if y[2][0] == 'llamadaMetodo':
+                                        x2 = y[2]
+                                        print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
+                                        self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
+                                        self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                    else:
+                                        self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
+                                elif len(y)==2:
+                                    valores= y[1][2]
+                                    self.fnAsignar(valores,id,True, llamada,line=line,lexpos=lexpos)
                         else:        
                             if len(y)==3:
                                 valores= y[2]

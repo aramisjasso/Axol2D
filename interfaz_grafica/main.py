@@ -90,9 +90,13 @@ if __name__ == "__main__":
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
-                while (x<5){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                while ((x<5) & x>1){
+                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    while (x<5){
+                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    }
                 }
                 
                 return 0;
@@ -103,9 +107,13 @@ if __name__ == "__main__":
 
                 return 0;
             }  
-            method int miMetodo3(int a , int c){
-                a1 = 12;
-                this.miMetodo3(a,12);
+            method int miMetodo3(int a1234 , int a21){
+                a1 = 120;
+                a1 = a21;
+                a21 = 21;
+                a1234 = 100;
+                this.miMetodo3(1,12);
+                a21 = a1 + 1;
                 return 0;
             }          
             
@@ -115,12 +123,13 @@ if __name__ == "__main__":
                 fin[0]=1+a1*1;
                 fin[0]=a1;
                 this.miMetodo3(a1,a1);
-                        while ((x<5) & x>1){
+                while ((x<5) & x>1){
                     obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     while (x<5){
                     obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
                 }
                 }
                 if (x>5){
@@ -140,10 +149,11 @@ if __name__ == "__main__":
                     break;
 
                     case 2:
-                        a1=0;
+                        a1=100-1;
                     break;
+                    
                     default:
-                        a1=0;
+                        a1=10;
                 }
 
                 a1 = this.miMetodo3(123,2);

@@ -25,13 +25,16 @@ class Intermedio():
         self.errores=[]
         self.compilo = True
         self.ts=TS
+        self.fnLimpiarTS()
+        self.fnAsignarTamanoTS()
         self.fnSepararArbol()
         self.fnParteImport()
         if self.parteNivel[2] != 'Sin Contenido Nivel':
             self.fnParteNivel()
-        # self.fnPrintTs()
-        # if len(self.errores)!=0:
-        #     self.compilo=False
+        self.fnPrintTs()
+
+        self.pilaCodigo=self.convertir_a_tuplas(self.pilaCodigo)
+
         print('Inicio Código Intermedio')
         self.fnPrintPilaIntermedia()
         print('Fin Código Intermedio')
@@ -81,11 +84,14 @@ class Intermedio():
         #Validación en TS del nombre de nivel
         #self.fnDeclararTipo(self.parteNivel[1],'Nivel')
         #self.fnBloqueDeclaracion()
-        if not(self.parteMetodos is None):
-            '''self.fnbloqueMetodos()'''
+        
         if self.parteMetodoPrincipal[1] != 'Sin Método Axol': 
             self.fnMetodoPrincipal()
+            self.pilaCodigo.append([self.idIntruccion,('','','')])
+            self.idIntruccion+=1
 
+        if not(self.parteMetodos is None):
+            self.fnbloqueMetodos()
 
 #----------Asignacion en TS de Estructura de Datos--------------------------------------
     def fnAsignar(self,valores,id,inMetodo = False, var = None,renin=None,axol=None, line=0 , lexpos=0 ):
@@ -319,28 +325,28 @@ class Intermedio():
                 tipo= metodo[1]
                 tipo=('metodo',tipo)
                 parametros = metodo[3]
-                line = metodo[5][0]
-                lexpos = metodo[5][1]
+
                 # print('linea y columna de metodo', line,lexpos)
                 #Separación de Parametros
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
+                self.pilaCodigo.append((self.idIntruccion,(f'metodo {id}','',self.listaParametros)))
+                self.idIntruccion += 1
                 if self.listaParametros !='Error':
-                    
                     contenido = metodo[4]
                     if contenido == 'Sin Contenido':
                         return
                     if len(contenido) == 4: 
                         instrucciones=contenido[1]
+                        print(instrucciones)
                         self.fnInstrucciones(instrucciones, id)
                         parteReturn=contenido[2]
-                        line  = contenido[3][0]
-                        lexpos =contenido[3][1]
+                        self.idIntruccion +=1
                     else: 
                         parteReturn=contenido[1]
-                        line  = contenido[2][0]
-                        lexpos =contenido[2][1]
-                    self.fnReturn(parteReturn,id,line=line,lexpos=lexpos)
+                        self.idIntruccion +=1
+                    self.fnReturn(parteReturn,id)
+                    self.pilaCodigo.append([self.idIntruccion,('','','')])
 
                 
         #print(lista_metodos)
@@ -380,17 +386,12 @@ class Intermedio():
                 if len(parametros[0])==2 :
                     self.listaParametros.append(parametros[0][1])
                     # print('Checar parametros',parametros[0][1] )
-                    if parametros[0][1][1] =='Sin Identificador':
-                        self.listaParametros ='Error'
-                        compara=False
                     parametros = parametros[1]
                     
 
                 else:
                     self.listaParametros.append(parametros[1])
                     # print('Checar parametros',parametros[1] )
-                    if parametros[1][1] =='Sin Identificador':
-                        self.listaParametros ='Error'
                     compara = False
             else:
                     compara=False
@@ -482,7 +483,45 @@ class Intermedio():
                     #Advertir si y[1][1] no ha sido inicializada
                     if self.fnRetornaValor(y[1][1]) == 'Null':
                         self.errores.append([f'Advertencia. La variable [{y[1][1]}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
-                    #print(y[1])
+                    
+                    hay_casos=True
+                    lista_casos=[]
+                    casos=y[1][2]
+                    while(hay_casos):
+                        lista_casos.append(casos[1])
+                        
+                        if  casos[0] in ['default']:
+                           hay_casos = False
+                        else:
+                            casos=casos[2]
+                            
+                    variable =y[1][1]
+                    lista_fuera_caso =[]
+                    for caso in lista_casos:
+                        if not isinstance(caso[0],tuple) :
+                            #compara el caso
+                            self.pilaCodigo.append([self.idIntruccion,['==',f'{caso[1]}',variable]])
+                            self.idIntruccion += 1
+                            inicio_caso=self.idIntruccion
+                            self.pilaCodigo.append([self.idIntruccion,['IFF',f'({self.idIntruccion -1})','GOTO']])
+                            self.idIntruccion += 1
+                            self.fnInstrucciones(caso[2],llamada)
+                            self.pilaCodigo.append([self.idIntruccion,['GOTO','','GOTO']])
+                            lista_fuera_caso.append(self.idIntruccion)
+                            self.idIntruccion += 1
+                            self.pilaCodigo[inicio_caso][1][2]=f'({self.idIntruccion})'
+
+                        else:
+                            self.fnInstrucciones(caso,llamada)
+                            fuera=(self.idIntruccion)
+                    
+                    for caso_for in lista_fuera_caso:
+                        self.pilaCodigo[caso_for][1][2]=f'({fuera})'
+                    
+                    
+                       
+                    
+                    
                 # elif y[1][0] == 'for':
                 #     print(y[1])
                 elif y[1][0] == 'forEach':
@@ -516,6 +555,7 @@ class Intermedio():
                     #INICIO DE CODIGO
                     
                     inicio_iff = self.idIntruccion
+                    
                     self.idIntruccion+=1
                     
                     #print(condEval)
@@ -539,7 +579,7 @@ class Intermedio():
                         self.fnInstrucciones(y[1][2], llamada)
 
             elif y[0]=='expresionAsignacion':
-                print('Es una fila',y)
+                print('Comprobar 1',y)
                 id=y[1][1]
                 if id == 'Sin Identificador':
                     return
@@ -567,26 +607,15 @@ class Intermedio():
                             if len(tipo) != 2 or tipo[0]=='Metodo':
                                 ''''''
                             else:
-                                id2 = separado[1]
-                                temp = self.fnComprobarDeclaracion(id2)
                                 
-                                if not temp or 'NoId'== temp:
-                                #print('Declaración', temp)
-                                    temp_id=id2
-                                    id2=f'{llamada},{id2}'
-                                    if 'NoId'== self.fnComprobarDeclaracion(id2):
-                                        ''''''
-                                if 'int' != self.fnEncontrarTipo(id2):
-                                    ''''''
-                                else:
+                                if True:
                                     if len(y)==3:
-                                        id +=f',{id2}'
                                         valores= y[2]        
                                         if y[2][0] == 'llamadaMetodo':
                                             x2 = y[2]
                                             print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
                                             self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada,line=line,lexpos=lexpos)
-                                            self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
+                                            #self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
                                         else:
                                             if valores[0] == 'expresion' and valores[1] != 'error':
                                                 self.postorden(valores)
@@ -626,13 +655,7 @@ class Intermedio():
                                             self.idIntruccion+=1
                                             self.pila_semantica = []
                     else:
-                        if not temp or 'NoId'== temp:
-                            #print('Declaración', temp)
-                            temp_id=id
-                            id=f'{llamada},{id}'
-                            if 'NoId'== self.fnComprobarDeclaracion(id):
-                                self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
-                        else:        
+                        if True:        
                             if len(y)==3:
                                 valores= y[2]
                                 
@@ -699,6 +722,7 @@ class Intermedio():
                     self.pilaCodigo.append((self.idIntruccion,('parm','',y[x1+2][1][1])))
                     self.idIntruccion+=1
                 self.pilaCodigo.append([self.idIntruccion,('call','','start')])
+                self.idIntruccion+=1
                 return
                 #print(y)
 #----------Asignación Metodo ()--------------------------------------------------------------
@@ -741,7 +765,17 @@ class Intermedio():
         # print('Return Metodo: ',id,regreso)
         #self.fnAsignar(regreso,id,True,id)
         # print('Retorno', regreso,id)
-        self.fnAsignar(regreso,id,inMetodo = True, renin=True,line=line,lexpos=lexpos)#Porque el id nunca se puede llamar for
+        self.postorden(regreso)
+        valor_x=self.evaluar_pila(self.pila_semantica)
+        if len(self.pila_semantica)!=1:    
+            self.pilaCodigo.append((self.idIntruccion,('return',f'({self.idIntruccion-1})',)))
+            self.idIntruccion+=1
+            self.pila_semantica = []
+        else:
+            self.pilaCodigo.append((self.idIntruccion,('return',f'{valor_x}',)))
+            self.idIntruccion+=1
+            self.pila_semantica = []
+        
 
 #---------Vuelve indice de TS-----------------------------------------------------------
     def fnIndice(self,id):
@@ -826,31 +860,12 @@ class Intermedio():
         idConValor = True
         
         for elemento in semantica:
-            print(elemento)
-            validaDeclaracion = self.fnComprobarDeclaracion(elemento)
-            print(validaDeclaracion)
             
-            if validaDeclaracion is False and nameMetod is not None:
-                temp_elemento=elemento
-                elemento=f'{nameMetod},{elemento}'
-                validaDeclaracion = self.fnComprobarDeclaracion(elemento)
-                if validaDeclaracion is False or validaDeclaracion == 'NoId':
-                    elemento=temp_elemento
-            validaDeclaracion =self.fnComprobarDeclaracion(elemento)
+            
+            
             if self.validaNumero(elemento):
                 pila_evaluacion.append((elemento))
-            #---Validación de Identificadores---
-
-            elif isinstance(validaDeclaracion, bool) and validaDeclaracion:
-                valor = (elemento)
-                if valor == 'Null' and nameMetod is None:
-                    self.errores.append([f'Advertencia (Línea {line}). La variable [{elemento}] no ha sido inicializada, por lo tanto tomará el valor actual en memoria.', line, lexpos])
-                    pila_evaluacion.append(12) #Quitar esto cuando empecemos a trabajar con la memoria. 
-                else:
-                    pila_evaluacion.append(valor)  
-            elif isinstance(validaDeclaracion, bool) and not validaDeclaracion:
-                self.errores.append([f'Error Semántico (Línea {line}). La variable [{elemento}] no ha sido declarada.', line, lexpos])
-                return 'Null'       
+            #---Validación de Identificadores---       
 
             elif elemento == 'true':
                 pila_evaluacion.append('true')
@@ -1004,10 +1019,46 @@ class Intermedio():
                 #print('Tipos',id1,id2, tipo1,tipo2)
                 if tipo1 !=tipo2:
                     self.errores.append([f'Error Semántico (Línea {line}). [{id2}] No se puede asingar a [{id1}] de tipo [{tipo1_antes}]. ', line , lexpos])
+
     def fnPrintPilaIntermedia(self):
         for x in self.pilaCodigo:
             print(x)
 
+    def fnContatenarPilaIntermedia(self):
+        regresa = ""
+        for x in self.pilaCodigo:
+            regresa +=  str(x) + "\n"
+        return regresa
+    
+    def convertir_a_tuplas(self,lista):
+        return [tuple(elemento) for elemento in lista]
+
+    def fnLimpiarTS(self):
+        compara = True
+        i = 0
+        while(compara):
+            tipo = self.ts[i][2]
+            if tipo == 'Sin tipo':
+                print('Se borro')
+                self.ts.pop(i)
+            else:    
+                i += 1
+            if len(self.ts) == i:
+                compara = False
+            
+    # Asignar tamano TS
+    def fnAsignarTamanoTS(self):
+        # [token[0].value, token[1],'Sin tipo', 'Sin Valor','Linea declación']
+        for x in self.ts:
+            tipo = x[2]
+            if tipo in ['background','character']:
+                x[1] = 0
+            elif tipo in ['char','byte']:
+                x[1] = 1
+            elif tipo in ['int']:
+                x[1] = 2
+            elif tipo in ['string']:
+                x[1] = 1
         # Devuelve un true si fue declaro el id 
     def fnComprobarDeclaracion(self,id):
         for simbolo in self.ts:

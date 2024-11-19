@@ -4,6 +4,7 @@ import clases as cs
 import compilador.compilador as ts
 import tabla_static as ta
 import tabla_dinamica as td
+import CódigoIntermedio as CI
 from tkinter import font
 import re
 
@@ -24,9 +25,12 @@ class InterfazCompilador:
         self.root.state('zoomed')  # Hacer la ventana a pantalla completa
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # Detecta Cierre de ventana
         self.root.bind("<Control-Shift-S>", self.guardar_archivo_como_evento)  # Detecta Ctrl + Shift + S
+        # self.Código intermedio
+        self.Tercetos =[]
         self.cmplr = ts.Compilador()
         self.tabla_estatica = ta.TablaDatos()
         self.tabla_dinamica = td.TablaDinamica(root, self.font_style)
+        self.CodigoIntermedio = CI.VentanaSecundaria(root)
         
         
         
@@ -75,12 +79,15 @@ class InterfazCompilador:
         archivo_menu3.add_command(label="Tabla estatica ", command=self.mostrar_tabla_estatica)
         archivo_menu3.add_command(label="Tabla dinamica",command=self.mostrar_tabla_dinamica )
 
+        #Tamaño de letra
         archivo_menu4 = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Tamaño de letra", menu=archivo_menu4)
         archivo_menu4.add_command(label="Más (Ctrl + +) ", command=self.aumentar_letra())
         archivo_menu4.add_command(label="Menos (Ctrl + -)",command=self.disminuir_letra() )
 
-        
+        # Compilación
+        menu_bar.add_command(label="Código Intermedio", command=self.abrirCodigo)
+
         self.set_menu_font(menu_bar)
 
         self.root.config(menu=menu_bar)
@@ -323,6 +330,10 @@ class InterfazCompilador:
         # Configurar los estilos de las etiquetas
         self.console.tag_configure('resaltado', foreground='red')  # Color para palabras clave
         self.console.tag_configure('resaltado_linea', foreground='blue')  # Color para "Línea"
+
+    def abrirCodigo(self):
+        Terceta = self.cmplr.codigoint.fnContatenarPilaIntermedia()
+        self.CodigoIntermedio.abrir(Terceta)
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()
