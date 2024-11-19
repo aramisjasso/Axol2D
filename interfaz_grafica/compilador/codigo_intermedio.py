@@ -1061,7 +1061,7 @@ class Intermedio():
             tipo = x[2]
             if tipo in ['background','character']:
                 x[1] = 0
-            elif tipo in ['char','byte']:
+            elif tipo in ['char','byte',('arreglo', 'char'),('matriz', 'char'),('arreglo', 'byte'),('matriz', 'byte')]:
                 x[1] = 1
             elif tipo in ['int','platform', 'obstacles',('arreglo', 'obstacles'),('arreglo', 'int'),('arreglo', 'platform'),('matriz', 'int')]:
                 x[1] = 2
