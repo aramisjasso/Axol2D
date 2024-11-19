@@ -595,7 +595,7 @@ class Intermedio():
                         if len(separado) == 3:
                             tamano = int(self.fnEcontrarTamano(id_separado))
                             tamanoFila = int(self.fnEcontrarTamanoFila(id_separado)[0])
-                            id_separado= f'{id_separado},{ int(separado[1]) *tamanoFila *tamano + tamano* int(separado[2]) }'
+                            id_separado= f'{id_separado},{ int(separado[1]) *tamanoFila *tamano + tamano* (int(separado[2]) )}'
                             if len(y)==3:
                                 valores= y[2]   
                                 print("Esto se sale",id_separado)     
@@ -1061,12 +1061,14 @@ class Intermedio():
             tipo = x[2]
             if tipo in ['background','character']:
                 x[1] = 0
-            elif tipo in ['char','byte',('arreglo', 'char'),('matriz', 'char'),('arreglo', 'byte'),('matriz', 'byte')]:
+            elif tipo in ['boolean','char','byte',('arreglo', 'char'),('matriz', 'char'),('arreglo', 'byte'),('matriz', 'byte'),('arreglo', 'boolean'),('matriz', 'boolean')]:
                 x[1] = 1
             elif tipo in ['int','platform', 'obstacles',('arreglo', 'obstacles'),('arreglo', 'int'),('arreglo', 'platform'),('matriz', 'int')]:
                 x[1] = 2
             elif tipo in ['string',('arreglo', 'string'),('matriz', 'string')]:
                 x[1] = 50
+            else: 
+                x[1] = 0
         # Devuelve un true si fue declaro el id 
     def fnComprobarDeclaracion(self,id):
         for simbolo in self.ts:

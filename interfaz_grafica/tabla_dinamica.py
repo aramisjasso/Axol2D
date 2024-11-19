@@ -29,7 +29,7 @@ class TablaDinamica:
         ventana_tabla.geometry(f"{width}x{height}+{x}+{y}")
         
         # Crear un widget Treeview para mostrar la tabla
-        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor"]
+        columnas = ["Lexema", "Tamaño", "Tipo de Datos", "Valor"]
         tree = ttk.Treeview(ventana_tabla, columns=columnas, show='headings')
         
         # Configurar encabezados de columna
