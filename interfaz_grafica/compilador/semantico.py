@@ -447,10 +447,14 @@ class Semantico():
                             for x in range(tamaño_matriz_x):
                                 for y in range(tamaño_matriz_y):
                                     valor=filas[x][2][y]
+                                    if valor[0]!='expresion':
+                                        valor=valor[1]
                                     temp_id=self.ts[indice+x1+1][0]
                                     #Se guarda el valor temporalmente para ver si no se debe de volver a poner
                                     temp_valor=self.ts[indice+x1+1][3]
+                                    
                                     temp_valores.append(temp_valor)
+                                    
                                     #Asignar valor
                                     self.fnAsignar(valor,temp_id,inMetodo,var,line=line,lexpos=lexpos)
 

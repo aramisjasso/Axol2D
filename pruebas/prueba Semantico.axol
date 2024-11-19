@@ -7,6 +7,9 @@
             byte y =  5;
             int a1;
             int a3 = 0;
+			 char ca = 'a';
+			 int matriz [2][2] = [[0,1],[2,3]];
+			 string matriz1 [2][2] = [["123","234"],["345","456"]];
             string b = "cadena";
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
             platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
@@ -46,12 +49,19 @@
             }  
             method int miMetodo3(int a , int c){
                 a1 = 12;
+				a1 = a;
+				a =11;
                 this.miMetodo3(a1,12);
                 return 0;
             }          
             
            axol2D play () {
+				 matriz[1][1]=1;
+				 matriz1 [1][1]="Cambio";
+				 ca = 'a';
                 b = "cadena";
+				 b = "Hola a todos";
+				fin = [ 10,100];
                 x = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start( plarreglo, obs , jugador , fondo ,  plarreglo,     fin  );
