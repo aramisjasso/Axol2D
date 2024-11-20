@@ -1130,7 +1130,9 @@ class Intermedio():
                     if id_3 is not None:
                         self.pilaCodigo.append((self.idIntruccion,('*',f'{tamanoFila}',f'{id_3}')))
                         self.idIntruccion+=1
-                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',f'{id_3}')))
+                        self.pilaCodigo.append((self.idIntruccion,('*',f'({self.idIntruccion-1})',f'{tamaño}')))
+                        self.idIntruccion+=1
+                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',2)))
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('+',f'({self.idIntruccion-2})',f'({self.idIntruccion-1})')))
                         self.idIntruccion+=1
