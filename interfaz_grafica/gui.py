@@ -29,9 +29,15 @@ class InterfazCompilador:
         self.Tercetos =[]
         self.cmplr = ts.Compilador()
         self.tabla_estatica = ta.TablaDatos()
-        self.tabla_dinamica = td.TablaDinamica(root, self.font_style)
-        self.CodigoIntermedio = CI.VentanaSecundaria(root)
-        
+        self.tabla_dinamica_variables = td.TablaDinamica(root)
+        self.tabla_dinamica_metodos = td.TablaDinamica(root, "métodos")
+        self.tabla_dinamica_importaciones = td.TablaDinamica(root)
+        self.CodigoIntermedio = CI.VentanaSecundaria(root,"Código Intermedio")
+        self.CodigoEnsamblador = CI.VentanaSecundaria(root, "Código Ensamblador")
+        #Separación de tablas
+        self.variables=[]
+        self.metodos=[]
+        self.importaciones=[]
         
         
     def setup_ui(self):
@@ -77,7 +83,9 @@ class InterfazCompilador:
         archivo_menu3 = Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Tablas de Simbolos", menu=archivo_menu3)
         archivo_menu3.add_command(label="Tabla estatica ", command=self.mostrar_tabla_estatica)
-        archivo_menu3.add_command(label="Tabla dinamica",command=self.mostrar_tabla_dinamica )
+        archivo_menu3.add_command(label="Tabla variables",command=self.mostrar_tabla_dinamica_variables )
+        archivo_menu3.add_command(label="Tabla métodos",command=self.mostrar_tabla_dinamica_metodos )
+        archivo_menu3.add_command(label="Tabla importaciones",command=self.mostrar_tabla_dinamica_importaciones )
 
         #Tamaño de letra
         archivo_menu4 = Menu(menu_bar, tearoff=0)
@@ -85,8 +93,11 @@ class InterfazCompilador:
         archivo_menu4.add_command(label="Más (Ctrl + +) ", command=self.aumentar_letra())
         archivo_menu4.add_command(label="Menos (Ctrl + -)",command=self.disminuir_letra() )
 
-        # Compilación
-        menu_bar.add_command(label="Código Intermedio", command=self.abrirCodigo)
+        # Código Intermedio
+        menu_bar.add_command(label="Código Intermedio", command=self.abrirCodigoIntermedio)
+
+        # Código Ensamblador
+        menu_bar.add_command(label="Ensamblador", command=self.abrirCodigoEnsamblador)
 
         self.set_menu_font(menu_bar)
 
@@ -209,8 +220,8 @@ class InterfazCompilador:
         self.cmplr = ts.Compilador()
         self.cmplr.compilar(self.text_area.get_text())
         if self.cmplr.compilo:
-            
             self.mostrar_resultado('Compilado de forma exitosa.')
+            self.separar_tablas()
         else:
             self.mostrar_resultado(self.cmplr.errores_re())
         
@@ -271,11 +282,34 @@ class InterfazCompilador:
     def mostrar_tabla_estatica(self):
         self.tabla_estatica.mostrar_tabla()
 
-    #Tabla Dinanica
-    def mostrar_tabla_dinamica(self):
-        self.tabla_dinamica.set_datos(self.cmplr.identificadores_ts)
-        self.tabla_dinamica.mostrar_tabla()
+    #Separar información de tablas:
+    def separar_tablas(self):
+        self.variables=[]
+        self.metodos=[]
+        self.importaciones=[]
+        for id in self.cmplr.identificadores_ts:
+            tipo =id[2]
+            id_separado = id[0].split(",")
+            
+            if tipo in ["character","background"]:
+                self.importaciones.append(id)
+            elif (len(tipo) == 2 and tipo[0] == "metodo" ) or (len(id_separado)==2 and not id_separado[1].isdigit()):
+                self.metodos.append(id)
+            else:
+                self.variables.append(id)
+
+    #Tablas Dinanicas
+    def mostrar_tabla_dinamica_variables(self):
+        self.tabla_dinamica_variables.set_datos(self.variables)
+        self.tabla_dinamica_variables.mostrar_tabla()
     
+    def mostrar_tabla_dinamica_metodos(self):
+        self.tabla_dinamica_metodos.set_datos(self.metodos)
+        self.tabla_dinamica_metodos.mostrar_tabla()
+    
+    def mostrar_tabla_dinamica_importaciones(self):
+        self.tabla_dinamica_importaciones.set_datos(self.importaciones)
+        self.tabla_dinamica_importaciones.mostrar_tabla()
     #Cambiar de tamaño
     def aumentar_letra(self):
         # Aumentar el tamaño de la fuente
@@ -331,9 +365,13 @@ class InterfazCompilador:
         self.console.tag_configure('resaltado', foreground='red')  # Color para palabras clave
         self.console.tag_configure('resaltado_linea', foreground='blue')  # Color para "Línea"
 
-    def abrirCodigo(self):
+    def abrirCodigoIntermedio(self):
         Terceta = self.cmplr.codigoint.fnContatenarPilaIntermedia()
         self.CodigoIntermedio.abrir(Terceta)
+
+    def abrirCodigoEnsamblador(self):
+        Ensamblador = self.cmplr.ensamblador.codigoConvertido
+        self.CodigoEnsamblador.abrir(Ensamblador)
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()

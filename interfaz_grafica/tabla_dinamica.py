@@ -2,10 +2,16 @@ import tkinter as tk
 from tkinter import ttk
 
 class TablaDinamica:
-    def __init__(self, root, font):
+    def __init__(self, root,tipo = ""):
         self.datos = []
         self.root = root
         self.font = ('Arial', 10)
+        if tipo == "métodos":
+            self.columna = "Parametros"
+            self.elementos = "Parametros"
+        else:
+            self.columna = "Valor"
+            self.elementos = "Valor"
     
     def set_datos(self, datos):
         self.datos = datos
@@ -29,7 +35,7 @@ class TablaDinamica:
         ventana_tabla.geometry(f"{width}x{height}+{x}+{y}")
         
         # Crear un widget Treeview para mostrar la tabla
-        columnas = ["Lexema", "Tamaño", "Tipo de Datos", "Valor"]
+        columnas = ["Lexema", "Tamaño", "Tipo de Datos", self.columna]
         tree = ttk.Treeview(ventana_tabla, columns=columnas, show='headings')
         
         # Configurar encabezados de columna
@@ -104,13 +110,13 @@ class TablaDinamica:
         ventana_detalle.geometry(f"{width}x{height}+{x}+{y}")
         # Mostrar los detalles del elemento en la nueva ventana
         texto = ''
-        for idx, col in enumerate(["Lexema", "NO. ID", "Tipo de Datos", "Elementos"]):
+        for idx, col in enumerate(["Lexema", "Tamaño", "Tipo de Datos", self.elementos]):
             texto += f"{col}: {self.datos[indice][idx]}\t"
         
         etiqueta = tk.Label(ventana_detalle, text=texto, font=self.font)  # Aplica la fuente a la etiqueta
         etiqueta.pack(padx=10, pady=5)
 
-        columnas = ["Lexema", "NO. ID", "Tipo de Datos", "Valor"]
+        columnas = ["Lexema", "Tamaño", "Tipo de Datos", "Valor"]
         tree = ttk.Treeview(ventana_detalle, columns=columnas, show='headings')
 
         # Configurar encabezados de columna y aplicar fuente
