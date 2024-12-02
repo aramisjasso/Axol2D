@@ -70,6 +70,9 @@ if __name__ == "__main__":
             int y = 1;
             int a1 = 0;
             int a3 = 0;
+            string bytes [5];
+            int arreglo [2][2];
+            int arreglo1 [2];
             string b = "cadena";
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
             platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
@@ -114,6 +117,11 @@ if __name__ == "__main__":
                 a1234 = 100;
                 this.miMetodo3(1,12);
                 a21 = a1 + 1;
+                arreglo1[1] = 1;
+                arreglo1[0] = 1;
+                arreglo1 = [0,1];
+                arreglo1[{x}] = 1+1;
+                bytes[{x}]="Hola";
                 return 0;
             }          
             
@@ -124,10 +132,10 @@ if __name__ == "__main__":
                 fin[0]=a1;
                 this.miMetodo3(a1,a1);
                 while ((x<5) & x>1){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     while (x<5){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
                     pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
                 }
@@ -155,7 +163,7 @@ if __name__ == "__main__":
                     default:
                         a1=10;
                 }
-
+                arreglo[1][1] = 1;
                 a1 = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );

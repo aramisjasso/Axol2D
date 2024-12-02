@@ -592,21 +592,24 @@ class Intermedio():
                     separado = id.split(',')
                     if ',' in id:
                         id_separado = separado[0]
-                        if len(separado) == 3:
-                            tamano = int(self.fnEcontrarTamano(id_separado))
-                            tamanoFila = int(self.fnEcontrarTamanoFila(id_separado)[0])
-                            id_separado= f'{id_separado},{ int(separado[1]) *tamanoFila *tamano + tamano* (int(separado[2]) )}'
-                            if len(y)==3:
-                                valores= y[2]   
-                                print("Esto se sale",id_separado)     
-                                self.fnAsignarAcceso(id_separado,valores,y,llamada)
-                            elif len(y)==2:
-                                valores= y[1][2]
-                                self.fnAsignarAcceso(id_separado,valores,y,llamada)
-                        probar = separado[1]
                         try:
+                            probar = separado[1]
                             probar= float(probar)  # Intenta convertir a número
-                            if len(separado) == 2:
+                            
+                            if len(separado) == 3:
+                                tamano = int(self.fnEcontrarTamano(id_separado))
+                                tamanoFila = int(self.fnEcontrarTamanoFila(id_separado)[0])
+                                id_separado= f'{id_separado},{ int(separado[1]) *tamanoFila *tamano + tamano* (int(separado[2]) )}'
+                                if len(y)==3:
+                                    valores= y[2]   
+                                    print("Esto se sale",id_separado)     
+                                    self.fnAsignarAcceso(id_separado,valores,y,llamada)
+                                elif len(y)==2:
+                                    valores= y[1][2]
+                                    self.fnAsignarAcceso(id_separado,valores,y,llamada)
+                            
+                            
+                            elif len(separado) == 2:
                                 tamano = int(self.fnEcontrarTamano(id_separado))
                                 id= f'{id_separado},{  tamano* int(separado[1]) }'
                                 if len(y)==3:
@@ -644,7 +647,8 @@ class Intermedio():
                                     else:
                                         if len(y)==3:
                                             # id +=f',{id2}'
-                                            valores= y[2]        
+                                            valores= y[2]
+                                                    
                                             self.fnAsignarAcceso(id,valores,y,llamada,id2)
                                         elif len(y)==2:
                                             valores= y[1][2]
@@ -890,7 +894,7 @@ class Intermedio():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    self.pilaCodigo.append((self.idIntruccion,(elemento,b,a)))
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,a,b)))
                     self.idIntruccion+=1
                      
                     pila_evaluacion.append(f'({self.idIntruccion-1})')
@@ -903,7 +907,7 @@ class Intermedio():
                     b = pila_evaluacion.pop()
                     a = pila_evaluacion.pop()
                     
-                    self.pilaCodigo.append((self.idIntruccion,(elemento,b,a)))
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,a,b)))
                     self.idIntruccion+=1
                      
                     pila_evaluacion.append(f'({self.idIntruccion-1})')
@@ -958,7 +962,7 @@ class Intermedio():
                     #Validar que son booleanos
                     a = pila_evaluacion.pop()
 
-                    self.pilaCodigo.append((self.idIntruccion,(elemento,'',a)))
+                    self.pilaCodigo.append((self.idIntruccion,(elemento,a,'')))
                     self.idIntruccion+=1
                      
                     pila_evaluacion.append(f'({self.idIntruccion-1})')
@@ -1103,21 +1107,33 @@ class Intermedio():
         
         if y[2][0] == 'llamadaMetodo':
             x2 = y[2]
-            print('Aqui se hizo una llamada a Metodo' , y, 'valores',valores,id,True, llamada)
             self.fnLlamadaMetodo(x2[1],x2[2],x2[3],llamada)
                                             #self.fnValidartipos(id,x2[1],True,line=line,lexpos=lexpos)
         else:
-            print("Esto se deberia insertar2", id,valores)
             if valores[0] in ['expresion']:
             
                 self.postorden(valores)
                 valor_x=self.evaluar_pila(self.pila_semantica)
-                if len(self.pila_semantica)!=1:    
-                    self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
+                if len(self.pila_semantica)!=1:
+                    if id_3 is not None:
+                        tamanoFila=self.fnEcontrarTamano(id)
+                        self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
+                        self.idIntruccion+=1
+                        id_guardar = f'{id},({self.idIntruccion-1})'
+                        self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-2})',id_guardar)))
+                    else:  
+                        self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
                     self.idIntruccion+=1
                     self.pila_semantica = []
                 else:
-                    self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
+                    if id_3 is not None:
+                        tamanoFila=self.fnEcontrarTamano(id)
+                        self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
+                        self.idIntruccion+=1
+                        id_guardar = f'{id},({self.idIntruccion-1})'
+                        self.pilaCodigo.append((self.idIntruccion,('=',valor_x,id_guardar)))
+                    else:  
+                        self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
                     self.idIntruccion+=1
                     self.pila_semantica = []
             elif valores[0] == 'fila':
@@ -1132,7 +1148,7 @@ class Intermedio():
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('*',f'({self.idIntruccion-1})',f'{tamaño}')))
                         self.idIntruccion+=1
-                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',2)))
+                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',tamanoFila)))
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('+',f'({self.idIntruccion-2})',f'({self.idIntruccion-1})')))
                         self.idIntruccion+=1
@@ -1145,10 +1161,16 @@ class Intermedio():
                                                 
             else:
                 if len(valores)>5:
-                    print("Esto se deberia insertar", id)
                     nuevo_id= f"_t_{self.contador_temp}"
                     self.contador_temp+=1
                     self.ts.append((nuevo_id,50,'string',valores))
                     valores=nuevo_id
-                self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
+                if id_3 is not None:
+                    tamanoFila=self.fnEcontrarTamano(id)
+                    self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
+                    self.idIntruccion+=1
+                    id_guardar = f'{id},({self.idIntruccion-1})'
+                    self.pilaCodigo.append((self.idIntruccion,('=',valores,id_guardar)))
+                else:  
+                    self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
                 self.idIntruccion+=1

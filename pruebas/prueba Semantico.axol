@@ -8,6 +8,7 @@
             int a1;
             int a3 = 0;
 			 char ca = 'a';
+			boolean boleano = false;
 			 int matriz [2][2] = [[0,1],[2,3]];
 			 string matriz1 [2][2] = [["123","234"],["345","456"]];
             string b = "cadena";
