@@ -2,7 +2,7 @@ import compilador.lexico as lexico
 import compilador.sintactico as sintactico
 import compilador.semantico as semantico
 import compilador.codigo_intermedio as codigo_int
-
+import compilador.ensamblador as asm
 # Clase del compilador
 class Compilador():
     def __init__(self):
@@ -19,6 +19,7 @@ class Compilador():
         self.resultado=None
         self.sema = semantico.Semantico()
         self.codigoint = codigo_int.Intermedio()
+        self.ensamblador = asm.ensamblador()
 
     def compilar(self,data):
         self.parte_Lexico(data)
@@ -26,6 +27,7 @@ class Compilador():
         self.parte_Semantica()
         if self.compilo:
             self.parte_Intermedia()
+            self.parte_Ensamblador()
         
 
     #Parte_del lexico
@@ -76,6 +78,10 @@ class Compilador():
     
     def parte_Intermedia(self):
         self.codigoint.correr(self.resultado,self.identificadores_ts)
+
+    #Ensamblador
+    def parte_Ensamblador(self):
+        self.ensamblador.fnCorre(self.codigoint.pilaCodigo,"")
 
     #Errores
     def errores_re(self):

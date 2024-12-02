@@ -32,7 +32,8 @@ class InterfazCompilador:
         self.tabla_dinamica_variables = td.TablaDinamica(root)
         self.tabla_dinamica_metodos = td.TablaDinamica(root, "métodos")
         self.tabla_dinamica_importaciones = td.TablaDinamica(root)
-        self.CodigoIntermedio = CI.VentanaSecundaria(root)
+        self.CodigoIntermedio = CI.VentanaSecundaria(root,"Código Intermedio")
+        self.CodigoEnsamblador = CI.VentanaSecundaria(root, "Código Ensamblador")
         #Separación de tablas
         self.variables=[]
         self.metodos=[]
@@ -92,8 +93,11 @@ class InterfazCompilador:
         archivo_menu4.add_command(label="Más (Ctrl + +) ", command=self.aumentar_letra())
         archivo_menu4.add_command(label="Menos (Ctrl + -)",command=self.disminuir_letra() )
 
-        # Compilación
-        menu_bar.add_command(label="Código Intermedio", command=self.abrirCodigo)
+        # Código Intermedio
+        menu_bar.add_command(label="Código Intermedio", command=self.abrirCodigoIntermedio)
+
+        # Código Ensamblador
+        menu_bar.add_command(label="Ensamblador", command=self.abrirCodigoEnsamblador)
 
         self.set_menu_font(menu_bar)
 
@@ -361,9 +365,13 @@ class InterfazCompilador:
         self.console.tag_configure('resaltado', foreground='red')  # Color para palabras clave
         self.console.tag_configure('resaltado_linea', foreground='blue')  # Color para "Línea"
 
-    def abrirCodigo(self):
+    def abrirCodigoIntermedio(self):
         Terceta = self.cmplr.codigoint.fnContatenarPilaIntermedia()
         self.CodigoIntermedio.abrir(Terceta)
+
+    def abrirCodigoEnsamblador(self):
+        Ensamblador = self.cmplr.ensamblador.codigoConvertido
+        self.CodigoEnsamblador.abrir(Ensamblador)
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()

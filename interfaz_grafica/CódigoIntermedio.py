@@ -1,10 +1,11 @@
 import tkinter as tk
 
 class VentanaSecundaria:
-    def __init__(self, parent):
+    def __init__(self, parent, titulo):
         self.parent = parent
         self.ventana = None
         self.text_widget = None
+        self.titulo = titulo
 
     def abrir(self, texto="Texto inicial"):
         # Si la ventana ya está abierta, no crear otra
@@ -14,7 +15,7 @@ class VentanaSecundaria:
 
         # Crear una ventana secundaria
         self.ventana = tk.Toplevel(self.parent)
-        self.ventana.title("Código Intermedio")
+        self.ventana.title(self.titulo)
 
         # Frame para contener el texto y la barra de desplazamiento
         frame = tk.Frame(self.ventana)
