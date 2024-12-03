@@ -78,7 +78,7 @@ class Sintactico():
                 p[0] = [p[2], p.lineno(0),p.lexpos(0)]
             
         elif len(p)==3:
-            print('pruebaaaa',p[1])
+            # print('pruebaaaa',p[1])
             if p.slice[2].type == 'libreriaAxol':
                 if not (p[2] == 'Background' or p[2] == 'Players') :
                     self.errores.append([f'Error Sintáctico (Línea {p.lineno(0)}) ""{p[1]} {p[2]}"". En la importación solo se puede importar una librería a la vez y falta punto y coma [;]. \n \t Solución: {p[1]} "[Background | Players] ;"',p.lineno(0),p.lexpos(0)])

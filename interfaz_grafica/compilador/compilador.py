@@ -62,13 +62,13 @@ class Compilador():
             self.resultado = self.sin.parser.parse(data, lexer=lexer ,tracking=True)
             # self.resultado = self.sin.parser.parse(data, lexer=lexer ,debug=True,tracking=True)
             if self.resultado:
-                print("Análisis sintáctico exitoso:", self.resultado, '\n')
+                '''print("Análisis sintáctico exitoso:", self.resultado, '\n')'''
                 #print("Análisis sintáctico completado pero sin resultado (posiblemente vacío)")
             if self.sin.errores != []:
                 self.compilo = False
                 self.errores_sintacticos=self.sin.errores
         except Exception as e:
-            print(f"Error durante el análisis sintáctico: {e}")
+            '''print(f"Error durante el análisis sintáctico: {e}")'''
 
     def parte_Semantica(self):
         self.sema.correr(self.resultado,self.identificadores_ts)
