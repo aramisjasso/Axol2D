@@ -67,10 +67,13 @@ if __name__ == "__main__":
 
         level MiPrimerNivel {
             int x = 0;
+            int X = 0;
             int y = 1;
             int a1 = 0;
-            int a3 = 0;
+            int a3 = 15;
             string b = "cadena";
+            byte a2 = 0;
+            int matriz [3][4] = [[1,2,3,4],[4,5,6,7],[7,8,9,0]];
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
             platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
             platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];

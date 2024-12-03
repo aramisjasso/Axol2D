@@ -691,7 +691,7 @@ class Intermedio():
                                         if len(valores)>5:
                                             nuevo_id= f"_t_{self.contador_temp}"
                                             self.contador_temp+=1
-                                            self.ts.append((nuevo_id,50,'string',valores))
+                                            self.ts.append([nuevo_id,50,'string',valores])
                                             valores=nuevo_id
                                         self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
                                         self.idIntruccion+=1
@@ -1163,7 +1163,7 @@ class Intermedio():
                 if len(valores)>5:
                     nuevo_id= f"_t_{self.contador_temp}"
                     self.contador_temp+=1
-                    self.ts.append((nuevo_id,50,'string',valores))
+                    self.ts.append([nuevo_id,50,'string',valores])
                     valores=nuevo_id
                 if id_3 is not None:
                     tamanoFila=self.fnEcontrarTamano(id)

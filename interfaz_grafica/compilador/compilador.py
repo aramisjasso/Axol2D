@@ -19,6 +19,9 @@ class Compilador():
         self.resultado=None
         self.sema = semantico.Semantico()
         self.codigoint = codigo_int.Intermedio()
+        self.variables=[] #TS variables
+        self.metodos=[] #TS metodos
+        self.importaciones=[] #TS importaciones
         self.ensamblador = asm.ensamblador()
 
     def compilar(self,data):
@@ -27,6 +30,7 @@ class Compilador():
         self.parte_Semantica()
         if self.compilo:
             self.parte_Intermedia()
+            self.separar_tablas()
             self.parte_Ensamblador()
         
 
@@ -81,7 +85,7 @@ class Compilador():
 
     #Ensamblador
     def parte_Ensamblador(self):
-        self.ensamblador.fnCorre(self.codigoint.pilaCodigo,"")
+        self.ensamblador.fnCorre(self.codigoint.pilaCodigo, self.variables)
 
     #Errores
     def errores_re(self):
@@ -108,3 +112,37 @@ class Compilador():
         for token in self.identificadores:
             self.identificadores_ts.append([token[0].value, token[1],'Sin tipo', 'Null'])
         return self.identificadores_ts
+    
+    #Separar en tablas de simbolos
+    #Separar información de tablas:
+    def separar_tablas(self):
+        self.variables=[]
+        self.metodos=[]
+        self.importaciones=[]
+        for id in self.identificadores_ts:
+            tipo =id[2]
+            id_separado = id[0].split(",")
+            
+            if tipo in ["character","background"]:
+                self.importaciones.append(id)
+            elif (len(tipo) == 2 and tipo[0] == "metodo" ) or (len(id_separado)==2 and not id_separado[1].isdigit()):
+                self.metodos.append(id)
+            elif tipo == "Nivel":
+                """No hace nada"""
+            elif tipo == "string":
+                id[3] = self.ajustar_cadena(id[3])
+                self.variables.append(id)
+            else:
+                self.variables.append(id)
+
+    def ajustar_cadena(self, cadena):
+        cadena = str(cadena)
+        tamaño = len(cadena)
+        cadena = cadena[:tamaño-1]
+        cadena = cadena[1:]
+        if tamaño-1 > 50:
+            # Truncar la cadena si es demasiado larga
+            return cadena[:50]
+        else:
+            # Rellenar con espacios si es más corta
+            return cadena.ljust(50)

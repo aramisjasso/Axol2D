@@ -74,32 +74,32 @@ class Semantico():
         if tipo == 'Background':
             if not self.fnChecharImportaciones('background',tipo,line,lexpos):
                 fondos = [
-                ['Forest', 'id_import', 'background', 'Forest'  ],
-                ['Mountain', 'id_import', 'background', 'Mountain'  ],
-                ['Ocean', 'id_import', 'background', 'Ocean'  ],
-                ['Desert', 'id_import', 'background', 'Desert'  ],
-                ['City', 'id_import', 'background', 'City'  ],
+                ['Forest',  'id_import', 'background', 'Forest'  ],
+                ['Mountain','id_import', 'background', 'Mountain'  ],
+                ['Ocean',   'id_import', 'background', 'Ocean'  ],
+                ['Desert',  'id_import', 'background', 'Desert'  ],
+                ['City',    'id_import', 'background', 'City'  ],
                 ['Village', 'id_import', 'background', 'Village'  ],
-                ['Cave', 'id_import', 'background', 'Cave'  ],
-                ['Swamp', 'id_import', 'background', 'Swamp'  ],
-                ['River', 'id_import', 'background', 'River'  ],
-                ['Island', 'id_import', 'background', 'Island'  ],
-                ['Castle', 'id_import','background', 'Castle']]
+                ['Cave',    'id_import', 'background', 'Cave'  ],
+                ['Swamp',   'id_import', 'background', 'Swamp'  ],
+                ['River',   'id_import', 'background', 'River'  ],
+                ['Island',  'id_import', 'background', 'Island'  ],
+                ['Castle',  'id_import','background', 'Castle']]
                 self.fnIsertarArrayImportaciones(fondos)
         else:
             if not self.fnChecharImportaciones('character',tipo,line,lexpos):
                 jugadores = [
-                    ['wizard', 'id_import', 'character', 'wizard' ],
-                    ['archer', 'id_import', 'character', 'archer' ],
-                    ['rogue', 'id_import', 'character', 'rogue' ],
+                    ['wizard',  'id_import', 'character', 'wizard' ],
+                    ['archer',  'id_import', 'character', 'archer' ],
+                    ['rogue',   'id_import', 'character', 'rogue' ],
                     ['paladin', 'id_import', 'character', 'paladin' ],
                     ['barbarian', 'id_import', 'character', 'barbarian' ],
                     ['assassin', 'id_import', 'character', 'assassin' ],
-                    ['druid', 'id_import', 'character', 'druid' ],
+                    ['druid',   'id_import', 'character', 'druid' ],
                     ['samurai', 'id_import', 'character', 'samurai' ],
-                    ['ninja', 'id_import', 'character', 'ninja' ],
-                    ['priest', 'id_import', 'character', 'priest' ],
-                    ['knight', 'id_import','character', 'knight']
+                    ['ninja',   'id_import', 'character', 'ninja' ],
+                    ['priest',  'id_import', 'character', 'priest' ],
+                    ['knight',  'id_import','character', 'knight']
                 ]
                 self.fnIsertarArrayImportaciones(jugadores)
 
