@@ -74,16 +74,16 @@ if __name__ == "__main__":
             string b = "cadena";
             byte a2 = 0;
             int matriz [3][4] = [[1,2,3,4],[4,5,6,7],[7,8,9,0]];
-                        // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
-            platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                        // [Tam_x<79, Tam_y<24, posi_x<79, posi_y<24,  color<16 ]A primera se puede poner cualquiervaleor
+            platform pl1 = [140  ,   10 ,   10  , 10     , 16 ];
+            platform pl2 = [110  ,   20 ,   20  , 10     ,  0 ];
             platform pl3 = pl2;
             platform pl4 = pl1;
             platform pl5 = pl4;
 
             platform plarreglo[3] = [pl1,pl2,pl3];
-            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 , 150  ,  150 ];
-            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110  ];
+            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0   ];
             obstacles obs [2] = [obs1,obs2];
             
             background fondo = Castle;
@@ -92,10 +92,10 @@ if __name__ == "__main__":
             player jugador = [   0    ,    0    ,   3  , knight   ];
             method int miMetodo1(){
                 a1 = 12;
-                pl1 = [200  ,   200 ,   200  , 200     , 200 , 200 ,200 ];
+                pl1 = [200  ,   200 ,   200  , 200     , 200 ];
                 while (x<5){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ,  0   ,   0  ];
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0    ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0    ];
                 }
                 
                 return 0;
