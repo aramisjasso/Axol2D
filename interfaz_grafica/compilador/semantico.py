@@ -228,7 +228,7 @@ class Semantico():
                         in_simbolo=[f'{id},{x}',f'{simbolo[1]},{x}',tipo[1], 'Null' ]
                         self.ts.insert(indice+y+1,in_simbolo)
                         y+=1
-                        atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
+                        atributos=['0', '1', '2', '3',  '4']
                         for k in range(len(atributos)):
                             in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
                             self.ts.insert(indice+y+1,in_simbolo)
@@ -282,7 +282,7 @@ class Semantico():
                         self.ts[indice][3]=(y, atributos)
                         # print('creación de un método',self.ts[indice])
             elif tipo in ['obstacles', 'platform']:
-                atributos=['0', '1', '2', '3',  '4'   ,  '5'   ,  '6'  ]
+                atributos=['0', '1', '2', '3',  '4'   ]
                 for x in range(len(atributos)):
                     in_simbolo=[f'{id},{atributos[x]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
                     self.ts.insert(indice+x+1,in_simbolo)
@@ -381,7 +381,7 @@ class Semantico():
                             temp_valores=[]
                             #validar tipo
                             for x in range(tamaño):
-                                temp_id = self.ts[indice+x*8+1][0]
+                                temp_id = self.ts[indice+x*6+1][0]
                                 temp_valores.append(self.ts[indice+x+1][3])
                                 temp_valor = valores[2][x]
                                 self.fnAsignar(temp_valor,temp_id, inMetodo,var,line=line,lexpos=lexpos)
@@ -481,21 +481,21 @@ class Semantico():
                     # print ('Entro en filas',id)
                     #Validación por Tamaño
                     tamaño=int(valores[1])
-                    tamaño_arreglo= 7
+                    tamaño_arreglo = 5
                     #[Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
                     if tamaño_arreglo!=tamaño:
                         self.errores.append([f'Error Semántico (Línea {line}). La fila no se puede asignar al identificador {id} de tipo de {tipo_id} solo se pueden asignar arreglos de tamaño: {tamaño_arreglo}',line,lexpos])
                     else:#Validación de inserción
                         tamaño_errores = len(self.errores)
                         temp_valores=[]
-                        for x in range(tamaño):
+                        for x in range(tamaño_arreglo):
                             temp_id = self.ts[indice+x+1][0]
                             temp_valores.append(self.ts[indice+x+1][3])
                             temp_valor = valores[2][x]
                             self.fnAsignar(temp_valor,temp_id,inMetodo,var,line=line,lexpos=lexpos)
                             #self.ts[indice+x+1][3]=valores[2][x]
                         if tamaño_errores != len(self.errores) or inMetodo:
-                            for x in range(tamaño):
+                            for x in range(tamaño_arreglo):
                                 self.ts[indice+x+1][3]=temp_valores[x]
                         else:
                             self.ts[indice][3] = 'asignadoblo'
@@ -578,7 +578,7 @@ class Semantico():
                     elif valores=='asignadoblo' and tipo_id in ['platform','obstacles']:
                         id_buscar = valortemp[1][1]
                         indice_buscar = self.fnIndice(id_buscar)
-                        for x in range(8):
+                        for x in range(6):
                             # print('Donde guardar:', self.ts[indice_buscar+x][3],self.ts[indice+x][3])
                             self.ts[indice+x][3]=self.ts[indice_buscar+x][3]
                         # print('valores:',valores,'valores:',valores[0],'tipo',tipo_id,id, 'valor tempo', valortemp[1][1])
