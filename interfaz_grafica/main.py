@@ -73,16 +73,17 @@ if __name__ == "__main__":
             string b = "cadena";
             byte a2 = 0;
             int matriz [3][4] = [[1,2,3,4],[4,5,6,7],[7,8,9,0]];
-                        // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl1 = [140  ,   10 ,   10  , 10     , 110 ];
-            platform pl2 = [110  ,   20 ,   20  , 10     ,  0  ];
-            platform pl3 = pl2;
-            platform pl4 = pl1;
-            platform pl5 = pl4;
+                        // [posi_x, posi_y, tam_x, tam_y,  R   ,  G   ,  B  ]
+            platform pl1 = [0  ,   24 ,   5  , 1        ,  48  ];
+            platform pl2 = [5  ,   23 ,   5  , 1        ,  48  ];
+            platform pl3 = [10  ,   22 ,   5  , 1       ,  48  ];
+            platform pl4 = [15  ,   21 ,   5  , 1       ,  48  ];
+            platform pl5 = [20  ,   20 ,   5  , 1       ,  48  ];
+            platform pl6 = [25  ,   19 ,   5  , 1       ,  48  ];
 
-            platform plarreglo[3] = [pl1,pl2,pl3];
-            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 ];
-            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ];
+            platform plarreglo[6] = [pl1, pl2, pl3, pl4, pl5, pl6];
+            obstacles obs1 = [0  ,   0 ,   5  , 1     , 64 ];
+            obstacles obs2 = [5  ,   1 ,   5  , 1     ,  64  ];
             obstacles obs [2] = [obs1,obs2];
             
             background fondo = Castle;

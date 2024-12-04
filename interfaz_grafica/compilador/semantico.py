@@ -230,7 +230,7 @@ class Semantico():
                         y+=1
                         atributos=['0', '1', '2', '3',  '4']
                         for k in range(len(atributos)):
-                            in_simbolo=[f'{id},{x},{atributos[k]}',f'{simbolo[1]},{atributos[x]}','int', 'Null' ]
+                            in_simbolo=[f'{id},{x},{atributos[k]}',f'','int', 'Null' ]
                             self.ts.insert(indice+y+1,in_simbolo)
                             y+=1
                         

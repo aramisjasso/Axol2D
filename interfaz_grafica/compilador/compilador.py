@@ -85,7 +85,7 @@ class Compilador():
 
     #Ensamblador
     def parte_Ensamblador(self):
-        self.ensamblador.fnCorre(self.codigoint.pilaCodigo, self.variables)
+        self.ensamblador.fnCorre(self.codigoint.pilaCodigo, self.variables, self.identificadores_ts)
 
     #Errores
     def errores_re(self):
