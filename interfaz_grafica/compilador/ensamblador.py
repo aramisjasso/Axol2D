@@ -119,7 +119,7 @@ class ensamblador():
                 if tipo[0] == "arreglo":
                     if tipo[1] in ["obstacles", "platform"]:
                         x = int(simbolo[3])
-                        y = 5
+                        y = 7
                         
                         for elemento_x in range(x):
                             valor = ""
@@ -155,7 +155,7 @@ class ensamblador():
                             identificador += f"\n\t{tamaño} {valor}"
                         
             elif tipo in ["obstacles", "platform"]:
-                for elemento in range(5):
+                for elemento in range(7):
                     contador += 1
                     simbolo = self.TS[contador]
                     valor += f"{simbolo[3]} "
