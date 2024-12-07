@@ -1,3 +1,12 @@
 *.pyc
 *.out
 parsetab.py
+*.asm
+*.obj
+*.exe
+# Excepciones: los archivos específicos que deseas incluir
+!GoLink.exe
+!lib.exe
+!link.exe
+!link16.exe
+!masm.exe

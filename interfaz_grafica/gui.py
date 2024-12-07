@@ -7,6 +7,7 @@ import tabla_dinamica as td
 import CódigoIntermedio as CI
 from tkinter import font
 import re
+import compilador.ejecutar as exe
 
 
 
@@ -34,6 +35,7 @@ class InterfazCompilador:
         self.tabla_dinamica_importaciones = td.TablaDinamica(root)
         self.CodigoIntermedio = CI.VentanaSecundaria(root,"Código Intermedio")
         self.CodigoEnsamblador = CI.VentanaSecundaria(root, "Código Ensamblador")
+        self.EjecutarASM = exe.ejecutar()
         #Separación de tablas
         self.variables=[]
         self.metodos=[]
@@ -98,6 +100,9 @@ class InterfazCompilador:
 
         # Código Ensamblador
         menu_bar.add_command(label="Ensamblador", command=self.abrirCodigoEnsamblador)
+
+        # Ejecutar ASM
+        menu_bar.add_command(label="Ejecutar", command=self.ejecutarASM)
 
         self.set_menu_font(menu_bar)
 
@@ -356,6 +361,11 @@ class InterfazCompilador:
     def abrirCodigoEnsamblador(self):
         Ensamblador = self.cmplr.ensamblador.codigoConvertido
         self.CodigoEnsamblador.abrir(Ensamblador)
+
+    def ejecutarASM(self):
+        ASM = self.cmplr.ensamblador.codigoConvertido
+        
+        self.EjecutarASM.run(ASM,self.current_file)
 #Inicio del main
 if __name__ == "__main__":
     root = tk.Tk()

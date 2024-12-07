@@ -23,7 +23,7 @@ class ensamblador():
         self.codigo.append(""";---Ruiz Jasso Gerrardo Aramis---
 ;---López Ramírez Miguel Ángel---""")
         self.fnConversionCodigo()
-
+        
         self.codigo.append(""";---Ruiz Jasso Gerrardo Aramis---
 ;---López Ramírez Miguel Ángel---""")
         self.fnImprimirConversion() #imprimir conversion
@@ -33,9 +33,10 @@ class ensamblador():
     #Convertir código a ensamblador
     def fnConversionCodigo(self):
         self.fnSepararCodigo()
-        self.fnImportaciones()
-        self.fnTablaDeSimbolos()
-        self.fnAxol()
+        #self.fnImportaciones()
+        self.fnStack_mas()
+        self.fnData()
+        self.fnCode()
         # self.fnProcedimientos()
     
     #Separa código en partes
@@ -82,15 +83,47 @@ class ensamblador():
                 self.procedimientos.append(metodo)
             else:
                 metodos=False
-            
+
+    def fnStack_mas(self):
+        self.codigo.append(f"""
+        .386
+.model flat, stdcall
+.stack 4096
+
+include kernel32.inc
+includelib kernel32.lib
+
+ExitProcess proto :dword
+SetConsoleCursorPosition proto :dword, :dword
+SetConsoleTextAttribute proto :dword, :dword
+WriteConsole proto :dword, :dword, :dword, :dword, :dword
+ReadConsole proto :dword, :dword, :dword, :dword, :dword
+GetStdHandle proto :dword
+
+_COORD struct
+    _X sword ?
+    _Y sword ?
+_COORD ends""")
     #Acomoda código
-    def fnImportaciones(self):
-        for importacion in self.importaciones:
-            self.codigo.append(f"include {importacion[1][2]}")
+    # def fnImportaciones(self):
+    #     for importacion in self.importaciones:
+    #         self.codigo.append(f"include {importacion[1][2]}")
 
 #---------------------------------------------DATA-----------------------------------------------------------------
+    def fnData(self):
+        self.codigo.append(f""".data
+_pincel db ' ', 0
+_posicion _COORD <0, 0>    ; Posición inicial
+
+_INVALID_HANDLE_VALUE equ -1
+_stdoutHandle dd ?        ; Manejador de salida
+_stdinHandle dd ?         ; Manejador de entrada
+_inputBuffer db 16 dup(?) ; Buffer de entrada
+_bytesRead dd 0
+_charsWritten dd ?""")
+        #self.fnTablaDeSimbolos()
+
     def fnTablaDeSimbolos(self):
-        self.codigo.append(".DATA")
         compara = True
         contador = 0
         tamaño_TS = len(self.TS)
@@ -193,15 +226,77 @@ class ensamblador():
                 identificador = f"\t{id} {tamaño} {valor}"
             self.codigo.append(identificador)
             contador += 1
-        self.codigo.append("""        _col db 0
-        _fil db 0
-        _cant_x dw 0
-        _cant_y dw 0
-        _color db 0""")
+        # self.codigo.append("""        _col db 0
+        # _fil db 0
+        # _cant_x dw 0
+        # _cant_y dw 0
+        # _color db 0""")
 
 #---------------------------------------------------------------------------------CODE-------------------------------------------------------------------------------------- 
+
+    def fnCode(self):
+        self.codigo.append(".code")
+        self.codigo.append("""main proc
+    ; Obtener manejador de salida
+    invoke GetStdHandle, -11
+    cmp eax, _INVALID_HANDLE_VALUE
+    je exit_error
+    mov _stdoutHandle, eax
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+
+    ; Modifica el color del caracter y el fondo
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0BBh
+
+    ; Configuración inicial de variables
+    mov ecx, 3000         ; Número de caracteres a imprimir (2 en este caso)
+
+; Ciclo para imprimir caracteres uno por uno
+imprimirCielo:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop imprimirCielo
+
+    mov word ptr [_posicion._X], 0    ; X = 0
+    mov word ptr [_posicion._Y], 25   ; Y = 25
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+
+    ; Modifica el color del caracter y el fondo
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0AAh
+
+    ; Configuración inicial de variables
+    mov ecx, 600         ; Número de caracteres a imprimir (2 en este caso)
+
+; Ciclo para imprimir caracteres uno por uno
+imprimirPasto:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop imprimirPasto
+
+    ; Esperar entrada del usuario
+    invoke GetStdHandle, -10
+    mov _stdinHandle, eax
+    invoke ReadConsole, _stdinHandle, offset _inputBuffer, sizeof _inputBuffer, offset _bytesRead, 0
+
+    invoke ExitProcess, 0
+
+exit_error:
+    invoke ExitProcess, 1
+main endp
+
+end main""")
+        ##self.fnAxol()
+        
+
     def fnAxol(self):
-        self.codigo.append(".CODE")
+        
         self.codigo.append("""        MOV AX,@DATA
         MOV DS,AX
 """)
