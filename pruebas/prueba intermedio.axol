@@ -9,21 +9,26 @@ import Background;
             int a3 = 0;
             string b = "cadena";
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl1 = [140  ,   10 ,   10  , 10     , 110 ];
-            platform pl2 = [110  ,   20 ,   20  , 10     ,  0 ];
-            platform pl3 = pl2;
-            platform pl4 = pl1;
-            platform pl5 = pl4;
+            platform pl1 = [0  ,   1 ,   20  , 10     , 16 ];
+            platform pl2 = [1  ,   2 ,   20  , 10     ,  32 ];
+            platform pl3 = [2  ,   3 ,   20  , 10     ,  48 ];
+			 platform pl7 = [119 , 0 ,   1  , 2     ,  255 ];
+			platform plarreglo2[4] = [pl1, pl2, pl3, pl7];
 
-            platform plarreglo[3] = [pl1,pl2,pl3];
-            obstacles obs1 = [140  ,   10 ,   10  , 10     , 110 ];
-            obstacles obs2 = [110  ,   20 ,   20  , 10     ,  0  ];
-            obstacles obs [2] = [obs1,obs2];
+			obstacles obs1 = [3  ,   4 ,   20  , 10     , 64 ];
+            obstacles obs2 = [4  ,   5 ,   20  , 10     ,  80 ];
+            obstacles obs3 = [5  ,   6 ,   20  , 10     ,  96 ];
+			obstacles obs [3] = [obs1, obs2, obs3];
+			
+			obstacles pl4 = [6  ,   7 ,   20  , 10     , 112 ];
+            obstacles pl5 = [7  ,   8 ,   20  , 10     ,  128 ];
+            obstacles pl6 = [8  ,   9 ,   20  , 10     ,  144 ];
+            platform plarreglo[3] = [ pl4 ,pl5,pl6];
             
             background fondo = Castle;
-            int fin [2] = [100,100];
+            int fin [2] = [119 , 0 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   0    ,    0    ,   3  , knight   ];
+            player jugador = [   50    ,    20    ,   3  , knight   ];
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200  ];
@@ -95,6 +100,6 @@ import Background;
 
                 a1 = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
-                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
+                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo2,     fin  );
            }
         }

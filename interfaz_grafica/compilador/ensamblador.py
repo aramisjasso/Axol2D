@@ -92,7 +92,9 @@ class ensamblador():
 
 include kernel32.inc
 includelib kernel32.lib
-
+include user32.inc
+includelib user32.lib
+                           
 ExitProcess proto :dword
 SetConsoleCursorPosition proto :dword, :dword
 SetConsoleTextAttribute proto :dword, :dword
@@ -111,17 +113,38 @@ _COORD ends""")
 
 #---------------------------------------------DATA-----------------------------------------------------------------
     def fnData(self):
-        self.codigo.append(f""".data
-_pincel db ' ', 0
-_posicion _COORD <0, 0>    ; Posición inicial
+        self.codigo.append(f"""
+.data
+    ; Constantes
+    _VK_ESCAPE equ 1Bh              ; Código de la tecla ESC
+    _VK_LEFT equ 25h                
+    _VK_UP equ 26h
+    _VK_RIGHT equ 27h         
+    _VK_DOWN equ 28h
+                           
+    ; Variables para imprimir caracteres en pantalla   
+    _pincel db ' ', 0
+    _posicion _COORD <0, 0>    ; Posición inicial
 
-_INVALID_HANDLE_VALUE equ -1
-_stdoutHandle dd ?        ; Manejador de salida
-_stdinHandle dd ?         ; Manejador de entrada
-_inputBuffer db 16 dup(?) ; Buffer de entrada
-_bytesRead dd 0
-_charsWritten dd ?""")
-        #self.fnTablaDeSimbolos()
+    ; Manejadores de entrada y salida
+    _stdoutHandle dd ?        ; Manejador de salida
+    _stdinHandle dd ?         ; Manejador de entrada
+                           
+    ; Variables para WriteConsole
+    _charsWritten dd ? ; Variable que recibe el total de caracteres escritos
+                           
+    ; Matriz de Colisiones
+    _matriz_colision db 3600 dup (0) ; Matriz de 30 filas y 120 columnas llena de ceros
+    ; Matriz de Colores
+    _matriz_colores db 3600 dup(000h) ; Inicializa del color base del fondo
+    ; Matriz de no vida
+    _matriz_vida db 3600 dup (0)
+
+    ; Matriz de posicion final
+    _matriz_final db 3600 dup (0)
+                           
+""")
+        self.fnTablaDeSimbolos()
 
     def fnTablaDeSimbolos(self):
         compara = True
@@ -213,9 +236,10 @@ _charsWritten dd ?""")
                     contador += 1
                     simbolo = self.TS[contador]
                     if elemento == 0:
-                        identificador = f"\t{id} {tamaño} {valor}"
+                        valor += f"{simbolo[3]}"
                     else:
-                        identificador += f"\n\t{tamaño} {valor}"
+                        valor += f", {simbolo[3]}"
+                identificador = f"\t{id} {tamaño} {valor}"
                 
                 identificador = f"\t{id} {tamaño} {valor}"
             elif tipo in ["string"]:
@@ -226,80 +250,36 @@ _charsWritten dd ?""")
                 identificador = f"\t{id} {tamaño} {valor}"
             self.codigo.append(identificador)
             contador += 1
-        # self.codigo.append("""        _col db 0
-        # _fil db 0
-        # _cant_x dw 0
-        # _cant_y dw 0
-        # _color db 0""")
+        self.codigo.append("""   
+    _ren sword 0
+    _col sword 0
+    _vidas sword 0
+    _ren_ini sword 0
+    _col_ini sword 0
+    _col_x dw 0
+    _fil dw 0
+    _cant_x dw 0
+    _cant_y dw 0
+    _color db 0
+    _contador_y dw 0
+    _contador_x dw 0""")
 
 #---------------------------------------------------------------------------------CODE-------------------------------------------------------------------------------------- 
 
     def fnCode(self):
         self.codigo.append(".code")
-        self.codigo.append("""main proc
+        self.codigo.append("""_main proc
     ; Obtener manejador de salida
     invoke GetStdHandle, -11
-    cmp eax, _INVALID_HANDLE_VALUE
-    je exit_error
     mov _stdoutHandle, eax
 
-    ; Posiciona el cursor
-    mov eax, _posicion
-    invoke SetConsoleCursorPosition, _stdoutHandle, eax
-
-    ; Modifica el color del caracter y el fondo
-    invoke SetConsoleTextAttribute, _stdoutHandle, 0BBh
-
-    ; Configuración inicial de variables
-    mov ecx, 3000         ; Número de caracteres a imprimir (2 en este caso)
-
-; Ciclo para imprimir caracteres uno por uno
-imprimirCielo:
-    push ecx                 ; Guarda el valor de ecx en la pila
-    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
-    pop ecx                  ; Restaura el valor de ecx
-    loop imprimirCielo
-
-    mov word ptr [_posicion._X], 0    ; X = 0
-    mov word ptr [_posicion._Y], 25   ; Y = 25
-
-    ; Posiciona el cursor
-    mov eax, _posicion
-    invoke SetConsoleCursorPosition, _stdoutHandle, eax
-
-    ; Modifica el color del caracter y el fondo
-    invoke SetConsoleTextAttribute, _stdoutHandle, 0AAh
-
-    ; Configuración inicial de variables
-    mov ecx, 600         ; Número de caracteres a imprimir (2 en este caso)
-
-; Ciclo para imprimir caracteres uno por uno
-imprimirPasto:
-    push ecx                 ; Guarda el valor de ecx en la pila
-    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
-    pop ecx                  ; Restaura el valor de ecx
-    loop imprimirPasto
-
-    ; Esperar entrada del usuario
-    invoke GetStdHandle, -10
-    mov _stdinHandle, eax
-    invoke ReadConsole, _stdinHandle, offset _inputBuffer, sizeof _inputBuffer, offset _bytesRead, 0
-
-    invoke ExitProcess, 0
-
-exit_error:
-    invoke ExitProcess, 1
-main endp
-
-end main""")
-        ##self.fnAxol()
+    """)
+        self.fnAxol()
+        
         
 
     def fnAxol(self):
         
-        self.codigo.append("""        MOV AX,@DATA
-        MOV DS,AX
-""")
         compara = True
         contador = 0
         
@@ -320,85 +300,440 @@ end main""")
         #         break
         #     self.codigo.append(f"\t{self.axol[contador]}")
         #     contador += 1
+        #Final
+        id = final[0]
+        self.codigo.append("_fin_juego:")
+        self.codigo.append(f""" ;posicion final para ganar
+    xor eax, eax
+    mov ax, {id}[2]
+    imul eax, 120
+    xor ebx, ebx
+    mov bx, {id}[0]
+    add ebx, eax
+    mov byte ptr _matriz_final[ebx], 1
+        """)
+        #Fondo
+        self.fnFondo(fondo[3])
+        #jugador
+        id =  jugador[0] 
+        self.codigo.append("_inicio_jugador:")
+        self.codigo.append(f""" ;posicion incial
+    mov ax, {id}[4]
+    mov _vidas, ax
+
+    mov ax, {id}[0]
+    mov _col_ini, ax
+    mov _col, ax
+
+    mov ax, {id}[2]
+    mov _ren_ini, ax
+    mov _ren, ax
+        """)
+
 
         #elementos_fondo
         id =  elementos_fondo[0]
         tamaño = elementos_fondo[3]
         etiqueta = "elementos_fondo"
-        self.fnBloques(id,tamaño, etiqueta)
+        self.fnBloques(id,tamaño, etiqueta, colision = False)
+
+        
+        #obstaculos
+        id =  obstaculos[0]
+        tamaño = obstaculos[3]
+        etiqueta = "obstaculos"
+        self.fnBloques(id, tamaño, etiqueta, quita_vida = True)
 
         #plataformas
         id =  plataformas[0]
         tamaño = plataformas[3]
         etiqueta = "plataformas"
         self.fnBloques(id, tamaño, etiqueta)
-       
-            
-        #obstaculos
-        id =  obstaculos[0]
-        tamaño = obstaculos[3]
-        etiqueta = "obstaculos"
-        self.fnBloques(id, tamaño, etiqueta)
 
+        self.codigo.append(""" ; Esperar entrada del usuario
+_tecla: 
+    invoke GetAsyncKeyState, _VK_ESCAPE
+    test eax, 8000h            ; Verificar si la tecla está presionada
+    jnz _fin                    ; Salir si ESC está presionado
+
+    invoke GetAsyncKeyState, _VK_LEFT
+    test eax, 8000h            
+    jnz _izquierda                
+
+    invoke GetAsyncKeyState, _VK_RIGHT
+    test eax, 8000h            
+    jnz _derecha  
+
+    invoke GetAsyncKeyState, _VK_UP
+    test eax, 8000h            
+    jnz _arriba  
+
+    invoke GetAsyncKeyState, _VK_DOWN
+    test eax, 8000h            
+    jnz _abajo     
+
+    ; Si no es una tecla especial, seguir leyendo
+    jmp _tecla
+    
+_arriba:
+    ; Calcula la posición destino 
+    movzx eax, _ren
+    dec eax
+    imul eax, 120
+    movzx ebx, _col
+    add eax, ebx
+
+    ; final
+    movzx ebx, _matriz_final[eax] ; quitar vida
+    cmp ebx, 1 
+    je _gano                        
+
+    ; vida menos
+    movzx ebx, _matriz_vida[eax] ; quitar vida
+    cmp ebx, 1 
+    je _vida_menos
+                                                     
+    movzx ebx, _matriz_colision[eax] ; índice = ren_actual * 120 + col_actual
+    ; Checa si el movimiento es permitido
+    cmp ebx, 1         
+    je _tecla                              
+
+    ; Movimiento permitido
+    call _borrar
+    movzx eax, _ren          ; Cargar ren en eax con extensión cero
+    cmp eax, 0              ; Comparar si ren es 0
+    je _tecla                ; Saltar si lo es
+    dec eax                 ; Decrementar ren
+    mov _ren, ax             ; Guardar de vuelta en ren
+    call _redibujar
+    invoke Sleep, 100       ; 50 ms de pausa
+    jmp _tecla
+
+_abajo:
+    ; Calcula la posición destino 
+    movzx eax, _ren
+    inc eax
+    imul eax, 120
+    movzx ebx, _col
+    add eax, ebx
+
+    ; final
+    movzx ebx, _matriz_final[eax] ; quitar vida
+    cmp ebx, 1 
+    je _gano                        
+
+    ; vida menos
+    movzx ebx, _matriz_vida[eax] ; quitar vida
+    cmp ebx, 1 
+    je _vida_menos
+                                                     
+    movzx ebx, _matriz_colision[eax] ; índice = ren_actual * 120 + col_actual
+    ; Checa si el movimiento es permitido
+    cmp ebx, 1         
+    je _tecla  
+                           
+    ; Movimiento permitido
+    call _borrar
+    movzx eax, _ren          ; Cargar ren en eax con extensión cero
+    cmp eax, 29             ; Comparar si ren es 24
+    je _tecla                ; Saltar si lo es
+    inc eax                 ; Incrementar ren
+    mov _ren, ax             ; Guardar de vuelta en ren
+    call _redibujar
+    invoke Sleep, 100 
+    jmp _tecla
+
+_izquierda:
+    ; Calcula la posición destino 
+    movzx eax, _ren
+    imul eax, 120
+    movzx ebx, _col
+    dec ebx
+    add eax, ebx
+
+    ; final
+    movzx ebx, _matriz_final[eax] ; quitar vida
+    cmp ebx, 1 
+    je _gano 
+                                                              
+    ; vida menos
+    movzx ebx, _matriz_vida[eax] ; quitar vida
+    cmp ebx, 1 
+    je _vida_menos
+                                                     
+    movzx ebx, _matriz_colision[eax] ; índice = ren_actual * 120 + col_actual
+    ; Checa si el movimiento es permitido
+    cmp ebx, 1         
+    je _tecla  
+                          
+    ; Movimiento permitido
+    call _borrar
+    movzx eax, _col          ; Cargar col en eax con extensión cero
+    cmp eax, 0              ; Comparar si col es 0
+    je _tecla                ; Saltar si lo es
+    dec eax                 ; Decrementar col
+    mov _col, ax             ; Guardar de vuelta en col
+    call _redibujar
+    invoke Sleep, 100 
+    jmp _tecla
+
+_derecha:
+    ; Calcula la posición destino 
+    movzx eax, _ren
+    imul eax, 120
+    movzx ebx, _col
+    inc ebx
+    add eax, ebx
+
+    ; final
+    movzx ebx, _matriz_final[eax] ; quitar vida
+    cmp ebx, 1 
+    je _gano                       
+
+    ; vida menos
+    movzx ebx, _matriz_vida[eax] ; quitar vida
+    cmp ebx, 1 
+    je _vida_menos
+                                                     
+    movzx ebx, _matriz_colision[eax] ; índice = ren_actual * 120 + col_actual
+    ; Checa si el movimiento es permitido
+    cmp ebx, 1         
+    je _tecla  
+                           
+    ; Movimiento permitido
+    call _borrar
+    movzx eax, _col          ; Cargar col en eax con extensión cero
+    cmp eax, 119            ; Comparar si col es 79
+    je _tecla                ; Saltar si lo es
+    inc eax                 ; Incrementar col
+    mov _col, ax             ; Guardar de vuelta en col
+    call _redibujar
+    invoke Sleep, 100 
+    jmp _tecla
+
+_borrar:
+    ; Calcular el índice
+    movzx eax, _ren            ; renglón actual
+    imul eax, 120           ; ren_actual * 120
+    movzx ebx, _col
+    add eax, ebx            ; índice = ren_actual * 120 + col_actual
+    ; Cargar el valor de la matriz
+    movzx ebx, byte ptr _matriz_colores[eax] ; Cargar color desde la matriz
+
+    mov ax, _col
+    mov word ptr [_posicion._X], ax
+    mov ax, _ren
+    mov word ptr [_posicion._Y], ax
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, ebx
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    ret
+
+_redibujar:
+    mov ax, _col
+    mov word ptr [_posicion._X], ax
+    mov ax, _ren
+    mov word ptr [_posicion._Y], ax
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 044h
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    ret
+    
+_vida_menos:
+    
+    sub _vidas, 1
+    ; Movimiento permitido
+    call _borrar
+    movzx eax, _col          ; Cargar col en eax con extensión cero
+    cmp eax, 119            ; Comparar si col es 79
+    je _tecla                ; Saltar si lo es
+    inc eax                 ; Incrementar col
+    mov _col, ax             ; Guardar de vuelta en col
+    
+    mov ax, _col_ini
+    mov _col, ax
+    mov ax, _ren_ini
+    mov _ren, ax
+    call _redibujar
+    invoke Sleep, 100
+    
+    xor eax, eax
+    mov ax, _vidas
+    cmp ax, 0 
+    je _fin        
+    jmp _tecla 
+    ret
+_gano:
+    jmp _fin 
+                                                      
+_fin: 
+    ; Salir del programa
+    invoke ExitProcess, 0
+_main endp
+
+end _main""")
+    
+    # Fondo
+    def fnFondo(self, valor):
+        self.codigo.append("""; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+
+    ; Modifica el color del caracter y el fondo
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0BBh
+
+    ; Configuración inicial de variables
+    mov ecx, 3000         ; Número de caracteres a imprimir (2 en este caso)
+
+; Ciclo para imprimir caracteres uno por uno
+_imprimirCielo:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop _imprimirCielo
+
+    ;Color de Pasto en Matriz Color
+    mov eax, 0          ; Número de la fila
+    imul eax, 120        ; Calcula el índice inicial: ren * 120
+    mov ebx, eax         ; Guarda el índice inicial en ebx
+
+    mov ecx, 3000         ; Número de columnas en la fila (120)
+_coloresCielo:
+    mov byte ptr _matriz_colores[ebx], 0BBh   ; Llena la celda actual con 1
+    inc ebx                       ; Pasa a la siguiente celda
+    loop _coloresCielo             ; Decrementa ecx y repite si no es 0
+
+    mov word ptr [_posicion._X], 0    ; X = 0
+    mov word ptr [_posicion._Y], 25   ; Y = 25
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+
+    ; Modifica el color del caracter y el fondo
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0AAh
+
+    ; Configuración inicial de variables
+    mov ecx, 600         ; Número de caracteres a imprimir (2 en este caso)
+
+; Ciclo para imprimir caracteres uno por uno
+_imprimirPasto:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop _imprimirPasto
+
+                           
+    ;Color de Pasto en Matriz Color
+    mov eax, 25          ; Número de la fila
+    imul eax, 120        ; Calcula el índice inicial: ren * 120
+    mov ebx, eax         ; Guarda el índice inicial en ebx
+
+    mov ecx, 600         ; Número de columnas en la fila (120)
+_coloresPasto:
+    mov byte ptr _matriz_colores[ebx], 0AAh   ; Llena la celda actual con 1
+    inc ebx                       ; Pasa a la siguiente celda
+    loop _coloresPasto             ; Decrementa ecx y repite si no es 0
+   """)
 
     # Imprimir bloques 
-    def fnBloques(self, id, tamaño, etiqueta):
+    def fnBloques(self, id, tamaño, etiqueta, colision = True, quita_vida = False):
         id_mayusculas = etiqueta.upper()
-        self.codigo.append(f"{id_mayusculas}:")
-        self.codigo.append(f"\tmov si, 0; Se carga en memoria el elemento")
-        self.codigo.append(f"\tmov cx, {tamaño}; Cantidad de elementos de el arreglo")
+        self.codigo.append(f"_{id_mayusculas}:")
+        self.codigo.append(f"""\tmov esi, 0; Se carga en memoria el elemento""")
+        self.codigo.append(f"\tmov _contador_x, {tamaño}; Cantidad de elementos de el arreglo")
 
-        self.codigo.append(f"\nMAIN_LOOP_{id_mayusculas}:")
-        self.codigo.append(f"""          push cx ; contador arreglo        
-        xor ax, ax
-        mov ax, {id}[si]
-        mov _col, al
-        add si, 2
-                           
-        xor ax, ax
-        mov ax, {id}[si]
-        mov _fil, al
-        add si, 2
+        self.codigo.append(f"\n_MAIN_LOOP_{id_mayusculas}:")
+        self.codigo.append(f""" ;Cargar cada bloque
+        xor eax, eax 
+        mov ax, {id}[esi] 
+        mov _col_x, ax   
+        add esi, 2
+
+        xor eax, eax     
+        mov ax, {id}[esi]     
+        mov _fil, ax
+        add esi, 2
 
         xor ax, ax
-        mov ax, {id}[si]
+        mov ax, {id}[esi]
         mov _cant_x, ax
         add si, 2
         
         xor ax, ax
-        mov ax, {id}[si]
+        mov ax, {id}[esi]
         mov _cant_y, ax
         add si, 2
         
         xor ax, ax
-        mov ax, {id}[si]
+        mov ax, {id}[esi]
         mov _color, al
         add si, 2
-        
-        mov cx, _cant_y
-{id_mayusculas}_LOOP:
-        
-        push cx ; Guardar cantidad y
                            
-        mov ah, 02h       ; Función para mover el cursor
-        mov bh, 0         ; Página de video
-        mov dl, _col         ; Columna (posición X)
-        mov dh, _fil         ; Fila (posición Y)
-
-        int 10h           ; Llamada a BIOS para posicionar el cursor
-
-        mov ah, 09h       ; Función para escribir carácter con atributo
-        mov al, ' '       ; Carácter a imprimir
-        mov bl, _color       ; Atributo de color (fondo negro, texto blanco brillante)
-        mov cx, _cant_x        ; Cantidad de veces que se imprime
-        int 10h           ; Llamada a BIOS para imprimir
+_{id_mayusculas}_LOOP_y:
         
-        inc _fil
-        pop cx
-        loop {id_mayusculas}_LOOP
+    mov ax, _col_x
+    mov word ptr [_posicion._X], ax   ; X = 0
+    mov ax, _fil
+    mov word ptr [_posicion._Y], ax   ; Y = 25
 
-        pop cx                   
-        loop MAIN_LOOP_{id_mayusculas}""")
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+
+    ; Modifica el color del caracter y el fondo
+    mov al, _color
+    invoke SetConsoleTextAttribute, _stdoutHandle, al
+
+    ; Configuraci�n inicial de variables
+    xor ecx, ecx
+
+    mov cx, _cant_x       ; N�mero de caracteres a imprimir (2 en este caso)
+
+_{id_mayusculas}_LOOP_PRINT_x:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop _{id_mayusculas}_LOOP_PRINT_x
+
+;Color de {id_mayusculas} en Matriz Color
+    xor eax, eax
+    mov ax, _fil          ; Número de la fila
+    imul eax, 120        ; Calcula el índice inicial: ren * 120
+    xor ebx, ebx
+    mov bx, _col_x
+    add eax, ebx
+    mov ebx, eax         ; Guarda el índice inicial en ebx
+
+    mov cx, _cant_x        ; Número de columnas en la fila (120)
+_colores{id_mayusculas}:
+    mov al, _color
+    mov byte ptr _matriz_colores[ebx], al   ; Llena la celda actual con color
+    """)
+        if (colision):
+            self.codigo.append(f"""  mov byte ptr _matriz_colision[ebx], 1   ; Llena la celda actual con 1""")
+        if (quita_vida):
+            self.codigo.append(f"""  mov byte ptr _matriz_vida[ebx], 1   ; Llena la celda actual con 1""")
+        self.codigo.append(f"""    inc ebx                       ; Pasa a la siguiente celda
+    loop _colores{id_mayusculas}             ; Decrementa ecx y repite si no es 0
+
+    inc _fil
+    sub _cant_y, 1
+    mov cx, _cant_y
+    cmp ecx, 0
+    
+    jnz _{id_mayusculas}_LOOP_y
+
+;ciclo para resolver arreglo
+    sub _contador_x, 1
+    mov cx, _contador_x
+    cmp ecx, 0
+    jnz _MAIN_LOOP_{id_mayusculas}""")
+        
     #Buscar id
     def fnBuscar(self, busca):
         for id in self.TS_Completa:
@@ -418,3 +753,4 @@ end main""")
         for icono in self.codigo:
             temporal += icono +"\n"
         self.codigoConvertido = temporal
+
