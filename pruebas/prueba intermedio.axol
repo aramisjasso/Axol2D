@@ -28,7 +28,7 @@ import Background;
             background fondo = Castle;
             int fin [2] = [119 , 0 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   50    ,    20    ,   3  , knight   ];
+            player jugador = [   0    ,    0    ,   3  , knight   ];
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200  ];
@@ -62,18 +62,38 @@ import Background;
            axol2D play () {
                 a1=2;
                 b = "a";
-                fin[0]=1+a1*1;
-                fin[0]=a1;
-                this.miMetodo3(a1,a1);
-                while ((x<5) & x>1){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    while (x<5){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    pl1 = [200  ,   200 ,   200  , 200     , 200 ];
+				 x = 0;
+                fin[0] = a1;
+                fin[0] = 0;
+				 fin[1] = 0;
+				if (3 <= 2 & x == 0){
+                    fin[1] = 2;
+                }else {
+                    fin[0] = 2;
+					if (x>1){
+                    fin[1] = 0;
+                }else {
+                    fin[0] = 4;
                 }
                 }
+				x = 0;
+				while (x<7){
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
+                    //obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
+                    fin[0] = x;
+				x = x +1 ;
+                }
+				x = 0;
+				 //fin[{x}] = 11%3;
+				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
+				//obs[0] = [9  ,   10 ,   20  , 10     ,  96 ];
+               // this.miMetodo3(a1,a1);
+/°                while ((x<5)){
+                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
+                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
+                    
+                }
+
                 if (x>5){
                     a1=122;
                     if (x>5){
@@ -98,7 +118,7 @@ import Background;
                         a1=10;
                 }
 
-                a1 = this.miMetodo3(123,2);
+                a1 = this.miMetodo3(123,2);°/
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo2,     fin  );
            }

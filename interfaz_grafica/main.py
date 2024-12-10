@@ -114,7 +114,8 @@ if __name__ == "__main__":
             
            axol2D play () {
                 b = "b";
-                a1 = this.miMetodo3(123,2);
+                matriz[0][2] = 1;
+                //a1 = this.miMetodo3(123,2);
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo,     fin  );
            }

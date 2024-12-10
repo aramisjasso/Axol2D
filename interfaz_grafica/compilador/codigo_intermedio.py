@@ -599,7 +599,7 @@ class Intermedio():
                             if len(separado) == 3:
                                 tamano = int(self.fnEcontrarTamano(id_separado))
                                 tamanoFila = int(self.fnEcontrarTamanoFila(id_separado)[0])
-                                id_separado= f'{id_separado},{ int(separado[1]) *tamanoFila *tamano + tamano* (int(separado[2]) )}'
+                                id_separado= f'{id_separado}[{ int(separado[1]) *tamanoFila *tamano + tamano* (int(separado[2]) )}]'
                                 if len(y)==3:
                                     valores= y[2]   
                                     # print("Esto se sale",id_separado)     
@@ -611,7 +611,7 @@ class Intermedio():
                             
                             elif len(separado) == 2:
                                 tamano = int(self.fnEcontrarTamano(id_separado))
-                                id= f'{id_separado},{  tamano* int(separado[1]) }'
+                                id= f'{id_separado}[{  tamano* int(separado[1]) }]'
                                 if len(y)==3:
                                     valores= y[2]        
                                     self.fnAsignarAcceso(id,valores,y,llamada)
@@ -639,7 +639,7 @@ class Intermedio():
                                     if not temp or 'NoId'== temp:
                                     # print('Declaración', temp)
                                         temp_id=id2
-                                        id2=f'{llamada},{id2}'
+                                        id2=f'{llamada}[{id2}]'
                                         if 'NoId'== self.fnComprobarDeclaracion(id2):
                                             self.errores.append([f'Error Semántico (Línea {line}. La variable [{temp_id}] no ha sido declarada.',line, lexpos])
                                     if 'int' != self.fnEncontrarTipo(id2):
@@ -683,7 +683,7 @@ class Intermedio():
                                         tamanoFila=self.fnEcontrarTamano(id)
                                         for x1 in range (tamaño):
                                             self.postorden(fila[x1])
-                                            self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id},{x1*tamanoFila}')))
+                                            self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id}[{x1*tamanoFila}]')))
                                             self.idIntruccion+=1
                                             self.pila_semantica = []
                                                 
@@ -715,7 +715,7 @@ class Intermedio():
                                     tamanoFila=self.fnEcontrarTamano(id)
                                     for x1 in range (tamaño):
                                         self.postorden(fila[x1])
-                                        self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id},{x1*tamanoFila}')))
+                                        self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,f'{id}[{x1*tamanoFila}]')))
                                         self.idIntruccion+=1
                                         self.pila_semantica = []
                                 
@@ -1119,7 +1119,7 @@ class Intermedio():
                         tamanoFila=self.fnEcontrarTamano(id)
                         self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
                         self.idIntruccion+=1
-                        id_guardar = f'{id},({self.idIntruccion-1})'
+                        id_guardar = f'{id}[({self.idIntruccion-1})]'
                         self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-2})',id_guardar)))
                     else:  
                         self.pilaCodigo.append((self.idIntruccion,('=',f'({self.idIntruccion-1})',id)))
@@ -1130,7 +1130,7 @@ class Intermedio():
                         tamanoFila=self.fnEcontrarTamano(id)
                         self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
                         self.idIntruccion+=1
-                        id_guardar = f'{id},({self.idIntruccion-1})'
+                        id_guardar = f'{id}[({self.idIntruccion-1})]'
                         self.pilaCodigo.append((self.idIntruccion,('=',valor_x,id_guardar)))
                     else:  
                         self.pilaCodigo.append((self.idIntruccion,('=',f'{valor_x}',id)))
@@ -1152,7 +1152,7 @@ class Intermedio():
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('+',f'({self.idIntruccion-2})',f'({self.idIntruccion-1})')))
                         self.idIntruccion+=1
-                        id_guardar = f'{id},({self.idIntruccion-1})'
+                        id_guardar = f'{id},[({self.idIntruccion-1})]'
                     else:
                         id_guardar = f'{id},{x1*tamanoFila}'
                     self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,id_guardar)))
@@ -1169,7 +1169,7 @@ class Intermedio():
                     tamanoFila=self.fnEcontrarTamano(id)
                     self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
                     self.idIntruccion+=1
-                    id_guardar = f'{id},({self.idIntruccion-1})'
+                    id_guardar = f'{id},[({self.idIntruccion-1})]'
                     self.pilaCodigo.append((self.idIntruccion,('=',valores,id_guardar)))
                 else:  
                     self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))

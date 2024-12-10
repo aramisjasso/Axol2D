@@ -293,13 +293,174 @@ _COORD ends""")
         obstaculos = self.fnBuscar(self.axol.pop()[1][2])
         plataformas = self.fnBuscar(self.axol.pop()[1][2])
         
-        # tamaño_Code = len(self.axol)
-        # while (compara):
-        #     if tamaño_Code < contador + 1:
-        #         compara = False
-        #         break
-        #     self.codigo.append(f"\t{self.axol[contador]}")
-        #     contador += 1
+        tamaño_Code = len(self.axol)
+        while (compara):
+            if tamaño_Code < contador + 1:
+                compara = False
+                break
+            instruccion = self.axol[contador][1]
+            terceta = self.axol[contador][0]
+            signo = instruccion[0]
+            operando_1 = instruccion[1]
+            operando_2 = instruccion[2]
+            es_id_1 =self.fnEsid(operando_1)
+            es_id_2 =self.fnEsid(operando_2)
+            pila_1 = self.fnEsTerceta(operando_1)
+            pila_2 = self.fnEsTerceta(operando_2)
+            self.codigo.append(f"_{terceta}:")
+            if signo == "=":
+                # Identifica el tamaño para asignar
+                id =self.fnBuscar(instruccion[2].split("[")[0])
+                if id[1] in [1, 50]:
+                    tamaño = "BYTE"
+                elif id [1] == 2 :
+                    tamaño = "WORD"
+                
+                if es_id_1:
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_1}")
+                    operando_1 = registro
+                #Si es una terceta
+                elif pila_1:
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tpop eax")
+                    operando_1 = registro
+
+                self.codigo.append(f"\tmov {tamaño} ptr {operando_2}, {operando_1}")
+
+
+            elif signo in ["+", "-", "*", "/", "%"]:
+                 
+                if es_id_1: #Si es id
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_1}")
+                    operando_1 = registro
+                elif pila_1: #Si es una terceta
+                    self.codigo.append(f"\tpop eax")
+                else: # Si es un número
+                    self.codigo.append(f"\tmov eax, {operando_1}")
+
+                #Segundo elemento
+                if es_id_2: #Si es id
+                    if tamaño =="WORD":
+                        registro = "bx"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_2}")
+                    operando_2 = registro
+                elif pila_2: #Si es una terceta
+                    self.codigo.append(f"\tpop ebx")
+                else:  # Si es un número
+                    self.codigo.append(f"\tmov ebx, {operando_2}")
+                
+                if signo == "+":                
+                    self.codigo.append(f"\tadd eax, ebx")
+                elif signo == "-":
+                    self.codigo.append(f"\tsub eax, ebx")
+                elif signo == "*":
+                    self.codigo.append(f"\tmul ebx")
+                elif signo == "/":
+                    self.codigo.append(f"\txor edx, edx")
+                    self.codigo.append(f"\tdiv ebx")
+                elif signo == "%":
+                    self.codigo.append(f"\txor edx, edx")
+                    self.codigo.append(f"\tdiv ebx")
+                    self.codigo.append(f"\tmov eax, edx")
+                self.codigo.append(f"\tpush eax ")
+
+            elif signo in ["<", ">", "<=", ">=", "==", "!="]:
+                if es_id_1: #Si es id
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_1}")
+                    operando_1 = registro
+                elif pila_1: #Si es una terceta
+                    self.codigo.append(f"\tpop eax")
+                else: # Si es un número
+                    self.codigo.append(f"\tmov eax, {operando_1}")
+
+                #Segundo elemento
+                if es_id_2: #Si es id
+                    if tamaño =="WORD":
+                        registro = "bx"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_2}")
+                    operando_2 = registro
+                elif pila_2: #Si es una terceta
+                    self.codigo.append(f"\tpop ebx")
+                else:  # Si es un número
+                    self.codigo.append(f"\tmov ebx, {operando_2}")
+                
+                self.codigo.append(f"\tcmp eax, ebx") #Para hacer las comparaciones
+
+                if signo == "<": #Si es menor
+                    self.codigo.append("\tsetl bl")
+                elif signo == "<=": #Si es menor o igual
+                    self.codigo.append("\tsetle bl")
+                elif signo == ">": #Si es mayor
+                    self.codigo.append("\tsetg bl")
+                elif signo == ">=": #Si es mayor o igual
+                    self.codigo.append("\tsetge bl")
+                elif signo == "==": #Si es igual
+                    self.codigo.append("\tsete bl")
+                elif signo == "!=": #Si es diferente
+                    self.codigo.append("\tsetne bl")
+                
+                self.codigo.append("\txor eax, eax")
+                self.codigo.append("\tmov al, bl")
+                self.codigo.append(f"\tpush eax ")
+            
+            elif signo in ["&", "|"]:
+                if es_id_1: #Si es id
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_1}")
+                    operando_1 = registro
+                elif pila_1: #Si es una terceta
+                    self.codigo.append(f"\tpop eax")
+                else: # Si es un número
+                    self.codigo.append(f"\tmov eax, {operando_1}")
+
+                #Segundo elemento
+                if es_id_2: #Si es id
+                    if tamaño =="WORD":
+                        registro = "bx"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_2}")
+                    operando_2 = registro
+                elif pila_2: #Si es una terceta
+                    self.codigo.append(f"\tpop ebx")
+                else:  # Si es un número
+                    self.codigo.append(f"\tmov ebx, {operando_2}")
+
+                if signo == "&": #Si es menor
+                    self.codigo.append("\tand al, bl")
+                elif signo == "|": #Si es menor o igual
+                    self.codigo.append("\tor al, bl")
+                
+                self.codigo.append("\txor ebx, ebx")
+                self.codigo.append("\tmov bl, al")
+                self.codigo.append(f"\tpush ebx ")
+                
+            elif signo in ["IFF"]: #Si es falso
+                if es_id_1: #Si es id
+                    if tamaño =="WORD":
+                        registro = "ax"
+                    self.codigo.append(f"\tmov {tamaño} ptr {registro}, {operando_1}")
+                    operando_1 = registro
+                elif pila_1: #Si es una terceta
+                    self.codigo.append(f"\tpop eax")
+                else: # Si es un número
+                    self.codigo.append(f"\tmov eax, {operando_1}")
+
+                self.codigo.append(f"\tcmp eax, 0") #Para hacer la comparacion si es falso
+                self.codigo.append(f"\tjz _{operando_2[1:-1]}") #Para hacer las comparaciones
+            
+            elif signo in ["GO TO"]: #Si es falso
+                self.codigo.append(f"\tJMP _{operando_2[1:-1]}") #Para hacer las comparaciones
+            self.codigo.append("") 
+            #self.codigo.append(f"\t{self.axol[contador]}")
+            contador += 1
+        
         #Final
         id = final[0]
         self.codigo.append("_fin_juego:")
@@ -406,7 +567,7 @@ _arriba:
     dec eax                 ; Decrementar ren
     mov _ren, ax             ; Guardar de vuelta en ren
     call _redibujar
-    invoke Sleep, 100       ; 50 ms de pausa
+    invoke Sleep, 150       ; 50 ms de pausa
     jmp _tecla
 
 _abajo:
@@ -440,7 +601,7 @@ _abajo:
     inc eax                 ; Incrementar ren
     mov _ren, ax             ; Guardar de vuelta en ren
     call _redibujar
-    invoke Sleep, 100 
+    invoke Sleep, 150 
     jmp _tecla
 
 _izquierda:
@@ -474,7 +635,7 @@ _izquierda:
     dec eax                 ; Decrementar col
     mov _col, ax             ; Guardar de vuelta en col
     call _redibujar
-    invoke Sleep, 100 
+    invoke Sleep, 150 
     jmp _tecla
 
 _derecha:
@@ -508,7 +669,7 @@ _derecha:
     inc eax                 ; Incrementar col
     mov _col, ax             ; Guardar de vuelta en col
     call _redibujar
-    invoke Sleep, 100 
+    invoke Sleep, 150 
     jmp _tecla
 
 _borrar:
@@ -559,7 +720,7 @@ _vida_menos:
     mov ax, _ren_ini
     mov _ren, ax
     call _redibujar
-    invoke Sleep, 100
+    invoke Sleep, 150
     
     xor eax, eax
     mov ax, _vidas
@@ -740,7 +901,16 @@ _colores{id_mayusculas}:
             if id[0] == busca:
                 return id
         
-
+    def fnEsid(self, busca):
+        for id in self.TS_Completa:
+            if id[0] == busca:
+                return True
+        return False
+    
+    def fnEsTerceta(self, valor):
+        if "(" in valor:
+            return True
+        return False
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
     #Imprimir conversion
     def fnImprimirConversion(self):
