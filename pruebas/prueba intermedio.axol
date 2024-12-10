@@ -25,10 +25,10 @@ import Background;
             obstacles pl6 = [8  ,   9 ,   20  , 10     ,  144 ];
             platform plarreglo[3] = [ pl4 ,pl5,pl6];
             
-            background fondo = Castle;
+            background fondo = Forest;
             int fin [2] = [119 , 0 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   0    ,    0    ,   3  , knight   ];
+            player jugador = [   0    ,    0    ,   3  , wizard   ];
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200  ];
@@ -88,7 +88,7 @@ import Background;
 				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
 				//obs[0] = [9  ,   10 ,   20  , 10     ,  96 ];
                // this.miMetodo3(a1,a1);
-/°                while ((x<5)){
+               /°while ((x<5)){
                     //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
                     obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
                     
@@ -119,7 +119,7 @@ import Background;
                 }
 
                 a1 = this.miMetodo3(123,2);°/
-                // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posión a llegar)
+                // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posiï¿½n a llegar)
                 MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo2,     fin  );
            }
         }
