@@ -25,10 +25,10 @@ import Background;
             obstacles pl6 = [8  ,   9 ,   20  , 10     ,  144 ];
             platform plarreglo[3] = [ pl4 ,pl5,pl6];
             
-            background fondo = Castle;
+            background fondo = Forest;
             int fin [2] = [119 , 0 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   50    ,    20    ,   3  , knight   ];
+            player jugador = [   50    ,    20    ,   3  , wizard   ];
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200  ];

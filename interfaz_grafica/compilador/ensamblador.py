@@ -86,7 +86,7 @@ class ensamblador():
 
     def fnStack_mas(self):
         self.codigo.append(f"""
-        .386
+.386
 .model flat, stdcall
 .stack 4096
 
@@ -262,7 +262,17 @@ _COORD ends""")
     _cant_y dw 0
     _color db 0
     _contador_y dw 0
-    _contador_x dw 0""")
+    _contador_x dw 0
+                           
+    ; Mensajes
+    _msjVictoria    db "   Enhorabuena   ", 0
+    _msjDerrota     db "    Game Over    ", 0
+    _msjArriba      db 17 dup (220), 0
+    _msjAbajo       db 17 dup (223), 0
+    ; Colores Fondo
+    _colorCielo db 00h
+    _colorSuelo db 00h
+    _colorPersonaje db 00h""")
 
 #---------------------------------------------------------------------------------CODE-------------------------------------------------------------------------------------- 
 
@@ -300,6 +310,139 @@ _COORD ends""")
         #         break
         #     self.codigo.append(f"\t{self.axol[contador]}")
         #     contador += 1
+        self.codigo.append("_inicializarColores:")
+        background = fondo[3]
+        if background == 'Forest':
+            self.codigo.append('''  ; --- Bosque ---
+    mov al, 033h
+    mov _colorCielo, al
+    mov al, 022h
+    mov _colorSuelo, al''')
+        elif background == 'Mountain':
+            self.codigo.append('''  ; --- Montaña ---
+    mov al, 033h
+    mov _colorCielo, al
+    mov al, 088h
+    mov _colorSuelo, al''')
+        elif background == 'Ocean':
+            self.codigo.append('''    ; --- Oceano ---
+    mov al, 033h
+    mov _colorCielo, al
+    mov al, 011h
+    mov _colorSuelo, al
+''')    
+        elif background == 'Desert':
+            self.codigo.append('''    ; --- Desierto ---
+    mov al, 0EEh
+    mov _colorCielo, al
+    mov al, 066h
+    mov _colorSuelo, al
+''')
+        elif background == 'City':
+            self.codigo.append('''    ; --- Ciudad ---
+    mov al, 033h
+    mov _colorCielo, al
+    mov al, 088h
+    mov _colorSuelo, al
+''')
+        elif background == 'Village':
+            self.codigo.append('''    ; --- Villa ---
+    mov al, 033h
+    mov _colorCielo, al
+    mov al, 066h
+    mov _colorSuelo, al
+''')
+        elif background == 'Cave':
+            self.codigo.append('''    ; --- Cueva ---
+    mov al, 000h
+    mov _colorCielo, al
+    mov al, 088h
+    mov _colorSuelo, al
+''')
+        elif background == 'Swamp':
+            self.codigo.append('''    ; --- Pantano ---
+    mov al, 022h
+    mov _colorCielo, al
+    mov al, 066h
+    mov _colorSuelo, al
+''')
+        elif background == 'River':
+            self.codigo.append('''    ; --- Rio ---
+    mov al, 0BBh
+    mov _colorCielo, al
+    mov al, 033h
+    mov _colorSuelo, al
+''')
+        elif background == 'Island':
+            self.codigo.append('''    ; --- Isla ---
+    mov al, 0BBh
+    mov _colorCielo, al
+    mov al, 066h
+    mov _colorSuelo, al
+''')
+        elif background == 'Castle':
+            self.codigo.append('''    ; --- Castillo ---
+    mov al, 077h
+    mov _colorCielo, al
+    mov al, 088h
+    mov _colorSuelo, al
+''')
+        player = self.fnBuscar(f'{jugador[0]},3')[3]
+        if player == 'wizard':
+            self.codigo.append('''    ; Mago - Wizard
+    mov al, 0DDh
+    mov _colorPersonaje, al
+''')
+        elif player == 'archer':
+            self.codigo.append('''    ; Arquero - Archer
+    mov al, 0AAh
+    mov _colorPersonaje, al
+''')
+        elif player == 'rogue':
+            self.codigo.append('''    ; Pícaro - Rogue
+    mov al, 0CCh
+    mov _colorPersonaje, al
+''')
+        elif player == 'paladin':
+            self.codigo.append('''    ; Paladín - Paladin 
+    mov al, 0EEh
+    mov _colorPersonaje, al
+''')
+        elif player == 'barbarian':
+            self.codigo.append('''    ; Bárbaro - Barbarian
+    mov al, 044h
+    mov _colorPersonaje, al
+''')
+        elif player == 'assassin':
+            self.codigo.append('''    ; Asesino - Assassin
+    mov al, 077h
+    mov _colorPersonaje, al
+''')
+        elif player == 'druid':
+            self.codigo.append('''    ; Druida - Druid
+    mov al, 022h
+    mov _colorPersonaje, al
+''')
+        elif player == 'samurai':
+            self.codigo.append('''    ; Samurai
+    mov al, 011h
+    mov _colorPersonaje, al
+''')
+        elif player == 'ninja':
+            self.codigo.append('''    ; Ninja 
+    mov al, 000h
+    mov _colorPersonaje, al
+''')
+        elif player == 'priest':
+            self.codigo.append('''    ; Sacerdote - Priest
+    mov al, 0FFh
+    mov _colorPersonaje, al
+''')
+        elif player == 'knight':
+            self.codigo.append('''    ; Caballero - Knight
+    mov al, 088h
+    mov _colorPersonaje, al
+''')
         #Final
         id = final[0]
         self.codigo.append("_fin_juego:")
@@ -350,7 +493,27 @@ _COORD ends""")
         etiqueta = "plataformas"
         self.fnBloques(id, tamaño, etiqueta)
 
-        self.codigo.append(""" ; Esperar entrada del usuario
+        self.codigo.append(""" 
+_imprimirVidas: 
+    mov word ptr [_posicion._X], 3    ; X = 0
+    mov word ptr [_posicion._Y], 0   ; Y = 25
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0AAh
+    movzx ecx, _vidas         ; Número de caracteres a imprimir (2 en este caso)
+    add ecx, ecx
+    add ecx, ecx
+
+; Ciclo para imprimir caracteres uno por uno
+_loopVidas:
+    push ecx                 ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    pop ecx                  ; Restaura el valor de ecx
+    loop _loopVidas
+                           
+; Esperar entrada del usuario
 _tecla: 
     invoke GetAsyncKeyState, _VK_ESCAPE
     test eax, 8000h            ; Verificar si la tecla está presionada
@@ -539,12 +702,29 @@ _redibujar:
     ; Posiciona el cursor
     mov eax, _posicion
     invoke SetConsoleCursorPosition, _stdoutHandle, eax
-    invoke SetConsoleTextAttribute, _stdoutHandle, 044h
+    movzx eax, _colorPersonaje
+    invoke SetConsoleTextAttribute, _stdoutHandle, eax
     invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
     ret
     
 _vida_menos:
-    
+    movzx eax, _vidas
+    mov ebx, 4
+    mul bx
+    dec eax
+    mov word ptr [_posicion._X], ax   
+    mov word ptr [_posicion._Y], 0   
+
+    ; Posiciona el cursor
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 077h
+    ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+    invoke WriteConsole, _stdoutHandle, offset _pincel, 1, offset _charsWritten, 0
+
     sub _vidas, 1
     ; Movimiento permitido
     call _borrar
@@ -553,6 +733,11 @@ _vida_menos:
     je _tecla                ; Saltar si lo es
     inc eax                 ; Incrementar col
     mov _col, ax             ; Guardar de vuelta en col
+
+    xor eax, eax
+    mov ax, _vidas
+    cmp ax, 0 
+    je _gameover        
     
     mov ax, _col_ini
     mov _col, ax
@@ -560,16 +745,53 @@ _vida_menos:
     mov _ren, ax
     call _redibujar
     invoke Sleep, 100
-    
-    xor eax, eax
-    mov ax, _vidas
-    cmp ax, 0 
-    je _fin        
+
     jmp _tecla 
     ret
 _gano:
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 13 
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 06Eh
+    ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _msjArriba, 17, offset _charsWritten, 0
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 14
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 0E6h
+    invoke WriteConsole, _stdoutHandle, offset _msjVictoria, 17, offset _charsWritten, 0
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 15
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 06Eh
+    invoke WriteConsole, _stdoutHandle, offset _msjAbajo, 17, offset _charsWritten, 0
+    invoke Sleep, 10000
     jmp _fin 
-                                                      
+_gameover:
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 13 
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 08h
+    ; Guarda el valor de ecx en la pila
+    invoke WriteConsole, _stdoutHandle, offset _msjArriba, 17, offset _charsWritten, 0
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 14
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 80h
+    invoke WriteConsole, _stdoutHandle, offset _msjDerrota, 17, offset _charsWritten, 0
+    mov word ptr [_posicion._X], 50
+    mov word ptr [_posicion._Y], 15
+    mov eax, _posicion
+    invoke SetConsoleCursorPosition, _stdoutHandle, eax
+    invoke SetConsoleTextAttribute, _stdoutHandle, 08h
+    invoke WriteConsole, _stdoutHandle, offset _msjAbajo, 17, offset _charsWritten, 0
+    invoke Sleep, 10000
+    jmp fin                                 
 _fin: 
     ; Salir del programa
     invoke ExitProcess, 0
@@ -583,8 +805,8 @@ end _main""")
     mov eax, _posicion
     invoke SetConsoleCursorPosition, _stdoutHandle, eax
 
-    ; Modifica el color del caracter y el fondo
-    invoke SetConsoleTextAttribute, _stdoutHandle, 0BBh
+    movzx eax, _colorCielo
+    invoke SetConsoleTextAttribute, _stdoutHandle, eax
 
     ; Configuración inicial de variables
     mov ecx, 3000         ; Número de caracteres a imprimir (2 en este caso)
@@ -603,7 +825,8 @@ _imprimirCielo:
 
     mov ecx, 3000         ; Número de columnas en la fila (120)
 _coloresCielo:
-    mov byte ptr _matriz_colores[ebx], 0BBh   ; Llena la celda actual con 1
+    movzx eax, _colorCielo
+    mov byte ptr _matriz_colores[ebx], al 
     inc ebx                       ; Pasa a la siguiente celda
     loop _coloresCielo             ; Decrementa ecx y repite si no es 0
 
@@ -614,8 +837,8 @@ _coloresCielo:
     mov eax, _posicion
     invoke SetConsoleCursorPosition, _stdoutHandle, eax
 
-    ; Modifica el color del caracter y el fondo
-    invoke SetConsoleTextAttribute, _stdoutHandle, 0AAh
+    movzx eax, _colorSuelo
+    invoke SetConsoleTextAttribute, _stdoutHandle, eax
 
     ; Configuración inicial de variables
     mov ecx, 600         ; Número de caracteres a imprimir (2 en este caso)
@@ -635,7 +858,8 @@ _imprimirPasto:
 
     mov ecx, 600         ; Número de columnas en la fila (120)
 _coloresPasto:
-    mov byte ptr _matriz_colores[ebx], 0AAh   ; Llena la celda actual con 1
+    movzx eax, _colorSuelo
+    mov byte ptr _matriz_colores[ebx], al
     inc ebx                       ; Pasa a la siguiente celda
     loop _coloresPasto             ; Decrementa ecx y repite si no es 0
    """)
