@@ -300,7 +300,7 @@ _COORD ends""")
         obstaculos = self.fnBuscar(self.axol.pop()[1][2])
         plataformas = self.fnBuscar(self.axol.pop()[1][2])
         
-        self.fnDefinirMetodos()
+        
 
         tamaño_Code = len(self.axol)
         self.fnInstrucciones(self.axol,tamaño_Code)
@@ -765,7 +765,11 @@ _gano:
     invoke SetConsoleTextAttribute, _stdoutHandle, 06Eh
     invoke WriteConsole, _stdoutHandle, offset _msjAbajo, 17, offset _charsWritten, 0
     invoke Sleep, 10000
-    jmp _fin 
+    jmp _fin
+
+    """)
+        self.fnDefinirMetodos()
+        self.codigo.append("""
 _gameover:
     mov word ptr [_posicion._X], 50
     mov word ptr [_posicion._Y], 13 
@@ -787,7 +791,9 @@ _gameover:
     invoke SetConsoleTextAttribute, _stdoutHandle, 08h
     invoke WriteConsole, _stdoutHandle, offset _msjAbajo, 17, offset _charsWritten, 0
     invoke Sleep, 10000
-    jmp fin                                 
+    jmp _fin 
+
+
 _fin: 
     ; Salir del programa
     invoke ExitProcess, 0

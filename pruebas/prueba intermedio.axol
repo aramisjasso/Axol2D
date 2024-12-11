@@ -15,7 +15,7 @@ import Background;
 			 platform pl7 = [119 , 0 ,   1  , 2     ,  255 ];
 			platform plarreglo2[4] = [pl1, pl2, pl3, pl7];
 
-			obstacles obs [10];
+			obstacles obs [19];
 			
 			obstacles pl4 = [6  ,   7 ,   20  , 10     , 112 ];
             obstacles pl5 = [7  ,   8 ,   20  , 10     ,  128 ];
@@ -35,7 +35,7 @@ import Background;
 
             method int miMetodo2(){
                 fin[1] = 2;
-
+				fin[0] = 10;
                 return 0;
             }          
             
@@ -48,12 +48,12 @@ import Background;
 				 fin[1] = 1;
 				x = 0;
 				
-				while (x<=9){
-                    obs[{x}] = [x+50  ,   x+3 ,   2  , 2     ,  64  ];
+				while (x<=20){
+                    obs[{x}] = [x+50  ,   x+3 ,   20  , 2     ,  64  ];
                     //obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
 				x = x +1 ;
                 }
-				//this.miMetodo2();
+			this.miMetodo2();
 				//x = 0;
 				 //fin[{x}] = 11%3;
 				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
