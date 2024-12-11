@@ -1142,20 +1142,26 @@ class Intermedio():
                 # print('fila123',fila[0])
                 tamanoFila=self.fnEcontrarTamano(id)
                 for x1 in range (tamaño):
-                    self.postorden(fila[x1])
+                    
                     if id_3 is not None:
                         self.pilaCodigo.append((self.idIntruccion,('*',f'{tamanoFila}',f'{id_3}')))
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('*',f'({self.idIntruccion-1})',f'{tamaño}')))
                         self.idIntruccion+=1
-                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',tamanoFila)))
+                        self.pilaCodigo.append((self.idIntruccion,('*',f'{x1}',f'{tamanoFila}')))
                         self.idIntruccion+=1
                         self.pilaCodigo.append((self.idIntruccion,('+',f'({self.idIntruccion-2})',f'({self.idIntruccion-1})')))
                         self.idIntruccion+=1
-                        id_guardar = f'{id},[({self.idIntruccion-1})]'
+                        id_guardar = f'{id}[({self.idIntruccion-1})]'
+                        self.evaluar_pila(self.pila_semantica)
                     else:
                         id_guardar = f'{id},{x1*tamanoFila}'
-                    self.pilaCodigo.append((self.idIntruccion,('=',self.pila_semantica,id_guardar)))
+                    self.postorden(fila[x1])
+                    valor_x=self.evaluar_pila(self.pila_semantica)
+                    if len(self.pila_semantica)!=1:
+                        self.pilaCodigo.append((self.idIntruccion,('=',f"({self.idIntruccion-1})",id_guardar)))
+                    else:
+                        self.pilaCodigo.append((self.idIntruccion,('=',f"{valor_x}",id_guardar)))
                     self.idIntruccion+=1
                     self.pila_semantica = []
                                                 

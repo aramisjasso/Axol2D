@@ -15,20 +15,17 @@ import Background;
 			 platform pl7 = [119 , 0 ,   1  , 2     ,  255 ];
 			platform plarreglo2[4] = [pl1, pl2, pl3, pl7];
 
-			obstacles obs1 = [3  ,   4 ,   20  , 10     , 64 ];
-            obstacles obs2 = [4  ,   5 ,   20  , 10     ,  80 ];
-            obstacles obs3 = [5  ,   6 ,   20  , 10     ,  96 ];
-			obstacles obs [3] = [obs1, obs2, obs3];
+			obstacles obs [10];
 			
 			obstacles pl4 = [6  ,   7 ,   20  , 10     , 112 ];
             obstacles pl5 = [7  ,   8 ,   20  , 10     ,  128 ];
             obstacles pl6 = [8  ,   9 ,   20  , 10     ,  144 ];
             platform plarreglo[3] = [ pl4 ,pl5,pl6];
             
-            background fondo = Forest;
+            background fondo = Ocean;
             int fin [2] = [119 , 0 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   0    ,    0    ,   3  , wizard   ];
+            player jugador = [   0    ,    0    ,   3  , barbarian   ];
             method int miMetodo1(){
                 a1 = 12;
                 pl1 = [200  ,   200 ,   200  , 200     , 200  ];
@@ -64,26 +61,15 @@ import Background;
                 b = "a";
 				 x = 0;
                 fin[0] = a1;
-                fin[0] = 0;
-				 fin[1] = 0;
-				if (3 <= 2 & x == 0){
-                    fin[1] = 2;
-                }else {
-                    fin[0] = 2;
-					if (x>1){
-                    fin[1] = 0;
-                }else {
-                    fin[0] = 4;
-                }
-                }
+                fin[0] = 1;
+				 fin[1] = 1;
 				x = 0;
-				while (x<7){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
+				while (x<=9){
+                    obs[{x}] = [x+50  ,   x+3 ,   2  , 2     ,  64  ];
                     //obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    fin[0] = x;
 				x = x +1 ;
                 }
-				x = 0;
+				//x = 0;
 				 //fin[{x}] = 11%3;
 				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
 				//obs[0] = [9  ,   10 ,   20  , 10     ,  96 ];
