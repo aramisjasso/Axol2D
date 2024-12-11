@@ -1,4 +1,3 @@
-Valor 	Color
 0 	    Negro
 1 	    Azul
 2 	    Verde

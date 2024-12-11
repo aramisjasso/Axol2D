@@ -1,0 +1,45 @@
+import Background;
+import Players; 
+
+level MiPrimerNivel {
+	platform base = [4, 23, 20, 2, 24];
+	platform base1 = [28, 21, 20, 2, 24];
+	platform base2 = [52, 19, 20, 2, 24];
+	platform base3 = [76, 21, 20, 2, 24];
+	platform plataformas[4] = [base, base1, base2, base3];
+	//platform plataformas[5];
+
+	obstacles lava = [24, 21, 4, 4, 64];
+	obstacles lava1 = [48, 19, 4, 6, 64];
+	obstacles lava2 = [72, 19, 4, 6, 64];
+	obstacles lava3 = [96, 21, 4, 4, 64];
+	obstacles obstaculos[4] = [lava, lava1, lava2, lava3];
+
+	platform arbolHojas = [104, 18, 8, 4, 32];
+	platform tronco = [106, 22, 4, 3, 96];
+	platform portalFinal = [115, 22, 4, 2, 254];
+	platform elementosFondo[3] = [portalFinal, arbolHojas, tronco];
+
+	background fondo = Forest; 
+	player jugador = [1, 23, 5, wizard];
+
+	int fin[2] = [115, 22];
+
+	//int x = 4;
+
+	method int MiMetodo() {
+		return 0;
+	}
+	
+	axol2D play() {
+		this.MiMetodo();
+		/°while (x < 120) {
+			plataformas[{x}] = [x, 23, 20, 2, 96];
+			x = x + 24;
+		}°/
+		MiPrimerNivel.start(plataformas , obstaculos, jugador, fondo, elementosFondo, fin);
+	}
+}
+
+//Posición en X, Posición en Y, Tamaño en X, Tamaño en Y, Color dígito (0 - 16) * 10
+
