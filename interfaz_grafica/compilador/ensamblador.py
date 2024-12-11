@@ -300,6 +300,8 @@ _COORD ends""")
         obstaculos = self.fnBuscar(self.axol.pop()[1][2])
         plataformas = self.fnBuscar(self.axol.pop()[1][2])
         
+        self.fnDefinirMetodos()
+
         tamaño_Code = len(self.axol)
         self.fnInstrucciones(self.axol,tamaño_Code)
 
@@ -960,7 +962,7 @@ _colores{id_mayusculas}:
             if tamaño_Code < contador + 1:
                 compara = False
                 break
-            print("\tHola", codigo[contador])
+            print(f"hola{codigo[contador]}")
             instruccion = codigo[contador][1]
             terceta = codigo[contador][0]
             signo = instruccion[0]
@@ -1134,12 +1136,21 @@ _colores{id_mayusculas}:
             
             elif signo in ["GO TO"]: #Si es falso
                 self.codigo.append(f"\tJMP _{operando_2[1:-1]}") #Para hacer las comparaciones
+
+            elif signo in ["call"]: #Si es falso
+                self.codigo.append(f"\tcaLL {operando_2}") #Para hacer las comparaciones
             self.codigo.append("") 
             #self.codigo.append(f"\t{self.axol[contador]}")
             contador += 1
         
         self.codigo.append(f"_{terceta+1}:")
     
+    def fnDefinirMetodos(self):
+        for metodo in self.procedimientos:
+            self.codigo.append(f"""\t{metodo.pop(0)[1][0]}:""")
+            self.fnInstrucciones(metodo,len(metodo)-2)
+            self.codigo.append("""\tret""")
+
     #Buscar id
     def fnBuscar(self, busca):
         for id in self.TS_Completa:

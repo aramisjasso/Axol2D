@@ -331,7 +331,7 @@ class Intermedio():
                 #Separación de Parametros
                 self.fnSeparacionDeParametros(parametros[1])
                 #Declaracion Métodos
-                self.pilaCodigo.append((self.idIntruccion,(f'metodo {id}','',self.listaParametros)))
+                self.pilaCodigo.append((self.idIntruccion,(f'{id}','',self.listaParametros)))
                 self.idIntruccion += 1
                 if self.listaParametros !='Error':
                     contenido = metodo[4]
