@@ -15,7 +15,7 @@ import Background;
 			 platform pl7 = [119 , 0 ,   1  , 2     ,  255 ];
 			platform plarreglo2[4] = [pl1, pl2, pl3, pl7];
 
-			obstacles obs [10];
+			obstacles obs [19];
 			
 			obstacles pl4 = [6  ,   7 ,   20  , 10     , 112 ];
             obstacles pl5 = [7  ,   8 ,   20  , 10     ,  128 ];
@@ -28,31 +28,14 @@ import Background;
             player jugador = [   0    ,    0    ,   3  , barbarian   ];
             method int miMetodo1(){
                 a1 = 12;
-                pl1 = [200  ,   200 ,   200  , 200     , 200  ];
-                while ((x<5) & x>1){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    while (x<5){
-                    obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    }
-                }
+                
                 
                 return 0;
             }
 
             method int miMetodo2(){
-                a1 = 12;
-
-                return 0;
-            }  
-            method int miMetodo3(int a1234 , int a21){
-                a1 = 120;
-                a1 = a21;
-                a21 = 21;
-                a1234 = 100;
-                this.miMetodo3(1,12);
-                a21 = a1 + 1;
+                fin[1] = 2;
+				fin[0] = 10;
                 return 0;
             }          
             
@@ -64,11 +47,13 @@ import Background;
                 fin[0] = 1;
 				 fin[1] = 1;
 				x = 0;
-				while (x<=9){
-                    obs[{x}] = [x+50  ,   x+3 ,   2  , 2     ,  64  ];
+				
+				while (x<=20){
+                    obs[{x}] = [x+50  ,   x+3 ,   20  , 2     ,  64  ];
                     //obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
 				x = x +1 ;
                 }
+			this.miMetodo2();
 				//x = 0;
 				 //fin[{x}] = 11%3;
 				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
