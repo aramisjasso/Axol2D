@@ -1,0 +1,54 @@
+import Background;
+        import Players;
+
+
+        level MiPrimerNivel {
+            int x = 0;
+            int y = 1;
+            int a1 = 0;
+            int a3 = 0;
+			int color = 0;
+			int compara = 0;
+			int inicio = 0;
+			int fini = 0;
+                        // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
+           platform barraArriba = [0  ,   3 ,   120  , 1     , 16 ];
+			platform barraAbajo = [0  ,   25 ,   120, 1     , 16 ];
+			platform final = [119  ,   15 ,   1  , 1     , 16 ];
+			platform barrera[2] = [barraArriba, barraAbajo];
+
+			obstacles obs [13];
+            platform elementosFondo[1] = [final];
+            
+            background fondo = River;
+            int fin [2] = [119 , 15 ];
+                           //[inicio x, inicio y, vidas, personaje       ]
+            player jugador = [   0    ,    15    ,   10  , wizard   ];         
+            
+           axol2D play () {
+                a1=2;
+				 x = 0;
+				compara = 0;
+				x=0;
+				while (x<10){
+					compara = x % 2;
+				if (compara ==1){
+                    obs[{x}] = [ 5 + 1 ,    5 + 2*x ,   99  , 1,  color  ];
+				}else{
+					obs[{x}] = [ 5   ,    5 + 2*x ,   99  , 1,  color  ];
+				}
+				x = x +1 ;
+				}
+				
+				obs[{x}] = [ 2+3*y ,   5  ,   1  , 17,  color  ];
+				x = x +1 ;
+				obs[{x}] = [ 105 ,   6  ,   1  , 18,  color  ];
+				x = x +1 ;
+				obs[{x}] = [0 ,   4 ,   120  , 1     ,  color+ 64  ];
+				x = x +1 ;
+				obs[{x}] = [0, 24, 120, 1, color + 64];
+                // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posi�n a llegar)
+                MiPrimerNivel.start(barrera , obs , jugador , fondo ,  elementosFondo,     fin  );
+           }
+        }
+

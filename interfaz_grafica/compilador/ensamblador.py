@@ -870,7 +870,8 @@ _coloresPasto:
     def fnBloques(self, id, tamaño, etiqueta, colision = True, quita_vida = False):
         id_mayusculas = etiqueta.upper()
         self.codigo.append(f"_{id_mayusculas}:")
-        self.codigo.append(f"""\tmov esi, 0; Se carga en memoria el elemento""")
+        self.codigo.append(f"""\txor esi, esi;
+        mov esi, 0; Se carga en memoria el elemento""")
         self.codigo.append(f"\tmov _contador_x, {tamaño}; Cantidad de elementos de el arreglo")
 
         self.codigo.append(f"\n_MAIN_LOOP_{id_mayusculas}:")
@@ -888,17 +889,17 @@ _coloresPasto:
         xor ax, ax
         mov ax, {id}[esi]
         mov _cant_x, ax
-        add si, 2
+        add esi, 2
         
         xor ax, ax
         mov ax, {id}[esi]
         mov _cant_y, ax
-        add si, 2
+        add esi, 2
         
         xor ax, ax
         mov ax, {id}[esi]
         mov _color, al
-        add si, 2
+        add esi, 2
                            
 _{id_mayusculas}_LOOP_y:
         
@@ -912,13 +913,13 @@ _{id_mayusculas}_LOOP_y:
     invoke SetConsoleCursorPosition, _stdoutHandle, eax
 
     ; Modifica el color del caracter y el fondo
-    mov al, _color
-    invoke SetConsoleTextAttribute, _stdoutHandle, al
+    movzx eax, _color
+    invoke SetConsoleTextAttribute, _stdoutHandle, eax
 
     ; Configuraci�n inicial de variables
     xor ecx, ecx
 
-    mov cx, _cant_x       ; N�mero de caracteres a imprimir (2 en este caso)
+    movzx ecx, _cant_x       ; N�mero de caracteres a imprimir (2 en este caso)
 
 _{id_mayusculas}_LOOP_PRINT_x:
     push ecx                 ; Guarda el valor de ecx en la pila
@@ -935,7 +936,7 @@ _{id_mayusculas}_LOOP_PRINT_x:
     add eax, ebx
     mov ebx, eax         ; Guarda el índice inicial en ebx
 
-    mov cx, _cant_x        ; Número de columnas en la fila (120)
+    movzx ecx, _cant_x        ; Número de columnas en la fila (120)
 _colores{id_mayusculas}:
     mov al, _color
     mov byte ptr _matriz_colores[ebx], al   ; Llena la celda actual con color
@@ -949,14 +950,14 @@ _colores{id_mayusculas}:
 
     inc _fil
     sub _cant_y, 1
-    mov cx, _cant_y
+    movzx ecx, _cant_y
     cmp ecx, 0
     
     jnz _{id_mayusculas}_LOOP_y
 
 ;ciclo para resolver arreglo
     sub _contador_x, 1
-    mov cx, _contador_x
+    movzx ecx, _contador_x
     cmp ecx, 0
     jnz _MAIN_LOOP_{id_mayusculas}""")
         
