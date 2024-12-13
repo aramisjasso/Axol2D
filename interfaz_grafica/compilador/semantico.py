@@ -544,22 +544,22 @@ class Semantico():
                         if (valores >= 0 and valores <= 65535):
                             if inMetodo is False:
                                 self.ts[indice][3] = valores
-                        elif valores < 0:
-                            self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
-                            if inMetodo is False:
-                                self.ts[indice][3] = 0
-                        else: 
-                            self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [int] es de 65535. ',line,lexpos])
+                        #elif valores < 0:
+                        #    self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
+                        #    if inMetodo is False:
+                        #        self.ts[indice][3] = 0
+                        #else: 
+                        #    self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [int] es de 65535. ',line,lexpos])
                     elif not isinstance(valores, bool) and isinstance(valores, int) and tipo_id == 'byte':
                         if valores >= 0 and valores <= 255:
                             if inMetodo is False:
                                 self.ts[indice][3] = valores
-                        elif valores < 0:
-                            self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
-                            if inMetodo is False:
-                                self.ts[indice][3] = 0
-                        else: 
-                            self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [byte] es de 255. ',line,lexpos])
+                        # elif valores < 0:
+                        #     self.errores.append([f'Error Semántico (Línea {line}). Axol2D no permite números negativos. El valor de la asignación será redondeado a 0. ',line,lexpos])
+                        #     if inMetodo is False:
+                        #         self.ts[indice][3] = 0
+                        # else: 
+                        #     self.errores.append([f'Error Semántico (Línea {line}). El máximo valor permitido para una variable de tipo [byte] es de 255. ',line,lexpos])
                     elif not isinstance(valores, tuple) and isinstance(valores, str) and re.fullmatch("'[a-zA-ZñÑ0-9]'", valores) and tipo_id == 'char':
                         if inMetodo is False:
                             self.ts[indice][3] = valores

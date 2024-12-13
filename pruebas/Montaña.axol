@@ -2,79 +2,99 @@ import Background;
 import Players; 
 
 level MiPrimerNivel {
-	platform plataformas[1];
-	obstacles obstaculos[1];
+	platform plataformas[10];
+	obstacles obstaculos[8];
 
-	platform portalFinal = [115, 2, 4, 2, 254];
-	platform montana[10]; 
+	//platform portalFinal = [115, 2, 4, 2, 254];
 	
-	platform elementosFondo[1];
+	platform elementosFondo[9];
 
 	background fondo = Mountain; 
-	player jugador = [1, 23, 5, wizard];
+	player jugador = [1, 23, 5, archer];
 
-	int fin[2] = [115, 22];
+	int fin[2] = [80, 4];
 	
 	int i = 0;
-	int x = 4;
-	int y;
-	int tamX;
+	int x = 0;
+	int y = 0;
+	int tamX = 0;
 	int tamY;
-	
-	method int dibujarMontana() {
-		i = 0;
-		elementosFondo[{i}] = [115, 2, 4, 2, 254]; //Portal Final
-		return 0;
-	}
+	int colorMont;
 
-	/°method int agregaPlataformas() {
-		tamX = 20;
+	method int agregarMontanaPlataforma() {
+		tamX = 80;
 		tamY = 2;
-		while (x < 100) {
-			if (i == 0) {
-				y = 23;
-			}
-			else {
-				if (i == 2) {
-					y = 19;
-				}
-				else {
-					y = 21;
-				}
-			}
-			plataformas[{i}] = [x, y, tamX, tamY, 24];
-			x = x + 24;
+		i = 0;
+		x = 40;
+		y = 23;
+		colorMont = 128;
+		while (x < 120) {
+			plataformas[{i}] = [x, y, tamX, tamY, colorMont];
+			x = x + 2;
+			//y = y - 2;
+			//tamX = tamX - 8;
 			i = i + 1;
+
+			if (x > 80) {
+				y = y + 2;
+			} 
+			else {
+				y = y - 2;
+			}
+
+			if (y < 10) {
+				colorMont = 254;
+			}
+			tamX = tamX - 4;
 		}
 
 		return 0;
 	}
 
 	method int agregaObstaculos() {
-		tamX = 4;
-		x = 24;
+		//tamX = 1;
+		x = 39;
 		i = 0;
-		while (x < 100) {
-			if (i == 1 | i == 2) {
-				y = 19;
-				tamY = 6;
-			}
-			else {
-				y = 21;
-				tamY = 4;
-			}
-			obstaculos[{i}] = [x, y, tamX, tamY, 64];
-			x = x + 24;
+		y = 23;
+		//obstaculos[{i}] = [x, y, 1, 2, 64];
+		while (i < 8) {
+			obstaculos[{i}] = [x, y, 1, 2, 0];
+			x = x + 2;
+			y = y - 2;
 			i = i + 1;
 		}
 		return 0;
-	}°/
+	}
+
+	method int dibujarFondo() {
+		tamX = 70;
+		//tamY = 2;
+		i = 0;
+		x = 10;
+		y = 23;
+		colorMont = 112;
+		elementosFondo[{i}] = [80, 2, 4, 2, 238]; //Portal Final
+		while (x < 80) {
+			i = i + 1;
+			elementosFondo[{i}] = [x, y, tamX, 2, colorMont];
+			x = x + 2;
+
+			y = y - 2;
+
+			if (y < 14) {
+				colorMont = 254;
+			}
+			tamX = tamX - 4;
+		}
+		
+		return 0;
+	}
 	
 	
 	axol2D play() {
-		//this.agregaPlataformas();
-		//this.agregaObstaculos();
-		this.dibujarMontana();
+		this.agregarMontanaPlataforma();
+		this.agregaObstaculos();
+		this.dibujarFondo();
 		MiPrimerNivel.start(plataformas , obstaculos, jugador, fondo, elementosFondo, fin);
 	}
 }
