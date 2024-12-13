@@ -2,15 +2,15 @@ import Background;
 import Players; 
 
 level MiPrimerNivel {
-	platform plataformas[4];
-	obstacles obstaculos[4];
+	platform plataformas[1];
+	obstacles obstaculos[1];
 
-	platform arbolHojas = [104, 17, 8, 4, 32];
-	platform tronco = [106, 21, 4, 4, 96];
-	platform portalFinal = [115, 22, 4, 2, 254];
-	platform elementosFondo[3] = [portalFinal, arbolHojas, tronco];
+	platform portalFinal = [115, 2, 4, 2, 254];
+	platform montana[10]; 
+	
+	platform elementosFondo[1];
 
-	background fondo = Forest; 
+	background fondo = Mountain; 
 	player jugador = [1, 23, 5, wizard];
 
 	int fin[2] = [115, 22];
@@ -20,8 +20,14 @@ level MiPrimerNivel {
 	int y;
 	int tamX;
 	int tamY;
+	
+	method int dibujarMontana() {
+		i = 0;
+		elementosFondo[{i}] = [115, 2, 4, 2, 254]; //Portal Final
+		return 0;
+	}
 
-	method int agregaPlataformas() {
+	/°method int agregaPlataformas() {
 		tamX = 20;
 		tamY = 2;
 		while (x < 100) {
@@ -62,12 +68,13 @@ level MiPrimerNivel {
 			i = i + 1;
 		}
 		return 0;
-	}
+	}°/
 	
 	
 	axol2D play() {
-		this.agregaPlataformas();
-		this.agregaObstaculos();
+		//this.agregaPlataformas();
+		//this.agregaObstaculos();
+		this.dibujarMontana();
 		MiPrimerNivel.start(plataformas , obstaculos, jugador, fondo, elementosFondo, fin);
 	}
 }
