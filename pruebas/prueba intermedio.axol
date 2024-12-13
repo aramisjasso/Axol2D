@@ -7,90 +7,77 @@ import Background;
             int y = 1;
             int a1 = 0;
             int a3 = 0;
-            string b = "cadena";
+			int color = 0;
+			int compara = 0;
+			int inicio = 0;
+			int fini = 0;
                         // [Tam_x, Tam_y, posi_x, posi_y,  R   ,  G   ,  B  ]
-            platform pl1 = [0  ,   1 ,   20  , 10     , 16 ];
-            platform pl2 = [1  ,   2 ,   20  , 10     ,  32 ];
-            platform pl3 = [2  ,   3 ,   20  , 10     ,  48 ];
-			 platform pl7 = [119 , 0 ,   1  , 2     ,  255 ];
-			platform plarreglo2[4] = [pl1, pl2, pl3, pl7];
+           platform barraArriba = [0  ,   3 ,   120  , 1     , 16 ];
+			platform barraAbajo = [0  ,   24 ,   120, 1     , 16 ];
+			platform final = [119  ,   15 ,   1  , 1     , 16 ];
+			platform barrera[2] = [barraArriba, barraAbajo];
 
-			obstacles obs [19];
-			
-			obstacles pl4 = [6  ,   7 ,   20  , 10     , 112 ];
-            obstacles pl5 = [7  ,   8 ,   20  , 10     ,  128 ];
-            obstacles pl6 = [8  ,   9 ,   20  , 10     ,  144 ];
-            platform plarreglo[3] = [ pl4 ,pl5,pl6];
+			obstacles obs [41];
+            platform elementosFondo[1] = [final];
             
-            background fondo = Ocean;
-            int fin [2] = [119 , 0 ];
+            background fondo = Cave;
+            int fin [2] = [119 , 15 ];
                            //[inicio x, inicio y, vidas, personaje       ]
-            player jugador = [   0    ,    0    ,   3  , barbarian   ];
-            method int miMetodo1(){
-                a1 = 12;
-                
-                
+            player jugador = [   0    ,    15    ,   10  , wizard   ];
+
+            method int laberinto1(){
+					x=0;
+			while (x<39){
+				if (x % 2  == 1){
+                    obs[{x}] = [x*3 +3 ,   5 ,   1  , 17,  64  ];
+					}else{
+						obs[{x}] = [x*3 +3 ,   6 ,   1  , 17     ,  64  ];
+					}
+				x = x +1 ;
+			}
+				obs[{x}] = [0 ,   4 ,   120  , 1     ,  64  ];
+				x = x +1 ;
+				obs[{x}] = [0, 23, 120, 1, 64];
                 return 0;
             }
-
-            method int miMetodo2(){
-                fin[1] = 2;
-				fin[0] = 10;
+			method int laberinto2(){
+				inicio = 0;
+				fini = 10;
+                fin[0] = inicio;
+				fin[1] = fini;
+					x=0;
+			while (x<39){
+				if (x % 2  == 1){
+                    obs[{x}] = [x*3 +3 ,   5 ,   1  , 17,  color  ];
+					}else{
+						obs[{x}] = [x*3 +3 ,   6 ,   1  , 17     ,  color  ];
+					}
+				x = x +1 ;
+			}
+				obs[{x}] = [0 ,   4 ,   120  , 1     ,  color  ];
+				x = x +1 ;
+				obs[{x}] = [0, 23, 120, 1, color];
+				x = 0;
+				elementosFondo[{x}] = [inicio,fini, 1,1 ,color];
+				jugador[0] = 119;
+				jugador[1] = fini;
+				jugador[2] = 20;
+				fin[0] = 15;
+fin[1] = 15;
                 return 0;
-            }          
+            }         
             
            axol2D play () {
                 a1=2;
-                b = "a";
 				 x = 0;
-                fin[0] = a1;
-                fin[0] = 1;
-				 fin[1] = 1;
-				x = 0;
-				
-				while (x<=20){
-                    obs[{x}] = [x+50  ,   x+3 ,   20  , 2     ,  64  ];
-                    //obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-				x = x +1 ;
-                }
-			this.miMetodo2();
-				//x = 0;
-				 //fin[{x}] = 11%3;
-				//obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-				//obs[0] = [9  ,   10 ,   20  , 10     ,  96 ];
-               // this.miMetodo3(a1,a1);
-               /°while ((x<5)){
-                    //obs[{x}] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    obs[0] = [110  ,   20 ,   20  , 10     ,  0  ];
-                    
-                }
-
-                if (x>5){
-                    a1=122;
-                    if (x>5){
-                    a1=122;
-                    a1=0;
-                }
-                    a1=0;
-                }else {
-                    a1=0;
-                }
-                
-                switch (a1){
-                    case 1:
-                        a1=0;
-                    break;
-
-                    case 2:
-                        a1=100-1;
-                    break;
-                    
-                    default:
-                        a1=10;
-                }
-
-                a1 = this.miMetodo3(123,2);°/
+				compara = 0;
+				if (compara == 1){
+					this.laberinto1();
+				}else{
+					color = 255;
+					this.laberinto2();
+				}
                 // (Fila_pla, fila_obs ,Jugador, Fondo ,  elementos_fondo, Posiï¿½n a llegar)
-                MiPrimerNivel.start(plarreglo , obs , jugador , fondo ,  plarreglo2,     fin  );
+                MiPrimerNivel.start(barrera , obs , jugador , fondo ,  elementosFondo,     fin  );
            }
         }

@@ -1067,7 +1067,7 @@ class Intermedio():
                 x[1] = 0
             elif tipo in ['boolean','char','byte',('arreglo', 'char'),('matriz', 'char'),('arreglo', 'byte'),('matriz', 'byte'),('arreglo', 'boolean'),('matriz', 'boolean')]:
                 x[1] = 1
-            elif tipo in ['int','platform', 'obstacles',('arreglo', 'obstacles'),('arreglo', 'int'),('arreglo', 'platform'),('matriz', 'int')]:
+            elif tipo in ['int','platform','player', 'obstacles',('arreglo', 'obstacles'),('arreglo', 'int'),('arreglo', 'platform'),('matriz', 'int')]:
                 x[1] = 2
             elif tipo in ['string',('arreglo', 'string'),('matriz', 'string')]:
                 x[1] = 50
@@ -1155,7 +1155,7 @@ class Intermedio():
                         id_guardar = f'{id}[({self.idIntruccion-1})]'
                         self.evaluar_pila(self.pila_semantica)
                     else:
-                        id_guardar = f'{id},{x1*tamanoFila}'
+                        id_guardar = f'{id}[{x1*tamanoFila}]'
                     self.postorden(fila[x1])
                     valor_x=self.evaluar_pila(self.pila_semantica)
                     if len(self.pila_semantica)!=1:
@@ -1175,7 +1175,7 @@ class Intermedio():
                     tamanoFila=self.fnEcontrarTamano(id)
                     self.pilaCodigo.append((self.idIntruccion,('*',tamanoFila,id_3)))
                     self.idIntruccion+=1
-                    id_guardar = f'{id},[({self.idIntruccion-1})]'
+                    id_guardar = f'{id}[({self.idIntruccion-1})]'
                     self.pilaCodigo.append((self.idIntruccion,('=',valores,id_guardar)))
                 else:  
                     self.pilaCodigo.append((self.idIntruccion,('=',valores,id)))
